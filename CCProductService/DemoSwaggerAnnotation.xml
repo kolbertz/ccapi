@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CCProductService</name>
+    </assembly>
+    <members>
+        <member name="F:CCProductService.DTOs.Enums.ProductType.DefaultProduct">
+            <summary>
+            0 = DefaultProduct / null / Standard Artikel
+            </summary>
+        </member>
+        <member name="F:CCProductService.DTOs.Enums.ProductType.MenuProduct">
+            <summary>
+            1 = MenuProduct / Speiseplan Artikel mit täglich wechselnden Texten und Bildern
+            </summary>
+        </member>
+        <member name="F:CCProductService.DTOs.Enums.ProductType.Deposit">
+            <summary>
+            2 = Deposit / Pfand
+            </summary>
+        </member>
+        <member name="F:CCProductService.DTOs.Enums.ProductType.Discount">
+            <summary>
+            3 = Discount / Subventionsartikel
+            </summary>
+        </member>
+    </members>
+</doc>
