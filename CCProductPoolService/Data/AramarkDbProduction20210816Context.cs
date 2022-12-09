@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using CCProductPoolService.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace CCProductPoolService.Data;
 
 public partial class AramarkDbProduction20210816Context : DbContext
 {
-    public AramarkDbProduction20210816Context()
-    {
-    }
-
     public AramarkDbProduction20210816Context(DbContextOptions<AramarkDbProduction20210816Context> options)
         : base(options)
     {
@@ -20,11 +18,6 @@ public partial class AramarkDbProduction20210816Context : DbContext
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductPool> ProductPools { get; set; }
-    public IDbConnection Connection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=tcp:ccdemo-dbserver.database.windows.net,1433;Initial Catalog=AramarkDbProduction_20210816;Persist Security Info=False;User ID=Demo;Password=js4ACAKsw5Gf2B5F;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

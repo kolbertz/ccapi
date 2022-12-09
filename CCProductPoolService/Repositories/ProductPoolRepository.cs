@@ -47,16 +47,12 @@ namespace CCProductPoolService.Repositories
             return _readDbContext.Connection.ExecuteScalarAsync<Guid>(query, param: pool);
         }
 
-        public async Task UpdateProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim)
+        public Task<int> UpdateProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim)
         {
-            ProductPool pool = await _dbContext.ProductPools.Where(pool => pool.Id == productPool.Id).FirstOrDefaultAsync();
-            if (pool != null)
-            {
-                pool.MergeProductPool(productPool);
-                pool.LastUpdatedDate= DateTimeOffset.Now;
-                pool.LastUpdatedUser = userClaim.UserId;
-                await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            }
+            ProductPool pool = new ProductPool(productPool);
+            pool.LastUpdatedDate = DateTimeOffset.Now;
+            pool.LastUpdatedUser = userClaim.UserId;
+            return Update(pool);
         }
 
         public async Task<ProductPoolDto> PatchProductPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
@@ -69,20 +65,25 @@ namespace CCProductPoolService.Repositories
                 pool.MergeProductPool(productPoolDto);
                 pool.LastUpdatedDate= DateTimeOffset.Now;
                 pool.LastUpdatedUser = userClaim.UserId;
-                await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-                return productPoolDto;
+                if (await Update(pool).ConfigureAwait(false) > 0)
+                {
+                    return productPoolDto;
+                }
             }
             return null;
         }
 
-        public async Task DeleteProductPoolAsync(Guid id)
+        private Task<int> Update(ProductPool pool)
         {
-            ProductPool productPool = await _dbContext.ProductPools.Where(pool => pool.Id == id).FirstOrDefaultAsync().ConfigureAwait(false);
-            if (productPool != null)
-            {
-                _dbContext.ProductPools.Remove(productPool);
-                await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(!false);
-            }
+            var query = "UPDATE ProductPool Set ProductPoolKey = @ProductPoolKey, [Name] = @Name, Description = @Description, ParentProductPoolId = @ParentProductPoolId, " +
+                "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser WHERE Id = @Id";
+            return _readDbContext.Connection.ExecuteAsync(query, param: pool);
+        }
+
+        public Task<int> DeleteProductPoolAsync(Guid id)
+        {
+            var query = "DELETE FROM ProductPool WHERE Id = @Id";
+            return _readDbContext.Connection.ExecuteAsync(query, param: new { Id = id });
         }
     }
 }

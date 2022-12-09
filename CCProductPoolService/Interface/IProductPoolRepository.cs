@@ -12,10 +12,10 @@ namespace CCProductPoolService.Interface
 
         Task<Guid> AddProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim);
 
-        Task UpdateProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim);
+        Task<int> UpdateProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim);
 
         Task<ProductPoolDto> PatchProductPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
 
-        Task DeleteProductPoolAsync(Guid id);
+        Task<int> DeleteProductPoolAsync(Guid id);
     }
 }

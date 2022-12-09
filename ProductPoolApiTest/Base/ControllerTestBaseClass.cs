@@ -13,11 +13,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using CCProductPoolService.Repositories;
 using CCProductPoolService.DapperDbConnection;
+using System.Data.Common;
 
 namespace ProductPoolApiTest
 {
     public class ControllerTestBaseClass
     {
+        protected Guid systemSettingsId = new Guid("fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
+
         protected WebApplicationFactory<Program> GetWebApplication()
         {
             var inMemorySettings = new Dictionary<string, string>
@@ -36,12 +39,20 @@ namespace ProductPoolApiTest
                     {
                         services.Remove(oldOptions);
                     }
+                    var dbConnectionDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection));
+                    if (dbConnectionDescriptor != null)
+                    {
+                        services.Remove(dbConnectionDescriptor);
+                    }
                     var options = new DbContextOptionsBuilder<AramarkDbProduction20210816Context>()
                     .UseSqlServer(configuration.GetConnectionString("AramarkStaging"))
                                     .Options;
                     services.AddSingleton<IConfiguration>(configuration);
                     services.AddSingleton(options);
                     services.AddSingleton<AramarkDbProduction20210816Context>();
+                    services.AddSingleton<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
+                    services.AddSingleton<IApplicationReadDbConnection, ApplicationReadDbConnection>();
+                    services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));
                     services.AddAuthorization(config => {
@@ -61,14 +72,25 @@ namespace ProductPoolApiTest
             return client;
         }
 
-        protected async Task PopulateDatabase(string commandText, AramarkDbProduction20210816Context ctx, IDbContextTransaction transaction)
+        protected async Task PopulateDatabase(string commandText, DbContext ctx, IDbContextTransaction transaction)
         {
             var conn = ctx.Database.GetDbConnection();
             using (var cmd = conn.CreateCommand())
             {
                 cmd.Transaction = transaction.GetDbTransaction();
                 cmd.CommandText = commandText;
-                await cmd.ExecuteNonQueryAsync();
+                int result = await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        protected async Task<Guid> PopulateDatabaseAndReturnIdentity(string commandText, DbContext ctx, IDbContextTransaction transaction)
+        {
+            var conn = ctx.Database.GetDbConnection();
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.Transaction = transaction.GetDbTransaction();
+                cmd.CommandText = commandText;
+                return (Guid)await cmd.ExecuteScalarAsync();
             }
         }
     }

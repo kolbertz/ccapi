@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CCProductPoolService.Controllers
 {
@@ -35,60 +36,113 @@ namespace CCProductPoolService.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Post(ProductPoolDto productPoolDto)
         {
-            Guid? poolId = null;
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+                Guid? poolId = null;
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                poolId = await _serviceProvider.GetService<IProductPoolRepository>().AddProductPoolAsync(productPoolDto, userClaim);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{poolId}"), null);
             }
-            poolId = await _serviceProvider.GetService<IProductPoolRepository>().AddProductPoolAsync(productPoolDto, userClaim);
-            return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{poolId}"), null);
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPut]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Put(Guid id, ProductPoolDto productPoolDto)
         {
-            if (id != productPoolDto.Id)
+            try
             {
-                return BadRequest();
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+                if (id != productPoolDto.Id)
+                {
+                    return BadRequest("The id inside the body do not match the query parameter");
+                }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
+                return Ok();
             }
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            catch (Exception ex)
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                return StatusCode(500);
             }
-            await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
-            return Ok();
         }
 
         [HttpPatch]
         [Route("{id}")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPoolPatch)
         {
-            ProductPoolDto productPoolDto = null;
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                ProductPoolDto productPoolDto = null;
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().PatchProductPoolAsync(id, productPoolPatch, userClaim).ConfigureAwait(false);
+                if (productPoolDto != null)
+                {
+                    return Ok(productPoolDto);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().PatchProductPoolAsync(id, productPoolPatch, userClaim).ConfigureAwait(false);
-            return Ok(productPoolDto);
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                if (await _serviceProvider.GetService<IProductPoolRepository>().DeleteProductPoolAsync(id).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            await _serviceProvider.GetService<IProductPoolRepository>().DeleteProductPoolAsync(id).ConfigureAwait(false);
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }
