@@ -87,3 +87,4 @@ C:\Users\KaiOlbertz\source\repos\CCProductService\CCProductService\bin\Debug\net
 C:\Users\KaiOlbertz\source\repos\CCProductService\CCProductService\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\KaiOlbertz\source\repos\CCProductService\CCProductService\bin\Debug\net7.0\Newtonsoft.Json.Bson.dll
 C:\Users\KaiOlbertz\source\repos\CCProductService\CCProductService\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\KaiOlbertz\source\repos\CCProductService\CCProductService\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll

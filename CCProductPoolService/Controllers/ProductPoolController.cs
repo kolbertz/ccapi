@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace CCProductPoolService.Controllers
 {
@@ -24,6 +27,18 @@ namespace CCProductPoolService.Controllers
         [HttpGet]
         public Task<IReadOnlyList<ProductPoolDto>> Get()
         {
+    //        var tokenDescriptor = new SecurityTokenDescriptor
+    //        {
+    //            Subject = new ClaimsIdentity(new Claim[]
+    // { new Claim("listName", list != null ? JsonSerializer.Serialize(user.RoleName) : string.Empty,JsonClaimValueTypes.JsonArray)
+    //}}
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+            IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>();
+            productPoolRepository.Init(userClaim.TenantDatabase);
             return _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync();
         }
 

@@ -8,5 +8,7 @@
         public string Code { get; set; }
         public string Nonce { get; set; }
         public IList<string> RequestedScopes { get; set; }
+        public Guid SystemSettingId { get; set; }
+        public string TenantDatabase { get; set; }
     }
 }

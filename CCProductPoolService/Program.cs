@@ -2,17 +2,27 @@ using CCProductPoolService.DapperDbConnection;
 using CCProductPoolService.Data;
 using CCProductPoolService.Interface;
 using CCProductPoolService.Repositories;
+using IdentityModel.AspNetCore.OAuth2Introspection;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
 
 public class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        IdentityModelEventSource.ShowPII = true;
         ConfigurationManager configuration = builder.Configuration;
 
         // Add services to the container.
@@ -28,7 +38,8 @@ public class Program
                 Description = "This is an CashControl ProductPool Service with Dapper and EF Core as ORM Mapper"
             });
             c.EnableAnnotations();
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+
+            c.AddSecurityDefinition("cclive", new OpenApiSecurityScheme()
             {
                 Name = "Authorization",
                 Type = SecuritySchemeType.OAuth2,
@@ -40,7 +51,7 @@ public class Program
                         AuthorizationUrl = new Uri(@"https://staging-signin.cashcontrol.com/OAuth/Authorize"),
                     }
                 },
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                Scheme = "monolithAuth",
                 In = ParameterLocation.Header,
                 Description = "JSON Web Token based security"
             });
@@ -53,24 +64,55 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
+                            Id = "cclive"
                         }
                     },
                     new string[] {}
                 }
                     });
+
+            c.AddSecurityDefinition("ccauthService", new OpenApiSecurityScheme()
+            {
+                Name = HeaderNames.Authorization,
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new OpenApiOAuthFlow
+                    {
+                        TokenUrl = new Uri(@"https://localhost:7092/Home/token"),
+                        AuthorizationUrl = new Uri(@"https://localhost:7092/Home/Authorize"),
+                    }
+                },
+                Scheme = "gloabalAuth",
+                In = ParameterLocation.Header,
+                Description = "JSON Web Token based security"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "ccauthService"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
         });
 
         builder.Services.AddDbContext<AramarkDbProduction20210816Context>(options =>
             options.UseSqlServer(configuration.GetConnectionString("AramarkStaging")));
-        //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetService<AramarkDbProduction20210816Context>());
         builder.Services.AddScoped<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
         builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();
         builder.Services.AddScoped<IProductPoolRepository, ProductPoolRepository>();
 
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        .AddJwtBearer("monolithAuth", options =>
         {
             options.Audience = "all";
             options.ClaimsIssuer = "localhost";
@@ -90,14 +132,43 @@ public class Program
                 ValidAudience = configuration["TokenAuthentication:Audience"],
                 IssuerSigningKey = signingKey
             };
-        });
+        }).AddJwtBearer("gloabalAuth", options =>
+            {
+                options.Audience = "all";
+                options.ClaimsIssuer = "localhost";
+                options.Authority = "https://localhost:7092";
+                options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
+                {
+                //AuthorizationEndpoint = @"https://localhost:7092/Home/Authorize\",
+                            TokenEndpoint = @"https://localhost:7092/Home/Token",
+                        };
+                        options.RequireHttpsMetadata = false;
+                        SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateAudience = true,
+                            ValidateIssuer = true,
+                            ValidateIssuerSigningKey = false,
+                            ValidateActor = false,
+                            ValidateLifetime = false,
+                            ValidateTokenReplay = false,
+                            ValidIssuer = configuration["TokenAuthentication:Issuer"],
+                            ValidAudience = configuration["TokenAuthentication:Audience"],
+                            IssuerSigningKey = signingKey,
+                            SignatureValidator = delegate (string token, TokenValidationParameters validationParameters)
+                            {
+                                var jwt = new JwtSecurityToken(token);
+                                return jwt;
+                            }
+                        };
+                    });
 
 
         builder.Services.AddAuthorization(options =>
         {
             options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                .AddAuthenticationSchemes("monolithAuth", "gloabalAuth")
                 .Build();
         });
 
@@ -113,6 +184,10 @@ public class Program
             opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
             opt.OAuthUsePkce();
         });
+        app.UseCors(builder => builder
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

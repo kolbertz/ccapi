@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "+lnSDBeRobGcXk20/DIu5g3EoPd2J21lFOz89WHrM3O0prgnBqayIdrqEJ7IAjSrGR8SUMNs1n3cW5QiBhBdtA==",
+  "dgSpecHash": "vo7YPHb5DkJn7h1VypwTs05DIA7U+GcQxF/efIaBwUo95y0fMYXqKYAZfx+O5D3yrdo806ZxWQZfMEjDNYBJ5A==",
   "success": true,
   "projectFilePath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
   "expectedPackageFiles": [
@@ -12,10 +12,13 @@
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\dapper.contrib\\2.0.78\\dapper.contrib.2.0.78.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\fakeiteasy\\7.3.1\\fakeiteasy.7.3.1.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\identitymodel\\5.2.0\\identitymodel.5.2.0.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\identitymodel.aspnetcore.oauth2introspection\\6.1.0\\identitymodel.aspnetcore.oauth2introspection.6.1.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.0.0\\microsoft.aspnetcore.authentication.2.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.0.0\\microsoft.aspnetcore.authentication.abstractions.2.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.core\\2.0.0\\microsoft.aspnetcore.authentication.core.2.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.0\\microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\7.0.1\\microsoft.aspnetcore.authentication.openidconnect.7.0.1.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\2.0.0\\microsoft.aspnetcore.cryptography.internal.2.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.dataprotection\\2.0.0\\microsoft.aspnetcore.dataprotection.2.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.dataprotection.abstractions\\2.0.0\\microsoft.aspnetcore.dataprotection.abstractions.2.0.0.nupkg.sha512",

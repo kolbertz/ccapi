@@ -6,6 +6,7 @@ namespace CCProductPoolService.Interface
 {
     public interface IProductPoolRepository
     {
+        void Init(string database);
         Task<IReadOnlyList<ProductPoolDto>> GetProductPoolsAsync();
 
         Task<ProductPoolDto> GetProductPoolByIdAsync(Guid id);

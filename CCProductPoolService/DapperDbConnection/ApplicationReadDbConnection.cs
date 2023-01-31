@@ -1,6 +1,5 @@
 ﻿using CCProductPoolService.Interface;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -9,10 +8,16 @@ namespace CCProductPoolService.DapperDbConnection
     public class ApplicationReadDbConnection : IApplicationReadDbConnection, IDisposable
     {
         public IDbConnection Connection { get; private set; }
+        private IConfiguration _configuration;
 
         public ApplicationReadDbConnection(IConfiguration configuration)
         {
-            Connection = new SqlConnection(configuration.GetConnectionString("AramarkStaging"));
+            _configuration = configuration;
+        }
+         
+        public void Init(string database)
+        {
+            Connection = new SqlConnection(_configuration.GetConnectionString(database));
         }
 
         public void Dispose()

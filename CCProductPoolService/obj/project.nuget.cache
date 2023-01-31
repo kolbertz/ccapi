@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7BXE7hfmFccR8ZGP49Uedy3eVAQol864NSIK+J9hRrWXg5IyMVC/XvGzYW68F2Tp9MTtfLUO/YjV5BRwLkOjmw==",
+  "dgSpecHash": "Y5KXDchBRw5Q7wQfIlLcW8BqMXn4ABRl3Y80ndH5fZlKwhXLUaKkKBlXs2tEuLPG8ZP+5pfV/HAUsfJiWZvKrw==",
   "success": true,
   "projectFilePath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCProductPoolService\\CCProductPoolService.csproj",
   "expectedPackageFiles": [
@@ -9,7 +9,10 @@
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\dapper.contrib\\2.0.78\\dapper.contrib.2.0.78.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\identitymodel\\5.2.0\\identitymodel.5.2.0.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\identitymodel.aspnetcore.oauth2introspection\\6.1.0\\identitymodel.aspnetcore.oauth2introspection.6.1.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.0\\microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\7.0.1\\microsoft.aspnetcore.authentication.openidconnect.7.0.1.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\7.0.0\\microsoft.aspnetcore.jsonpatch.7.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\7.0.0\\microsoft.aspnetcore.mvc.newtonsoftjson.7.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.0\\microsoft.aspnetcore.openapi.7.0.0.nupkg.sha512",

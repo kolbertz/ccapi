@@ -1,4 +1,5 @@
 ﻿using CCAuthServer.Models;
+using CCAuthServer.OauthRequest;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Concurrent;
 using System.Security.Claims;
@@ -13,17 +14,15 @@ namespace CCAuthServer.Services.CodeService
         // Here I genrate the code for authorization, and I will store it 
         // in the Concurrent Dictionary
 
-        public string GenerateAuthorizationCode(string clientId, IList<string> requestedScope)
+        public string GenerateAuthorizationCode(Client client, IList<string> requestedScope)
         {
-            var client = _clientStore.Clients.Where(x => x.ClientId == clientId).FirstOrDefault();
-
             if (client != null)
             {
                 var code = Guid.NewGuid().ToString();
 
                 var authoCode = new AuthorizationCode
                 {
-                    ClientId = clientId,
+                    ClientId = client.ClientId,
                     RedirectUri = client.RedirectUri,
                     RequestedScopes = requestedScope,
                 };
@@ -58,10 +57,11 @@ namespace CCAuthServer.Services.CodeService
         // Before updated the Concurrent Dictionary I have to Process User Sign In,
         // and check the user credienail first
         // But here I merge this process here inside update Concurrent Dictionary method
-        public AuthorizationCode UpdatedClientDataByCode(string key, IList<string> requestdScopes,
-            string userName, string password = null, string nonce = null)
+        public AuthorizationCode UpdatedClientDataByCode(OpenIdConnectLoginRequest loginRequest)
         {
-            var oldValue = GetClientDataByCode(key);
+            //loginRequest.Code, loginRequest.RequestedScopes,
+            //        loginRequest.UserName, nonce: loginRequest.Nonce, systemSettingsId: loginRequest.SystemSettingId
+            var oldValue = GetClientDataByCode(loginRequest.Code);
 
             if (oldValue != null)
             {
@@ -70,28 +70,34 @@ namespace CCAuthServer.Services.CodeService
 
                 if (client != null)
                 {
-                    var clientScope = (from m in client.AllowedScopes
-                                       where requestdScopes.Contains(m)
-                                       select m).ToList();
+                    if (loginRequest.RequestedScopes != null)
+                    {
+                        var clientScope = (from m in client.AllowedScopes
+                                           where loginRequest.RequestedScopes.Contains(m)
+                                           select m).ToList();
 
-                    if (!clientScope.Any())
-                        return null;
+                        if (!clientScope.Any())
+                            return null;
+                    }
+
+
 
                     AuthorizationCode newValue = new AuthorizationCode
                     {
                         ClientId = oldValue.ClientId,
                         CreationTime = oldValue.CreationTime,
-                        IsOpenId = requestdScopes.Contains("openId") || requestdScopes.Contains("profile"),
+                        IsOpenId = true,// requestdScopes.Contains("openId") || requestdScopes.Contains("profile"),
                         RedirectUri = oldValue.RedirectUri,
-                        RequestedScopes = requestdScopes,
-                        Nonce = nonce
+                        RequestedScopes = loginRequest.RequestedScopes,
+                        Nonce = loginRequest.Nonce,
                     };
 
 
                     // ------------------ I suppose the user name and password is correct  -----------------
                     var claims = new List<Claim>();
 
-
+                    claims.Add(new Claim("Tenant", loginRequest.SystemSettingId.ToString()));
+                    claims.Add(new Claim("TenantDatabase", loginRequest.TenantDatabase));
 
                     if (newValue.IsOpenId)
                     {
@@ -104,7 +110,7 @@ namespace CCAuthServer.Services.CodeService
                     newValue.Subject = new ClaimsPrincipal(claimIdentity);
                     // ------------------ -----------------------------------------------  -----------------
 
-                    var result = _codeIssued.TryUpdate(key, newValue, oldValue);
+                    var result = _codeIssued.TryUpdate(loginRequest.Code, newValue, oldValue);
 
                     if (result)
                         return newValue;

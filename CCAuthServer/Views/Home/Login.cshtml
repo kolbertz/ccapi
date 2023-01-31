@@ -18,6 +18,8 @@
             <input type="hidden" name="RedirectUri" value="@Model.RedirectUri"/>
             <input type="hidden" name="Code" value="@Model.Code" />
             <input type="hidden" name="Nonce" value="@Model.Nonce"/>
+            <input type="hidden" name="SystemSettingId"/>
+            <input type="hidden" name="TenantDatabase"/>
 
             @for (int i = 0; i < Model.RequestedScopes.Count; i++)
             {
@@ -31,15 +33,67 @@
                 <input type="text" name="UserName" class="form-control" />
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2" id="nextBtn">
+                <button type="button" id="next" class="btn btn-primary">Weiter</button>
+            </div>
+
+            <div class="col-md-6 dropdown mt-2">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="systemSettings" data-toggle="dropdown" aria-expanded="false">System wählen</button>
+                <ul class="dropdown-menu" aria-labelledby="systemSettings">
+
+                </ul>
+            </div>
+
+            <div class="col-md-6" id="password">
                 <label>Password</label>
                 <input type="text" name="Password" class="form-control" />
             </div>
 
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2" id="submitBtn">
                 <input type="submit" value="Login" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
+
+                <script>
+                    $(document).ready(function() {
+
+                        $('.dropdown').hide();
+                        $('#password').hide();
+                        $('#submitBtn').hide();
+
+                        $('#next').click(function() {
+                            var username = $('input[name="UserName"]').val();
+                            $.ajax({
+                                type: "GET",
+                                url: "/Home/GetSystems",
+                                data: {username : username},
+                                success: function(data) {
+                                    $('#nextBtn').hide();
+                                    var s = '';
+                                    for (var i = 0; i < data.length; i++) {
+                                        console.log(data[i]);
+                                        s += '<li><a class="dropdown-item" href="#" db="' + data[i].tenantDatabase + '" sysId="' + data[i].tenantId + '">' + data[i].tenantName + '</a></li>';
+                                    }
+                                    $('.dropdown-menu').html(s);
+                                    $('#systemSettings').dropdown();
+
+                                                            $('.dropdown-item').on('click',  function(){
+                                                                var btnObj = $(this).parent().parent().siblings('button');
+                                                                $(btnObj).text($(this).text());
+                                                                $(btnObj).val($(this).text());
+                                                                $('input[name="SystemSettingId"]').val($(this).attr('sysId'));
+                                                                $('input[name="TenantDatabase"]').val($(this).attr('db'));
+                                                                $('#password').show();
+                                                                $('#submitBtn').show();
+                                                            });
+
+
+                                    $('.dropdown').show();
+                                }
+                            });
+                        });
+                    });
+                </script>

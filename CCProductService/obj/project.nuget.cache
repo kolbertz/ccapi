@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7IRadEFMtDUpbpctkHDtpMJ0RHClz7c8Y6cRBebWMhZVoXh+nrqo5dSygoafNdbaHtKxu0u5NPDa8L+g2OT5Lw==",
+  "dgSpecHash": "EPSj/FQQ4cK0eyAw3vzSNvBMoqr2LNaXEl/LT1BNrIb5Ec5bQGxb7a0AdKykboFyQ9WzpDhV9HP9EXrCIlvLqg==",
   "success": true,
   "projectFilePath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCProductService\\CCProductService.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.0\\microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512",
+    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\7.0.1\\microsoft.aspnetcore.authentication.openidconnect.7.0.1.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\7.0.0\\microsoft.aspnetcore.jsonpatch.7.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\7.0.0\\microsoft.aspnetcore.mvc.newtonsoftjson.7.0.0.nupkg.sha512",
     "C:\\Users\\KaiOlbertz\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.0\\microsoft.aspnetcore.openapi.7.0.0.nupkg.sha512",

@@ -10,6 +10,7 @@
         "dependencies": {
           "Dapper": "2.0.123",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "7.0.0",
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "7.0.1",
           "Microsoft.AspNetCore.JsonPatch": "7.0.0",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "7.0.0",
           "Microsoft.AspNetCore.OpenApi": "7.0.0",
@@ -84,6 +85,17 @@
           "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
             "assemblyVersion": "7.0.0.0",
             "fileVersion": "7.0.22.51819"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.OpenIdConnect/7.0.1": {
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.21.0"
+        },
+        "runtime": {
+          "lib/net7.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll": {
+            "assemblyVersion": "7.0.1.0",
+            "fileVersion": "7.0.122.56809"
           }
         }
       },
@@ -858,6 +870,13 @@
       "sha512": "sha512-q2suMVl1gO6rBJkV7rxm0F2sBufValm2RKxY3zoWN4y6cAufDJYmzpLWPKju3kKFJFKNgivWgoTw0dvf4W5QDQ==",
       "path": "microsoft.aspnetcore.authentication.jwtbearer/7.0.0",
       "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.OpenIdConnect/7.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HTEPkaslzcrlMnqwc08yoU0TU5lNmgWVWgRsPJomvMbKzNozf3acsvA2hAeFVDHoJNBZmJm7Jhy3+pHmbzK0uQ==",
+      "path": "microsoft.aspnetcore.authentication.openidconnect/7.0.1",
+      "hashPath": "microsoft.aspnetcore.authentication.openidconnect.7.0.1.nupkg.sha512"
     },
     "Microsoft.AspNetCore.JsonPatch/7.0.0": {
       "type": "package",

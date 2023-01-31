@@ -7,8 +7,8 @@
             new Client
             {
                 ClientName = "platformnet .Net 6",
-                ClientId = "platformnet6",
-                ClientSecret = "123456789",
+                ClientId = "CCLive",
+                ClientSecret = "BYAmz*d4T3a!aucDdwD^K!8^Y2xTGg-Dr",
                 AllowedScopes = new[]{ "openid", "profile"},
                 GrantType = GrantTypes.Code,
                 IsActive = true,

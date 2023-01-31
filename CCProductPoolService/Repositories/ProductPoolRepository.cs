@@ -22,6 +22,11 @@ namespace CCProductPoolService.Repositories
             _writeDbContext = writeDbConnection;
         }
 
+        public void Init(string database)
+        {
+            _readDbContext.Init(database);
+        }
+
         public Task<IReadOnlyList<ProductPoolDto>> GetProductPoolsAsync()
         {
 
