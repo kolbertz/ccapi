@@ -14,7 +14,7 @@ namespace CCProductService.Controller
 {
     [Route("api/v2/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ProductsController : ControllerBase
     {
         private IServiceProvider _serviceProvider;

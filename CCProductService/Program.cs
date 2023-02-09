@@ -27,37 +27,37 @@ internal class Program
                 Description = "This is an CashControl Product Service using Microsofts Minimal API with Dapper and EF Core as ORM Mapper"
             });
             c.EnableAnnotations();
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        TokenUrl = new Uri(@"https://staging-signin.cashcontrol.com/OAuth/token"),
-                        AuthorizationUrl = new Uri(@"https://staging-signin.cashcontrol.com/OAuth/Authorize"),
-                    }
-                },
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
-                In = ParameterLocation.Header,
-                Description = "JSON Web Token based security"
-            });
+            //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+            //{
+            //    Name = "Authorization",
+            //    Type = SecuritySchemeType.OAuth2,
+            //    Flows = new OpenApiOAuthFlows
+            //    {
+            //        AuthorizationCode = new OpenApiOAuthFlow
+            //        {
+            //            TokenUrl = new Uri(@"https://staging-signin.cashcontrol.com/OAuth/token"),
+            //            AuthorizationUrl = new Uri(@"https://staging-signin.cashcontrol.com/OAuth/Authorize"),
+            //        }
+            //    },
+            //    Scheme = JwtBearerDefaults.AuthenticationScheme,
+            //    In = ParameterLocation.Header,
+            //    Description = "JSON Web Token based security"
+            //});
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
-                        }
-                    },
-                    new string[] {}
-                }
-            });
+            //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            //{
+            //    {
+            //        new OpenApiSecurityScheme
+            //        {
+            //            Reference = new OpenApiReference
+            //            {
+            //                Type = ReferenceType.SecurityScheme,
+            //                Id = "oauth2"
+            //            }
+            //        },
+            //        new string[] {}
+            //    }
+            //});
 
             c.SchemaFilter<SwaggerSchemaFilter>();
 
@@ -72,36 +72,36 @@ internal class Program
         builder.Services.AddScoped<IClaimsRepository, ClaimsRepository>();
         builder.Services.AddControllers().AddNewtonsoftJson();
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
-            options.Audience = "all";
-            options.ClaimsIssuer = "localhost";
-            options.Authority = "http://localhost:7298";
-            options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
-            {
-                AuthorizationEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/Authorize\",
-                TokenEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/token",
-            };
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["TokenAuthentication:Issuer"],
-                ValidAudience = configuration["TokenAuthentication:Audience"],
-                IssuerSigningKey = signingKey
-            };
-        });
+        //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
+        //    options.Audience = "all";
+        //    options.ClaimsIssuer = "localhost";
+        //    options.Authority = "http://localhost:7298";
+        //    options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
+        //    {
+        //        AuthorizationEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/Authorize\",
+        //        TokenEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/token",
+        //    };
+        //    options.RequireHttpsMetadata = false;
+        //    options.TokenValidationParameters = new TokenValidationParameters
+        //    {
+        //        ValidateAudience = false,
+        //        ValidateIssuer = false,
+        //        ValidateIssuerSigningKey = true,
+        //        ValidIssuer = configuration["TokenAuthentication:Issuer"],
+        //        ValidAudience = configuration["TokenAuthentication:Audience"],
+        //        IssuerSigningKey = signingKey
+        //    };
+        //});
 
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                .Build();
-        });
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        //        .RequireAuthenticatedUser()
+        //        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+        //        .Build();
+        //});
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -109,9 +109,9 @@ internal class Program
         app.UseSwaggerUI(opt =>
         {
             opt.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
-            opt.OAuthClientId(configuration["Authentication:ClientId"]);
-            opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
-            opt.OAuthUsePkce();
+            //opt.OAuthClientId(configuration["Authentication:ClientId"]);
+            //opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
+            //opt.OAuthUsePkce();
         });
         app.UseHttpsRedirection();
         app.UseAuthentication();
