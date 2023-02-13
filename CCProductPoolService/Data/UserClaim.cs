@@ -41,7 +41,7 @@ namespace CCProductPoolService.Data
             }
             else
             {
-                TenantDatabase = "AramarkDbProduction_20210816";
+                TenantDatabase = "TestDatabase";
             }
         }
     }

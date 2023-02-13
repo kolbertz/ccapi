@@ -27,19 +27,27 @@ namespace CCProductPoolService.Controllers
         [HttpGet]
         public Task<IReadOnlyList<ProductPoolDto>> Get()
         {
-    //        var tokenDescriptor = new SecurityTokenDescriptor
-    //        {
-    //            Subject = new ClaimsIdentity(new Claim[]
-    // { new Claim("listName", list != null ? JsonSerializer.Serialize(user.RoleName) : string.Empty,JsonClaimValueTypes.JsonArray)
-    //}}
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            //        var tokenDescriptor = new SecurityTokenDescriptor
+            //        {
+            //            Subject = new ClaimsIdentity(new Claim[]
+            // { new Claim("listName", list != null ? JsonSerializer.Serialize(user.RoleName) : string.Empty,JsonClaimValueTypes.JsonArray)
+            //}}
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>();
+                productPoolRepository.Init(userClaim.TenantDatabase);
+                return _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync();
             }
-            IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>();
-            productPoolRepository.Init(userClaim.TenantDatabase);
-            return _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync();
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         [HttpGet]

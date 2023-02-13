@@ -465,3 +465,6 @@ C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\obj\Debug\n
 C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\obj\Debug\net7.0\ProductPoolApiTest.genruntimeconfig.cache
 C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\obj\Debug\net7.0\ref\ProductPoolApiTest.dll
 C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\bin\Debug\net7.0\Dapper.Contrib.dll
+C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\bin\Debug\net7.0\IdentityModel.dll
+C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\bin\Debug\net7.0\IdentityModel.AspNetCore.OAuth2Introspection.dll
+C:\Users\KaiOlbertz\source\repos\CCProductService\ProductPoolApiTest\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll

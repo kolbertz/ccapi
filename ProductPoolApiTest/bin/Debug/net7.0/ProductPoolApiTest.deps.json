@@ -467,6 +467,31 @@
           "lib/net5.0/FakeItEasy.dll": {}
         }
       },
+      "IdentityModel/5.2.0": {
+        "runtime": {
+          "lib/net5.0/IdentityModel.dll": {
+            "assemblyVersion": "5.2.0.0",
+            "fileVersion": "5.2.0.0"
+          }
+        },
+        "compile": {
+          "lib/net5.0/IdentityModel.dll": {}
+        }
+      },
+      "IdentityModel.AspNetCore.OAuth2Introspection/6.1.0": {
+        "dependencies": {
+          "IdentityModel": "5.2.0"
+        },
+        "runtime": {
+          "lib/net6.0/IdentityModel.AspNetCore.OAuth2Introspection.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.1.0.0"
+          }
+        },
+        "compile": {
+          "lib/net6.0/IdentityModel.AspNetCore.OAuth2Introspection.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.Authentication/2.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.Core": "2.0.0",
@@ -504,6 +529,20 @@
         },
         "compile": {
           "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.OpenIdConnect/7.0.1": {
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.21.0"
+        },
+        "runtime": {
+          "lib/net7.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll": {
+            "assemblyVersion": "7.0.1.0",
+            "fileVersion": "7.0.122.56809"
+          }
+        },
+        "compile": {
+          "lib/net7.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll": {}
         }
       },
       "Microsoft.AspNetCore.Cryptography.Internal/2.0.0": {},
@@ -2575,7 +2614,9 @@
         "dependencies": {
           "Dapper": "2.0.123",
           "Dapper.Contrib": "2.0.78",
+          "IdentityModel.AspNetCore.OAuth2Introspection": "6.1.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "7.0.0",
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "7.0.1",
           "Microsoft.AspNetCore.JsonPatch": "7.0.0",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "7.0.0",
           "Microsoft.AspNetCore.OpenApi": "7.0.0",
@@ -4433,6 +4474,20 @@
       "path": "fakeiteasy/7.3.1",
       "hashPath": "fakeiteasy.7.3.1.nupkg.sha512"
     },
+    "IdentityModel/5.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nuhkbaDH9l5QzNJp2MtP3qio57MPtiRneUN8Ocr7od0JvSYaIe3gBj/vxllr11S/Qvu1AG4GZXoyv5469ewYDA==",
+      "path": "identitymodel/5.2.0",
+      "hashPath": "identitymodel.5.2.0.nupkg.sha512"
+    },
+    "IdentityModel.AspNetCore.OAuth2Introspection/6.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dDZmgLba3VTpSKaedZnazB7bweP9XrHIgLdIvn8i3R2ibS8vNe4rPWhI9vudF/zLTxPBxSA3V8AcMACyJ2Y3NQ==",
+      "path": "identitymodel.aspnetcore.oauth2introspection/6.1.0",
+      "hashPath": "identitymodel.aspnetcore.oauth2introspection.6.1.0.nupkg.sha512"
+    },
     "Microsoft.AspNetCore.Authentication/2.0.0": {
       "type": "package",
       "serviceable": true,
@@ -4460,6 +4515,13 @@
       "sha512": "sha512-q2suMVl1gO6rBJkV7rxm0F2sBufValm2RKxY3zoWN4y6cAufDJYmzpLWPKju3kKFJFKNgivWgoTw0dvf4W5QDQ==",
       "path": "microsoft.aspnetcore.authentication.jwtbearer/7.0.0",
       "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.7.0.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.OpenIdConnect/7.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HTEPkaslzcrlMnqwc08yoU0TU5lNmgWVWgRsPJomvMbKzNozf3acsvA2hAeFVDHoJNBZmJm7Jhy3+pHmbzK0uQ==",
+      "path": "microsoft.aspnetcore.authentication.openidconnect/7.0.1",
+      "hashPath": "microsoft.aspnetcore.authentication.openidconnect.7.0.1.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Cryptography.Internal/2.0.0": {
       "type": "package",

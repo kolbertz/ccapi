@@ -25,7 +25,7 @@ namespace ProductPoolApiTest
         {
             var inMemorySettings = new Dictionary<string, string>
             {
-                { "ConnectionStrings:AramarkStaging", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
+                { "ConnectionStrings:TestDatabase", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
             };
 
             IConfiguration configuration = new ConfigurationBuilder()

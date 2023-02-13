@@ -36,6 +36,7 @@ namespace ProductPoolApiTest
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64EncodedAuthString);
 
             var respone = await client.GetAsync("/api/v2/productpool");
+            string message = await respone.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
         }
 
