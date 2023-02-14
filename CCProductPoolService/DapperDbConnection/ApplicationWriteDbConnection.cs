@@ -6,20 +6,34 @@ using System.Data.SqlClient;
 
 namespace CCProductPoolService.DapperDbConnection
 {
-    public class ApplicationWriteDbConnection : IApplicationWriteDbConnection
+    public class ApplicationWriteDbConnection : IApplicationDbConnection
     {
-        public IDbConnection Connection { get; set; }
+        private IDbConnection _connection { get; set; }
+        private IConfiguration _configuration;
+
         public ApplicationWriteDbConnection(IConfiguration configuration)
         {
-            Connection = new SqlConnection(configuration.GetConnectionString("AramarkStaging"));
+            _configuration = configuration;
         }
-        public async Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+
+        public void Init(string database)
         {
-            return await Connection.ExecuteAsync(sql, param, transaction);
+            _connection = new SqlConnection(_configuration.GetConnectionString(database));
         }
-        public async Task<IReadOnlyList<T>> QueryAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+
+        public Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
         {
-            return (await Connection.QueryAsync<T>(sql, param, transaction)).AsList();
+            return _connection.ExecuteAsync(sql, param, transaction);
+        }
+
+        public Task<T> ExecuteScalarAsync<T>(string sql, object param, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+        {
+            return _connection.ExecuteScalarAsync<T>(sql, param, transaction);
+        }
+
+        public Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+        {
+            return _connection.QueryAsync<T>(sql, param, transaction);
         }
 
         public Task<IReadOnlyList<T>> QueryAsync<T>(string sql, Func<object[], T> map)
@@ -27,13 +41,19 @@ namespace CCProductPoolService.DapperDbConnection
             throw new NotImplementedException();
         }
 
-        public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+        public Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
         {
-            return await Connection.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
+            return _connection.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
         }
-        public async Task<T> QuerySingleAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
+        public Task<T> QuerySingleAsync<T>(string sql, object param = null, IDbTransaction transaction = null, CancellationToken cancellationToken = default)
         {
-            return await Connection.QuerySingleAsync<T>(sql, param, transaction);
+            return _connection.QuerySingleAsync<T>(sql, param, transaction);
+        }
+
+        public IDbTransaction BeginTransaction()
+        {
+            _connection.Open();
+            return _connection.BeginTransaction();
         }
     }
 }

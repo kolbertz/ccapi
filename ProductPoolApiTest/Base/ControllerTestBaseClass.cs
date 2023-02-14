@@ -7,13 +7,11 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using static System.Net.Mime.MediaTypeNames;
 using System.Text;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using CCProductPoolService.Repositories;
 using CCProductPoolService.DapperDbConnection;
 using System.Data.Common;
+using System.Data;
 
 namespace ProductPoolApiTest
 {
@@ -50,7 +48,7 @@ namespace ProductPoolApiTest
                     services.AddSingleton<IConfiguration>(configuration);
                     services.AddSingleton(options);
                     services.AddSingleton<AramarkDbProduction20210816Context>();
-                    services.AddSingleton<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
+                    services.AddSingleton<IApplicationDbConnection, ApplicationWriteDbConnection>();
                     services.AddSingleton<IApplicationReadDbConnection, ApplicationReadDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
                     services.AddAuthentication()
@@ -72,26 +70,14 @@ namespace ProductPoolApiTest
             return client;
         }
 
-        protected async Task PopulateDatabase(string commandText, DbContext ctx, IDbContextTransaction transaction)
+        protected Task PopulateDatabase(string commandText, IApplicationDbConnection dbConnection)
         {
-            var conn = ctx.Database.GetDbConnection();
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.Transaction = transaction.GetDbTransaction();
-                cmd.CommandText = commandText;
-                int result = await cmd.ExecuteNonQueryAsync();
-            }
+            return dbConnection.ExecuteAsync(commandText);
         }
 
-        protected async Task<Guid> PopulateDatabaseAndReturnIdentity(string commandText, DbContext ctx, IDbContextTransaction transaction)
+        protected Task<Guid> PopulateDatabaseAndReturnIdentity(string commandText, IApplicationDbConnection dbConnection)
         {
-            var conn = ctx.Database.GetDbConnection();
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.Transaction = transaction.GetDbTransaction();
-                cmd.CommandText = commandText;
-                return (Guid)await cmd.ExecuteScalarAsync();
-            }
+            return dbConnection.ExecuteScalarAsync<Guid>(commandText);
         }
     }
 }

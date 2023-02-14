@@ -106,7 +106,7 @@ public class Program
 
         builder.Services.AddDbContext<AramarkDbProduction20210816Context>(options =>
             options.UseSqlServer(configuration.GetConnectionString("AramarkStaging")));
-        builder.Services.AddScoped<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
+        builder.Services.AddScoped<IApplicationDbConnection, ApplicationWriteDbConnection>();
         builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();
         builder.Services.AddScoped<IProductPoolRepository, ProductPoolRepository>();
 

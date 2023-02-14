@@ -1,13 +1,10 @@
-﻿using CCProductPoolService.Data;
-using CCProductPoolService.Dtos;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using CCProductPoolService.Dtos;
+using CCProductPoolService.Interface;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ProductPoolApiTest.Interface;
 using ProductPoolApiTest.ProductPool;
-using System.Diagnostics.Contracts;
+using System.Data;
 using System.Net;
 using System.Text;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -46,15 +43,13 @@ namespace ProductPoolApiTest
             var application = GetWebApplication();
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
-                    await PopulateDatabaseWithList(transaction, ctx);
-                    transaction = null;
+                    await PopulateDatabaseWithList(dbConnection);
                     var client = CreateClientWithAuth(application);
                     var respone = await client.GetAsync("/api/v2/productpool");
                     string messsage = await respone.Content.ReadAsStringAsync();
@@ -64,10 +59,13 @@ namespace ProductPoolApiTest
                     Assert.Equal(1, (int)pools[0].key);
                     Assert.Equal("Pool 2", (string)pools[1].name);
                 }
+                catch(Exception ex)
+                {
+
+                }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
             }
         }
@@ -79,16 +77,14 @@ namespace ProductPoolApiTest
              
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
 
                     // Populate DB with a systemSetting
-                    await PopulateDbWithSystemSetting(ctx, transaction, true);
-                    transaction = null;
+                    await PopulateDbWithSystemSetting(dbConnection);
                     var client = CreateClientWithAuth(application);
                     ProductPoolDto productPool = new ProductPoolDto
                     {
@@ -107,8 +103,7 @@ namespace ProductPoolApiTest
                 }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
             }
         }
@@ -119,15 +114,13 @@ namespace ProductPoolApiTest
             var application = GetWebApplication();
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
-                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(transaction, ctx);
-                    transaction = null;
+                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
                     var respone = await client.GetAsync("/api/v2/productpool/" + productPoolId);
                     string messsage = await respone.Content.ReadAsStringAsync();
@@ -139,8 +132,7 @@ namespace ProductPoolApiTest
                 }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
             }
         }
@@ -151,15 +143,13 @@ namespace ProductPoolApiTest
             var application = GetWebApplication();
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
-                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(transaction, ctx);
-                    transaction = null;
+                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
                     ProductPoolDto productPool = new ProductPoolDto
                     {
@@ -175,8 +165,7 @@ namespace ProductPoolApiTest
                 }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
 
             }
@@ -188,15 +177,13 @@ namespace ProductPoolApiTest
             var application = GetWebApplication();
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
-                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(transaction, ctx);
-                    transaction = null;
+                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
                     var patch = new[]
                     {
@@ -223,8 +210,7 @@ namespace ProductPoolApiTest
                 }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
 
             }
@@ -236,23 +222,20 @@ namespace ProductPoolApiTest
             var application = GetWebApplication();
             using (var services = application.Services.CreateScope())
             {
-                IDbContextTransaction transaction = null;
-                AramarkDbProduction20210816Context ctx = null;
+                IApplicationDbConnection dbConnection = null;
                 try
                 {
-                    ctx = services.ServiceProvider.GetService<AramarkDbProduction20210816Context>();
-                    transaction = ctx.Database.BeginTransaction();
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
-                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(transaction, ctx);
-                    transaction = null;
+                    Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
                     var response = await client.DeleteAsync("/api/v2/productpool/" + productPoolId);
                     Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
                 }
                 finally
                 {
-                    await DePopulateDatabase(transaction, ctx);
-                    transaction = null;
+                    await DePopulateDatabase(dbConnection);
                 }
 
             }

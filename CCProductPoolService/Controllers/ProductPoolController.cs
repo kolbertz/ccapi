@@ -25,13 +25,8 @@ namespace CCProductPoolService.Controllers
         }
 
         [HttpGet]
-        public Task<IReadOnlyList<ProductPoolDto>> Get()
+        public async Task<IActionResult> Get()
         {
-            //        var tokenDescriptor = new SecurityTokenDescriptor
-            //        {
-            //            Subject = new ClaimsIdentity(new Claim[]
-            // { new Claim("listName", list != null ? JsonSerializer.Serialize(user.RoleName) : string.Empty,JsonClaimValueTypes.JsonArray)
-            //}}
             try
             {
                 UserClaim userClaim = null;
@@ -41,12 +36,11 @@ namespace CCProductPoolService.Controllers
                 }
                 IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>();
                 productPoolRepository.Init(userClaim.TenantDatabase);
-                return _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync();
+                return Ok(await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync());
             }
             catch (Exception ex)
             {
-
-                throw;
+                return StatusCode(500);
             }
         }
 
