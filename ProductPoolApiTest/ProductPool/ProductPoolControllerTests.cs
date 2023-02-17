@@ -47,7 +47,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
                     // Populate DB
                     await PopulateDatabaseWithList(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -58,10 +58,6 @@ namespace ProductPoolApiTest
                     Assert.Equal(2, pools.Count);
                     Assert.Equal(1, (int)pools[0].key);
                     Assert.Equal("Pool 2", (string)pools[1].name);
-                }
-                catch(Exception ex)
-                {
-
                 }
                 finally
                 {
@@ -81,7 +77,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
 
                     // Populate DB with a systemSetting
                     await PopulateDbWithSystemSetting(dbConnection);
@@ -118,7 +114,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -147,7 +143,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -181,7 +177,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -226,7 +222,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("TestDatabase");
+                    dbConnection.Init("DefaultDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);

@@ -6,21 +6,17 @@ namespace CCProductService.Repositories
 {
     public class ClaimsRepository : IClaimsRepository
     {
-        public IApplicationDbContext _dbContext { get; }
-        public IApplicationReadDbConnection _readDbContext { get; }
-        public IApplicationWriteDbConnection _writeDbContext { get; }
+        public IApplicationDbConnection _dbContext { get; }
 
-        public ClaimsRepository(IApplicationDbContext dbContext, IApplicationReadDbConnection readDbConnection, IApplicationWriteDbConnection writeDbConnection)
+        public ClaimsRepository(IApplicationDbConnection writeDbConnection)
         {
-            _dbContext = dbContext;
-            _readDbContext = readDbConnection;
-            _writeDbContext = writeDbConnection;
+            _dbContext = writeDbConnection;
         }
 
         public async Task GetProductPoolIds(UserClaim userClaim)
         {
             string query = $"Select ProfileToProductPool.ProductPoolId From ProfileToProductPool where ProfileToProductPool.ProfileId = @ProfileId";
-            userClaim.ProductPoolIds = await _readDbContext.Connection.QueryAsync<Guid>(query, param: new {ProfileId = userClaim.ProfileId});
+            userClaim.ProductPoolIds = await _dbContext.QueryAsync<Guid>(query, param: new {ProfileId = userClaim.ProfileId});
         }
 
         public async Task GetProfileId(UserClaim userClaim)
@@ -34,7 +30,7 @@ namespace CCProductService.Repositories
                 SystemId = userClaim.SystemId
             };
 
-            userClaim.ProfileId = await _readDbContext.Connection.ExecuteScalarAsync<Guid>(query, param: paramObj).ConfigureAwait(false);
+            userClaim.ProfileId = await _dbContext.ExecuteScalarAsync<Guid>(query, param: paramObj).ConfigureAwait(false);
         }
     }
 }

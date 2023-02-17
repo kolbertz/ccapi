@@ -2,27 +2,31 @@
 using CCProductService.DTOs;
 using CCProductService.Helper;
 using CCProductService.Interface;
-using Dapper;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.EntityFrameworkCore;
 using System.Dynamic;
 
 namespace CCProductService.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        public IApplicationDbContext _dbContext { get; }
-        public IApplicationReadDbConnection _readDbContext { get; }
-        public IApplicationWriteDbConnection _writeDbContext { get; }
+        public IApplicationDbConnection _dbContext { get; }
 
-        public ProductRepository(IApplicationDbContext dbContext, IApplicationReadDbConnection readDbConnection, IApplicationWriteDbConnection writeDbConnection)
+        public ProductRepository(IApplicationDbConnection writeDbConnection)
         {
-            _dbContext = dbContext;
-            _readDbContext = readDbConnection;
-            _writeDbContext = writeDbConnection;
+            _dbContext = writeDbConnection;
         }
 
-        public async Task<IReadOnlyList<ProductDto>> GetAllProducts(int? take, int? skip, UserClaim userClaim)
+        public void Init(string database)
+        {
+            _dbContext.Init(database);
+        }
+
+        public void Dispose()
+        {
+            _dbContext?.Dispose();
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetAllProducts(int? take, int? skip, UserClaim userClaim)
         {
             string query;
             string productPoolQuery = string.Empty;
@@ -51,7 +55,7 @@ namespace CCProductService.Repositories
                 paramObj.TryAdd("usergroup", userClaim.UserGroupId);
             }
             var stringMap = new Dictionary<Guid, ProductDto>();
-            await _readDbContext.Connection.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
+            IEnumerable<ProductDto> result = await _dbContext.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
             {
                 ProductDto dto;
                 if (!stringMap.TryGetValue(p.Id, out dto))
@@ -85,7 +89,7 @@ namespace CCProductService.Repositories
             paramObj.TryAdd("ProductId", id);
 
 
-            return (await _readDbContext.Connection.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
+            return (await _dbContext.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
             {
                 if (dto == null)
                 {
@@ -98,59 +102,78 @@ namespace CCProductService.Repositories
 
         public async Task<Guid> AddProductAsync(ProductDto productDto, UserClaim userClaim)
         {
+            string productInsertQuery = "INSERT INTO [dbo].[Product] ([ProductKey],[IsBlocked],[Balance],[BalanceTare],[BalanceTareBarcode],[BalancePriceUnit],[BalancePriceUnitValue],[CreatedDate],[CreatedUser],[LastUpdatedUser],[LastUpdatedDate],[ProductPoolId],[ProductType])"
+               + " VALUES(@ProductKey,@IsBlocked,@Balance,@BalanceTare,@BalanceTareBarcode,@BalancePriceUnit,@BalancePriceUnitValue,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@ProductPoolId,@ProductType)";
+
+            string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId])" +
+                " VALUES(@Barcode,@ProductId)";
+
+            string productStringInsertQuery = "INSERT INTO [dbo].[ProductString]([Language],[ShortName],[LongName],[Description],[ProductId])" +
+                " VALUES(@Language,@ShortName,@LongName,@Description,@ProductId)";
             Product product = new Product();
             ProductHelper.ParseDtoToProduct(productDto, product);
-            product.CreatedUser = userClaim.UserId;
-            product.CreatedDate = DateTimeOffset.Now;
-            _dbContext.Products.Add(product);
-            await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            return product.Id;
+            product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
+            product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
+            try
+            {
+                _dbContext.BeginTransaction();
+                Guid id = await _dbContext.ExecuteScalarAsync<Guid>(productInsertQuery, product);
+                await _dbContext.ExecuteAsync(barcodeInsertQuery, product.ProductBarcodes);
+                await _dbContext.ExecuteAsync(productStringInsertQuery, product.ProductStrings);
+                _dbContext.CommitTransaction();
+                return id;
+            }
+            catch (Exception ex)
+            {
+                // Rollback
+                throw;
+            }
         }
 
         public async Task UpdateProductAsync(ProductDto productDto, UserClaim userClaim)
         {
-            using (var context = new AramarkDbProduction20210816Context())
-            {
-                Product product = await context.Products
-                    .Include(p => p.ProductBarcodes)
-                    .Include(p => p.ProductStrings)
-                    .Where(p => p.Id == productDto.Id).FirstOrDefaultAsync();
-                ProductHelper.ParseDtoToProduct(productDto, product);
-                product.LastUpdatedUser = userClaim.UserId;
-                product.LastUpdatedDate = DateTimeOffset.Now;
-                await context.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            }
+            //using (var context = new AramarkDbProduction20210816Context())
+            //{
+            //    Product product = await context.Products
+            //        .Include(p => p.ProductBarcodes)
+            //        .Include(p => p.ProductStrings)
+            //        .Where(p => p.Id == productDto.Id).FirstOrDefaultAsync();
+            //    ProductHelper.ParseDtoToProduct(productDto, product);
+            //    product.LastUpdatedUser = userClaim.UserId;
+            //    product.LastUpdatedDate = DateTimeOffset.Now;
+            //    await context.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
+            //}
         }
 
         public async Task<ProductDto> PatchProductAsync(Guid id, JsonPatchDocument productPatch)
         {
-            Product product = await _dbContext.Products
-                .Include(p => p.ProductBarcodes)
-                .Include(p => p.ProductStrings)
-                .Where(p => p.Id == id).FirstOrDefaultAsync();
-            if (product != null)
-            {
-                ProductDto productDto = new ProductDto();
-                ProductHelper.ParseProductToDto(product, productDto);
-                productPatch.ApplyTo(productDto);
-                ProductHelper.ParseDtoToProduct(productDto, product);
-                await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            }
+            //Product product = await _dbContext.Products
+            //    .Include(p => p.ProductBarcodes)
+            //    .Include(p => p.ProductStrings)
+            //    .Where(p => p.Id == id).FirstOrDefaultAsync();
+            //if (product != null)
+            //{
+            //    ProductDto productDto = new ProductDto();
+            //    ProductHelper.ParseProductToDto(product, productDto);
+            //    productPatch.ApplyTo(productDto);
+            //    ProductHelper.ParseDtoToProduct(productDto, product);
+            //    await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
+            //}
             return new ProductDto();
         }
 
         public async Task DeleteProductAsync(Guid id, UserClaim userClaim)
         {
-            Product product = await _dbContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
-            _dbContext.Products.Remove(product);
-            await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
+            //Product product = await _dbContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
+            //_dbContext.Products.Remove(product);
+            //await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
         {
             var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
                 "WHERE ProductCategory.ProductId = @ProductId";
-            IReadOnlyList<CategoryString> categoryStrings = await _readDbContext.QueryAsync<CategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
+            IEnumerable<CategoryString> categoryStrings = await _dbContext.QueryAsync<CategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
             return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategoryDto
             {
                 CategoryId = c.Key,
@@ -162,10 +185,10 @@ namespace CCProductService.Repositories
             });
         }
 
-        public Task<IReadOnlyList<string>> GetBarcodesAsync(Guid id, UserClaim userClaim)
+        public Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT Barcode FROM ProductBarcode WHERE ProductId = @ProductId";
-            return _readDbContext.QueryAsync<string>(query, param: new { ProductId = id });
+            return _dbContext.QueryAsync<string>(query, param: new { ProductId = id });
         }
 
         public async Task<IEnumerable<ProductPriceDto>> GetProductPrices(Guid id, UserClaim userClaim)
@@ -178,7 +201,7 @@ namespace CCProductService.Repositories
                 "join ProductPriceList ppl on ppl.Id = tmp.ProductPriceListId " +
                 "join ProductPricePool ppp on ppp.Id = tmp.ProductPricePoolId Where tmp.row = 1";
 
-            var result = await _readDbContext.Connection.QueryAsync<(string pool, string list, decimal value)>(query, param: new { ProductId = id });
+            var result = await _dbContext.QueryAsync<(string pool, string list, decimal value)>(query, param: new { ProductId = id });
             return result.GroupBy(r => r.pool)
                 .Select(r => new ProductPriceDto
                 {

@@ -11,6 +11,7 @@ namespace CCProductService.Data
         public Guid UserGroupId { get; set; }
         public Guid ProfileId { get; set; }
         public IEnumerable<Guid> ProductPoolIds { get; set; }
+        public string TenantDatabase { get; set; }
 
         public UserClaim(IEnumerable<Claim> claims) {
             string tenant = claims.Where(x => x.Type == "Tenant").Select(x => x.Value).FirstOrDefault();
@@ -32,6 +33,15 @@ namespace CCProductService.Data
             if (!string.IsNullOrEmpty(userGroup))
             {
                 UserGroupId = new Guid(userGroup);
+            }
+            string tenantDatabase = claims.Where(x => x.Type == "TenantDatabase").Select(x => x.Value).FirstOrDefault();
+            if (!string.IsNullOrEmpty(tenantDatabase))
+            {
+                TenantDatabase = tenantDatabase;
+            }
+            else
+            {
+                TenantDatabase = "DefaultDatabase";
             }
         }
     }

@@ -23,7 +23,7 @@ namespace ProductPoolApiTest
         {
             var inMemorySettings = new Dictionary<string, string>
             {
-                { "ConnectionStrings:TestDatabase", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
+                { "ConnectionStrings:DefaultDatabase", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
             };
 
             IConfiguration configuration = new ConfigurationBuilder()
@@ -32,24 +32,13 @@ namespace ProductPoolApiTest
 
             return new WebApplicationFactory<Program>().WithWebHostBuilder(builder => {
                 builder.ConfigureTestServices(services => {
-                    var oldOptions = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AramarkDbProduction20210816Context>));
-                    if (oldOptions != null)
-                    {
-                        services.Remove(oldOptions);
-                    }
                     var dbConnectionDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection));
                     if (dbConnectionDescriptor != null)
                     {
                         services.Remove(dbConnectionDescriptor);
                     }
-                    var options = new DbContextOptionsBuilder<AramarkDbProduction20210816Context>()
-                    .UseSqlServer(configuration.GetConnectionString("AramarkStaging"))
-                                    .Options;
                     services.AddSingleton<IConfiguration>(configuration);
-                    services.AddSingleton(options);
-                    services.AddSingleton<AramarkDbProduction20210816Context>();
-                    services.AddSingleton<IApplicationDbConnection, ApplicationWriteDbConnection>();
-                    services.AddSingleton<IApplicationReadDbConnection, ApplicationReadDbConnection>();
+                    services.AddSingleton<IApplicationDbConnection, ApplicationDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));

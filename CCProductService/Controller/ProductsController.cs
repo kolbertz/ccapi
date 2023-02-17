@@ -1,11 +1,7 @@
-﻿using Azure;
-using CCProductService.Data;
+﻿using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Interface;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using JsonPatchDocument = Microsoft.AspNetCore.JsonPatch.JsonPatchDocument;
@@ -38,11 +34,16 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            IReadOnlyList<ProductDto> productsList = null;
-                await _serviceProvider.GetService<IClaimsRepository>().GetProfileId(userClaim);
-                await _serviceProvider.GetService<IClaimsRepository>().GetProductPoolIds(userClaim);
-                productsList = await _serviceProvider.GetRequiredService<IProductRepository>().GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
-            return Ok(productsList);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                IEnumerable<ProductDto> productsList = null;
+                productRepository.Init(userClaim.TenantDatabase);
+                productsList = await productRepository.GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
+                return Ok(productsList);
+            }
+            //await _serviceProvider.GetService<IClaimsRepository>().GetProfileId(userClaim);
+            //await _serviceProvider.GetService<IClaimsRepository>().GetProductPoolIds(userClaim);
 
         }
 
@@ -61,11 +62,15 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            ProductDto products = null;
-                await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
-                await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
-                products = await _serviceProvider.GetRequiredService<IProductRepository>().GetProductById(id, userClaim).ConfigureAwait(false);
-            return Ok(products);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                ProductDto product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
+                return Ok(product);
+            }
+            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
+            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
         }
 
         /// <summary>
@@ -84,10 +89,15 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-                await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
-                await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
-                newProductId = await _serviceProvider.GetRequiredService<IProductRepository>().AddProductAsync(productDto, userClaim).ConfigureAwait(false);
-            return Created(new Uri(HttpContext.Request.GetEncodedUrl()), null);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                newProductId = await productRepository.AddProductAsync(productDto, userClaim).ConfigureAwait(false);
+                return Created(new Uri(HttpContext.Request.GetEncodedUrl()), null);
+            }
+            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
+            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
         }
 
         /// <summary>
@@ -110,8 +120,13 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-                await _serviceProvider.GetRequiredService<IProductRepository>().UpdateProductAsync(productDto, userClaim).ConfigureAwait(false);
-            return Ok();
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                await productRepository.UpdateProductAsync(productDto, userClaim).ConfigureAwait(false);
+                return Ok();
+            }
         }
 
         /// <summary>
@@ -131,8 +146,13 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-                dto = await _serviceProvider.GetRequiredService<IProductRepository>().PatchProductAsync(id, jsonPatchDocument).ConfigureAwait(false);
-            return Ok(dto);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                dto = await productRepository.PatchProductAsync(id, jsonPatchDocument).ConfigureAwait(false);
+                return Ok(dto);
+            }
         }
 
         /// <summary>
@@ -150,8 +170,13 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            await _serviceProvider.GetRequiredService<IProductRepository>().DeleteProductAsync(id, userClaim).ConfigureAwait(false);
-            return Ok();
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                await productRepository.DeleteProductAsync(id, userClaim).ConfigureAwait(false);
+                return Ok();
+            }
         }
 
         /// <summary>
@@ -170,7 +195,11 @@ namespace CCProductService.Controller
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
-            return  _serviceProvider.GetService<IProductRepository>().GetCategoriesAsnyc(id, userClaim);
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                return productRepository.GetCategoriesAsnyc(id, userClaim);
+            }
         }
 
         [HttpGet]
@@ -183,8 +212,13 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            IReadOnlyList<string> barcodes = await _serviceProvider.GetService<IProductRepository>().GetBarcodesAsync(id, userClaim);
-            return Ok(barcodes);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                IEnumerable<string> barcodes = await productRepository.GetBarcodesAsync(id, userClaim);
+                return Ok(barcodes);
+            }
         }
 
         [HttpGet]
@@ -197,7 +231,12 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            return await _serviceProvider.GetService<IProductRepository>().GetProductPrices(id, userClaim);
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                return await productRepository.GetProductPrices(id, userClaim);
+            }
         }
 
         //[HttpGet]
