@@ -94,7 +94,7 @@ namespace CCProductService.Controller
             {
                 productRepository.Init(userClaim.TenantDatabase);
                 newProductId = await productRepository.AddProductAsync(productDto, userClaim).ConfigureAwait(false);
-                return Created(new Uri(HttpContext.Request.GetEncodedUrl()), null);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newProductId}"), null);
             }
             //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
             //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
