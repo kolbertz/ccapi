@@ -6839,28 +6839,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\PatrickMichla\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCApiGateway\\CCApiGateway.csproj",
+      "projectUniqueName": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\CCApiGateway\\CCApiGateway.csproj",
       "projectName": "CCApiGateway",
-      "projectPath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCApiGateway\\CCApiGateway.csproj",
-      "packagesPath": "C:\\Users\\KaiOlbertz\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCApiGateway\\obj\\",
+      "projectPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\CCApiGateway\\CCApiGateway.csproj",
+      "packagesPath": "C:\\Users\\PatrickMichla\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\CCApiGateway\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\KaiOlbertz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\PatrickMichla\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -6869,8 +6866,7 @@
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://cashcontrol.pkgs.visualstudio.com/_packaging/CCNuget/nuget/v3/index.json": {},
-        "https://nuget.telerik.com/nuget": {}
+        "https://cashcontrol.pkgs.visualstudio.com/_packaging/CCNuget/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net7.0": {

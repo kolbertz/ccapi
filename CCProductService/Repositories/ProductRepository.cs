@@ -164,9 +164,28 @@ namespace CCProductService.Repositories
 
         public async Task DeleteProductAsync(Guid id, UserClaim userClaim)
         {
+            //var query = "DELETE FROM [dbo].[Product] WHERE Id = @Id";
+
+            //_dbContext.QueryAsync<string>(query, param: new { id = id });
+            //try
+            //{
+            //    await _dbContext.ExecuteAsync(DeleteQuery, product.ProductStrings);
+            //    _dbContext.CommitTransaction();
+
+            //    _dbContext.Products.Remove(product);
+            //}
+            //catch (Exception ex)
+            //{
+
+            //    throw;
+            //}
+           
+
+
             //Product product = await _dbContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
             //_dbContext.Products.Remove(product);
-            //await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
+            //await _dbContext.QueryAsync(new CancellationToken()).ConfigureAwait(false);
+
         }
 
         public async Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)

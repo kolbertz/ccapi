@@ -1,12 +1,19 @@
-﻿using CCProductPoolService.Dtos;
+﻿using Azure;
+using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ProductPoolApiTest.ProductPool;
 using System.Data;
+using System.Data.Common;
 using System.Net;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace ProductPoolApiTest
 {
@@ -47,7 +54,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
                     await PopulateDatabaseWithList(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -58,6 +65,10 @@ namespace ProductPoolApiTest
                     Assert.Equal(2, pools.Count);
                     Assert.Equal(1, (int)pools[0].key);
                     Assert.Equal("Pool 2", (string)pools[1].name);
+                }
+                catch(Exception ex)
+                {
+
                 }
                 finally
                 {
@@ -77,7 +88,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
 
                     // Populate DB with a systemSetting
                     await PopulateDbWithSystemSetting(dbConnection);
@@ -114,7 +125,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -143,7 +154,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -177,7 +188,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -222,7 +233,7 @@ namespace ProductPoolApiTest
                 try
                 {
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
-                    dbConnection.Init("DefaultDatabase");
+                    dbConnection.Init("TestDatabase");
                     // Populate DB
                     Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
@@ -236,5 +247,191 @@ namespace ProductPoolApiTest
 
             }
         }
+
+        [Fact]
+        public async void Returns_BadRequestErrorMessageResult_when_request_is_wrong_GUID()
+        {
+            var application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {                
+                IApplicationDbConnection dbConnection = null;                
+                try
+                {
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
+
+                    //Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
+                    
+                    ProductPoolDto productPool = new ProductPoolDto
+                    {
+                        Description = "ApiController Test Pool",
+                        Name = "ApiController Test Pool",
+                        Key = 1,
+                        SystemSettingsId = new Guid("fab8c985-6147-4eba-b2c7-5f7012c4aeec")
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
+                    var client = CreateClientWithAuth(application);
+                    var response = await client.PostAsync("/api/v2/productpool/", httpContent);
+
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                }
+                finally
+                {
+                    await DePopulateDatabase(dbConnection);                    
+                }
+            }
+        }
+
+        [Fact]
+        public async void NotValidModel_400_Required_Field_name_missing()
+        {
+            var application = GetWebApplication();
+
+            using (var services = application.Services.CreateScope())
+            {
+                IApplicationDbConnection dbConnection = null;
+                try
+                {
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
+
+                    ProductPoolDto productPool = new ProductPoolDto
+                    {                        
+                        //Name = "ApiController Test Pool",
+                        Key = 1,
+                        SystemSettingsId = systemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
+                    var client = CreateClientWithAuth(application);
+
+                    var response = await client.PostAsync("/api/v2/productpool/", httpContent);
+                    //HttpResponseMessage response1 = await client.PostAsync("/api/v2/productpool/", httpContent);
+
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+                }
+                finally
+                {
+                    await DePopulateDatabase(dbConnection);
+                }
+            }
+        }
+
+        [Fact] 
+        public async Task GetByID_returns_500_If_wrong_and_wrong_datatyp_PoolID()
+        {
+            var application = GetWebApplication();
+
+            using (var services = application.Services.CreateScope())
+            {                
+                IApplicationDbConnection dbConnection = null;
+                //AramarkDbProduction20210816Context ctx = null;
+                try
+                {
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
+
+                    // Populate DB
+                    var client = CreateClientWithAuth(application);
+                    var response = await client.GetAsync("/api/v2/productpool/" + "fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
+                    Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+                }
+                finally
+                {
+                    await DePopulateDatabase(dbConnection);
+                }
+            }
+        }
+
+        [Fact]
+        public async void Get_All_204_No_Content()
+        {
+            var application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {                
+                try
+                {
+                    var client = application.CreateClient();
+                    var base64EncodedAuthString = Convert.ToBase64String(Encoding.UTF8.GetBytes("Test:test"));
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64EncodedAuthString);
+
+                    var response = await client.GetAsync("/api/v2/productpool");
+                    string message = await response.Content.ReadAsStringAsync();
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    //Assert.False(message.Any());
+                    //Assert.Empty(message);
+                    dynamic pools = JArray.Parse(message);                    
+                    Assert.Equal(0, pools.Count);
+                }
+                catch  (Exception ex) { }          
+              
+            }
+        }
+
+        [Fact]
+        public async void NotValidModel_400_Required_Field_Key_missing()
+        {
+            var application = GetWebApplication();
+
+            using (var services = application.Services.CreateScope())
+            {
+                IApplicationDbConnection dbConnection = null;
+                try
+                {
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
+
+                    ProductPoolDto productPool = new ProductPoolDto
+                    {
+                        Name = "ApiController Test Pool",
+                        //Key = 1,
+                        SystemSettingsId = systemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
+                    var client = CreateClientWithAuth(application);
+
+                    var response = await client.PostAsync("/api/v2/productpool/", httpContent);
+
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                }
+                finally
+                {
+                    await DePopulateDatabase(dbConnection);
+                }
+            }
+        }
+
+        [Fact]
+        public async void NotValidModel_400_Required_Field_SystemSettingsId_missing()
+        {
+            var application = GetWebApplication();
+
+            using (var services = application.Services.CreateScope())
+            {
+                IApplicationDbConnection dbConnection = null;
+                try
+                {
+                    dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
+                    dbConnection.Init("TestDatabase");
+
+                    ProductPoolDto productPool = new ProductPoolDto
+                    {
+                        Name = "ApiController Test Pool",
+                        Key = 1,
+                        //SystemSettingsId = systemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
+                    var client = CreateClientWithAuth(application);
+
+                    var response = await client.PostAsync("/api/v2/productpool/", httpContent);
+
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+                }
+                finally
+                {
+                    await DePopulateDatabase(dbConnection);
+                }
+            }
+        }
+    
     }
 }

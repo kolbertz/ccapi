@@ -172,6 +172,39 @@
           "Microsoft.AspNetCore.App"
         ]
       },
+      "Microsoft.AspNet.WebApi.Client/5.2.9": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "10.0.1",
+          "Newtonsoft.Json.Bson": "1.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/System.Net.Http.Formatting.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Net.Http.Formatting.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.AspNet.WebApi.Core/5.2.9": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNet.WebApi.Client": "5.2.9"
+        },
+        "compile": {
+          "lib/net45/System.Web.Http.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/System.Web.Http.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication/2.0.0": {
         "type": "package",
         "dependencies": {
@@ -3926,6 +3959,7 @@
           "Dapper": "2.0.123",
           "Dapper.Contrib": "2.0.78",
           "IdentityModel.AspNetCore.OAuth2Introspection": "6.1.0",
+          "Microsoft.AspNet.WebApi.Core": "5.2.9",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "7.0.0",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "7.0.1",
           "Microsoft.AspNetCore.JsonPatch": "7.0.0",
@@ -4175,6 +4209,41 @@
         "lib/netcoreapp3.1/IdentityModel.AspNetCore.OAuth2Introspection.dll",
         "lib/netcoreapp3.1/IdentityModel.AspNetCore.OAuth2Introspection.pdb",
         "lib/netcoreapp3.1/IdentityModel.AspNetCore.OAuth2Introspection.xml"
+      ]
+    },
+    "Microsoft.AspNet.WebApi.Client/5.2.9": {
+      "sha512": "cuVhPjjNMSEFpKXweMNBbsG4RUFuuZpFBm8tSyw309U9JEjcnbB6n3EPb4xwgcy9bJ38ctIbv5G8zXUBhlrPWw==",
+      "type": "package",
+      "path": "microsoft.aspnet.webapi.client/5.2.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NET.icon.png",
+        "NET_Library_EULA_ENU.txt",
+        "lib/net45/System.Net.Http.Formatting.dll",
+        "lib/net45/System.Net.Http.Formatting.xml",
+        "lib/netstandard2.0/System.Net.Http.Formatting.dll",
+        "lib/netstandard2.0/System.Net.Http.Formatting.xml",
+        "lib/portable-wp8+netcore45+net45+wp81+wpa81/System.Net.Http.Formatting.dll",
+        "lib/portable-wp8+netcore45+net45+wp81+wpa81/System.Net.Http.Formatting.xml",
+        "microsoft.aspnet.webapi.client.5.2.9.nupkg.sha512",
+        "microsoft.aspnet.webapi.client.nuspec"
+      ]
+    },
+    "Microsoft.AspNet.WebApi.Core/5.2.9": {
+      "sha512": "9C0/gBUeMBjorRFSmR5Z2j5wznf9BP5SddN+OZE7X0BpXgivBZTZ42d0h8tIjJzSLHYVCU4HZBf51+cidCY4fQ==",
+      "type": "package",
+      "path": "microsoft.aspnet.webapi.core/5.2.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Content/web.config.transform",
+        "NET.icon.png",
+        "NET_Library_EULA_ENU.txt",
+        "lib/net45/System.Web.Http.dll",
+        "lib/net45/System.Web.Http.xml",
+        "microsoft.aspnet.webapi.core.5.2.9.nupkg.sha512",
+        "microsoft.aspnet.webapi.core.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication/2.0.0": {
@@ -11238,28 +11307,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\KaiOlbertz\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\PatrickMichla\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
+      "projectUniqueName": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
       "projectName": "ProductPoolApiTest",
-      "projectPath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
-      "packagesPath": "C:\\Users\\KaiOlbertz\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\ProductPoolApiTest\\obj\\",
+      "projectPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
+      "packagesPath": "C:\\Users\\PatrickMichla\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\KaiOlbertz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\PatrickMichla\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -11268,15 +11334,14 @@
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://cashcontrol.pkgs.visualstudio.com/_packaging/CCNuget/nuget/v3/index.json": {},
-        "https://nuget.telerik.com/nuget": {}
+        "https://cashcontrol.pkgs.visualstudio.com/_packaging/CCNuget/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCProductPoolService\\CCProductPoolService.csproj": {
-              "projectPath": "C:\\Users\\KaiOlbertz\\source\\repos\\CCProductService\\CCProductPoolService\\CCProductPoolService.csproj"
+            "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\CCProductPoolService\\CCProductPoolService.csproj": {
+              "projectPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\CCProductPoolService\\CCProductPoolService.csproj"
             }
           }
         }
@@ -11347,5 +11412,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.AspNet.WebApi.Core 5.2.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Microsoft.AspNet.WebApi.Core",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }
