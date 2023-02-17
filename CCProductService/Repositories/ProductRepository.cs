@@ -2,6 +2,7 @@
 using CCProductService.DTOs;
 using CCProductService.Helper;
 using CCProductService.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Dynamic;
 
@@ -164,30 +165,32 @@ namespace CCProductService.Repositories
             return new ProductDto();
         }
 
-        public async Task DeleteProductAsync(Guid id, UserClaim userClaim)
+        public async Task<Guid> DeleteProductAsync(Guid id, UserClaim userClaim)
+                    
         {
-            //var query = "DELETE FROM [dbo].[Product] WHERE Id = @Id";
+            var query = "DELETE FROM [dbo].[Product] WHERE Id = @Id";
 
+
+            if (await _dbContext.ExecuteAsync(DeleteQuery, product.ProductStrings)>0)
+            {
+                return NoContent();
+            }
             //_dbContext.QueryAsync<string>(query, param: new { id = id });
             //try
             //{
-            //    await _dbContext.ExecuteAsync(DeleteQuery, product.ProductStrings);
+            //    
             //    _dbContext.CommitTransaction();
 
             //    _dbContext.Products.Remove(product);
             //}
             //catch (Exception ex)
             //{
-
             //    throw;
-            //}
-           
-
-
+            //}       
             //Product product = await _dbContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
             //_dbContext.Products.Remove(product);
             //await _dbContext.QueryAsync(new CancellationToken()).ConfigureAwait(false);
-
+            return new Guid();
         }
 
         public async Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
