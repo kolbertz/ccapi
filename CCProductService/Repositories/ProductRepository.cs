@@ -103,10 +103,11 @@ namespace CCProductService.Repositories
         public async Task<Guid> AddProductAsync(ProductDto productDto, UserClaim userClaim)
         {
             string productInsertQuery = "INSERT INTO [dbo].[Product] ([ProductKey],[IsBlocked],[Balance],[BalanceTare],[BalanceTareBarcode],[BalancePriceUnit],[BalancePriceUnitValue],[CreatedDate],[CreatedUser],[LastUpdatedUser],[LastUpdatedDate],[ProductPoolId],[ProductType])"
-               + " VALUES(@ProductKey,@IsBlocked,@Balance,@BalanceTare,@BalanceTareBarcode,@BalancePriceUnit,@BalancePriceUnitValue,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@ProductPoolId,@ProductType)";
+               + " OUTPUT INSERTED.Id"
+                + " VALUES(@ProductKey,@IsBlocked,@Balance,@BalanceTare,@BalanceTareBarcode,@BalancePriceUnit,@BalancePriceUnitValue,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@ProductPoolId,@ProductType)";
 
-            string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId])" +
-                " VALUES(@Barcode,@ProductId)";
+            string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId],[Refund])" +
+                " VALUES(@Barcode,@ProductId,@Refund)";
 
             string productStringInsertQuery = "INSERT INTO [dbo].[ProductString]([Language],[ShortName],[LongName],[Description],[ProductId])" +
                 " VALUES(@Language,@ShortName,@LongName,@Description,@ProductId)";
@@ -126,6 +127,7 @@ namespace CCProductService.Repositories
             catch (Exception ex)
             {
                 // Rollback
+                
                 throw;
             }
         }
