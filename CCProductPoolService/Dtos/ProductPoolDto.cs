@@ -14,7 +14,6 @@ namespace CCProductPoolService.Dtos
         [Required]
         public string Name { get; set; }
 
-
         public string Description { get; set; }
 
         public Guid? ParentProductPool { get; set; }

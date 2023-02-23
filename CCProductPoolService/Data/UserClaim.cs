@@ -41,7 +41,7 @@ namespace CCProductPoolService.Data
             }
             else
             {
-                TenantDatabase = "DefaultDatabase";
+                TenantDatabase = "TestDatabase";
             }
         }
     }

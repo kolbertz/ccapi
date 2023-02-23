@@ -1,16 +1,17 @@
 ﻿using CCProductPoolService.Interface;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace CCProductPoolService.DapperDbConnection
 {
-    public class ApplicationDbConnection : IApplicationDbConnection
+    public class ApplicationWriteDbConnection : IApplicationDbConnection
     {
         private IDbConnection _connection { get; set; }
         private IConfiguration _configuration;
 
-        public ApplicationDbConnection(IConfiguration configuration)
+        public ApplicationWriteDbConnection(IConfiguration configuration)
         {
             _configuration = configuration;
         }

@@ -3,12 +3,16 @@ using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
+using System.Web.Http.Controllers;
 
 namespace CCProductPoolService.Controllers
 {
@@ -46,24 +50,35 @@ namespace CCProductPoolService.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public Task<ProductPoolDto> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
+            ProductPoolDto productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
+            if 
+                (productPoolDto == null) 
+            {
+                return NotFound(); 
+            }
+            else
+            {
+                return Ok(productPoolDto);
+            }
+            
+
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+
         public async Task<IActionResult> Post(ProductPoolDto productPoolDto)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
+
                 Guid? poolId = null;
                 UserClaim userClaim = null;
+
                 if (HttpContext.User.Claims != null)
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
@@ -161,5 +176,12 @@ namespace CCProductPoolService.Controllers
                 return StatusCode(500);
             }
         }
+
+        //[HttpPost]
+        //[ServiceFilter (typeof(ValidateModelAttribute))]
+        //public IActionResult Post(ProductPoolDto productPoolDto)
+        //{
+        //    return Created(productPoolDto);
+        //}
     }
 }
