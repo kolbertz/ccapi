@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Pt+Va4sVVnmyUNPllHhQ+iHpSf5dvFs8JOmTqbXB5VFhyc2KQFxDg/Pe/oe9wa6Nx5DkIwvKjHXAermmekn6FQ==",
+  "dgSpecHash": "JplEr+XDvu8p2BSLGPJhmaEvXdchCbV2XaooNsrQmhrUCLroUhl61XJ42pdt7JzJIWRKpaBpoDB3D47avdVQgA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
+  "projectFilePath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\CCApiTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PatrickMichla\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\PatrickMichla\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

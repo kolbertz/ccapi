@@ -1,5 +1,6 @@
 ﻿using CCProductService.Data;
 using CCProductService.DTOs;
+using CCProductService.DTOs.Enums;
 using CCProductService.Helper;
 using CCProductService.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -107,11 +108,6 @@ namespace CCProductService.Repositories
                + " OUTPUT INSERTED.Id"
                 + " VALUES(@ProductKey,@IsBlocked,@Balance,@BalanceTare,@BalanceTareBarcode,@BalancePriceUnit,@BalancePriceUnitValue,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@ProductPoolId,@ProductType)";
 
-            string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId],[Refund])" +
-                " VALUES(@Barcode,@ProductId,@Refund)";
-
-            string productStringInsertQuery = "INSERT INTO [dbo].[ProductString]([Language],[ShortName],[LongName],[Description],[ProductId])" +
-                " VALUES(@Language,@ShortName,@LongName,@Description,@ProductId)";
             Product product = new Product();
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
@@ -120,77 +116,52 @@ namespace CCProductService.Repositories
             {
                 _dbContext.BeginTransaction();
                 Guid id = await _dbContext.ExecuteScalarAsync<Guid>(productInsertQuery, product);
-                await _dbContext.ExecuteAsync(barcodeInsertQuery, product.ProductBarcodes);
-                await _dbContext.ExecuteAsync(productStringInsertQuery, product.ProductStrings);
+                await InsertBarCode(productDto, userClaim);
+                await InsertProductString(productDto, userClaim);
                 _dbContext.CommitTransaction();
                 return id;
             }
             catch (Exception ex)
             {
                 // Rollback
-                
+
                 throw;
             }
         }
 
-        public async Task UpdateProductAsync(ProductDto productDto, UserClaim userClaim)
+        public Task<bool> UpdateProductAsync(ProductDto productDto, UserClaim userClaim)
         {
-            //using (var context = new AramarkDbProduction20210816Context())
-            //{
-            //    Product product = await context.Products
-            //        .Include(p => p.ProductBarcodes)
-            //        .Include(p => p.ProductStrings)
-            //        .Where(p => p.Id == productDto.Id).FirstOrDefaultAsync();
-            //    ProductHelper.ParseDtoToProduct(productDto, product);
-            //    product.LastUpdatedUser = userClaim.UserId;
-            //    product.LastUpdatedDate = DateTimeOffset.Now;
-            //    await context.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            //}
+            Product product = new Product();
+            ProductHelper.ParseDtoToProduct(productDto, product);
+            product.LastUpdatedDate = DateTimeOffset.Now;
+            product.LastUpdatedUser = userClaim.UserId;
+            return Update(product,productDto, userClaim);
         }
 
-        public async Task<ProductDto> PatchProductAsync(Guid id, JsonPatchDocument productPatch)
+        public async Task<ProductDto> PatchProductAsync(Guid id, UserClaim userClaim)
         {
-            //Product product = await _dbContext.Products
-            //    .Include(p => p.ProductBarcodes)
-            //    .Include(p => p.ProductStrings)
-            //    .Where(p => p.Id == id).FirstOrDefaultAsync();
-            //if (product != null)
-            //{
-            //    ProductDto productDto = new ProductDto();
-            //    ProductHelper.ParseProductToDto(product, productDto);
-            //    productPatch.ApplyTo(productDto);
-            //    ProductHelper.ParseDtoToProduct(productDto, product);
-            //    await _dbContext.SaveChangesAsync(new CancellationToken()).ConfigureAwait(false);
-            //}
+            var query = "SELECT * FROM Product WHERE Id = @ProductId";
+            var p = new {ProductId = id };
+            Product product = await _dbContext.QuerySingleAsync<Product>(query, p);
+            if (product != null)
+            {
+                ProductDto productDto = new ProductDto(product);
+                product.LastUpdatedDate = DateTimeOffset.Now;
+                product.LastUpdatedUser = userClaim.UserId;
+                if (await Update(product, productDto, userClaim).ConfigureAwait(false))
+                {
+                    return productDto;
+                }
+            }
             return new ProductDto();
         }
 
-        public async Task<Guid> DeleteProductAsync(Guid id, UserClaim userClaim)
-                    
+        public Task<int> DeleteProductAsync(Guid id, UserClaim userClaim)
         {
             var query = "DELETE FROM [dbo].[Product] WHERE Id = @Id";
 
+            return _dbContext.ExecuteAsync(query, param: new { Id = id });
 
-            if (await _dbContext.ExecuteAsync(DeleteQuery, product.ProductStrings)>0)
-            {
-                return NoContent();
-            }
-            //_dbContext.QueryAsync<string>(query, param: new { id = id });
-            //try
-            //{
-            //    
-            //    _dbContext.CommitTransaction();
-
-            //    _dbContext.Products.Remove(product);
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw;
-            //}       
-            //Product product = await _dbContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
-            //_dbContext.Products.Remove(product);
-            //await _dbContext.QueryAsync(new CancellationToken()).ConfigureAwait(false);
-            return new Guid();
         }
 
         public async Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
@@ -232,6 +203,104 @@ namespace CCProductService.Repositories
                     PoolName = r.Key,
                     PriceListPrice = r.Select(x => new PriceListPrice { PriceList = x.list, Value = x.value })
                 });
+        }
+
+        public async Task<bool> Update(Product product,ProductDto productDto, UserClaim userClaim)
+        {
+            var productUpdateQuery = "UPDATE Product Set ProductKey = @ProductKey, [IsBlocked] = @IsBlocked, [Balance] = @Balance, [BalanceTareBarcode] = @BalanceTareBarcode, " +
+                "[BalancePriceUnit] = @BalancePriceUnit, [BalancePriceUnitValue] = @BalancePriceUnitValue, [CreatedUser] = @CreatedUser, [ProductPoolId] = ProductPoolId, [ProductType] = ProductType WHERE Id = @Id";
+            //var barcodeUpdateQuery = "UPDATE ProductBarcode Set Barcode = @Barcode, [Refund] = @Refund, [ProductId] = @ProductId, [ParentProductId] = @ParentProductId WHERE ProductId = @Id";
+            //var productStringUpdateQuery = "UPDATE ProductString Set Language = @Language, [ShortName] = @ShortName, [Description] = @Description, [ProductId] = @ProductId, " +
+            //    "LongName = @LongName WHERE ProductId = @Id";
+            try
+            {
+                _dbContext.BeginTransaction();
+                if (await _dbContext.ExecuteAsync(productUpdateQuery, product) > 0)
+                {
+                    //Delete ProductString, Bardcode
+                    await DeleteProductStringAsync(product.Id, userClaim);
+                    await DeleteBarCodeAsync(product.Id, userClaim);
+                    //Insert ProductString, Barcode
+                    await InsertProductString(productDto, userClaim);
+                    await InsertBarCode(productDto, userClaim);
+                }
+               
+                //await _dbContext.ExecuteAsync(barcodeUpdateQuery, pool.ProductBarcodes);
+                //await _dbContext.ExecuteAsync(productStringUpdateQuery, pool.ProductStrings);
+                _dbContext.CommitTransaction();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // Rollback
+
+                throw;
+            }
+
+            //return _dbContext.ExecuteAsync(query, param: pool);
+        }
+        private async Task<bool> InsertProductString(ProductDto productDto, UserClaim userClaim)
+        {
+            string productStringInsertQuery = "INSERT INTO [dbo].[ProductString]([Language],[ShortName],[LongName],[Description],[ProductId])" +
+               " VALUES(@Language,@ShortName,@LongName,@Description,@ProductId)";
+            Product product = new Product();
+
+            ProductHelper.ParseDtoToProduct(productDto, product);
+            product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
+            product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
+            try
+            {
+
+                await _dbContext.ExecuteAsync(productStringInsertQuery, product.ProductStrings);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Rollback
+
+                throw;
+            }
+        }
+
+        private async Task<bool> InsertBarCode(ProductDto productDto, UserClaim userClaim)
+        {
+            string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId],[Refund])" +
+            " VALUES(@Barcode,@ProductId,@Refund)";
+
+            Product product = new Product();
+            ProductHelper.ParseDtoToProduct(productDto, product);
+            product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
+            product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
+            try
+            {
+
+                await _dbContext.ExecuteAsync(barcodeInsertQuery, product.ProductBarcodes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Rollback
+
+                throw;
+            }
+        }
+
+        public Task<int> DeleteProductStringAsync(Guid id, UserClaim userClaim)
+        {
+            var query = "DELETE FROM [dbo].[ProductString] WHERE ProductId = @Id";
+
+            return _dbContext.ExecuteAsync(query, param: new { Productid = id });
+
+        }
+
+        public Task<int> DeleteBarCodeAsync(Guid id, UserClaim userClaim)
+        {
+            var query = "DELETE FROM [dbo].[ProductBarcode] WHERE ProductId = @Id";
+
+            return _dbContext.ExecuteAsync(query, param: new { Productid = id });
+
         }
     }
 }

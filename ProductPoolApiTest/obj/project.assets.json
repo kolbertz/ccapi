@@ -11313,9 +11313,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
-      "projectName": "ProductPoolApiTest",
-      "projectPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\ProductPoolApiTest.csproj",
+      "projectUniqueName": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\CCApiTest.csproj",
+      "projectName": "CCApiTest",
+      "projectPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\CCApiTest.csproj",
       "packagesPath": "C:\\Users\\PatrickMichla\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\PatrickMichla\\source\\repos\\ccapi\\ProductPoolApiTest\\obj\\",
       "projectStyle": "PackageReference",

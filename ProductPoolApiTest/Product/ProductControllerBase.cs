@@ -1,19 +1,10 @@
 ﻿using CCApiTest.Base;
 using CCApiTest.Interface;
-using CCProductPoolService.Data;
 using CCProductPoolService.Interface;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CCApiTest.ProductPool
+namespace CCApiTest.Product
 {
-    public class ProductPoolControllerBase : ControllerTestBaseClass, IPopulateDbControllerTest
+    public class ProductControllerBase : ControllerTestBaseClass, IPopulateDbControllerTest
     {
         public async Task PopulateDbWithSystemSetting(IApplicationDbConnection ctx)
         {
@@ -27,27 +18,28 @@ namespace CCApiTest.ProductPool
 
         public async Task DePopulateDatabase(IApplicationDbConnection ctx)
         {
-                await PopulateDatabase("delete from ProductPool", ctx);
-                await PopulateDatabase("delete from SystemSettings", ctx);
+            await PopulateDatabase("delete from Product", ctx);
+            await PopulateDatabase("delete from SystemSettings", ctx);
         }
 
         public async Task PopulateDatabaseWithList(IApplicationDbConnection ctx)
         {
             await PopulateDbWithSystemSetting(ctx);
-            var query = "INSERT INTO ProductPool(ProductPoolKey, [Name], SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
-                "VALUES(1, 'Pool 1', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4'), " +
-                "(2, 'Pool 2', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4');";
+            var query = "INSERT INTO Product(ProductKey, IsBlocked, Balance, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser, ProductPoolId, ProductType) " +
+                "VALUES(1, false, false, GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', 0), " +
+                      "(2, false, false, GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', 0);";
             await PopulateDatabase(query, ctx);
         }
 
         public async Task<Guid> PopulateDatabaseWithSingleEntity(IApplicationDbConnection ctx)
         {
             await PopulateDbWithSystemSetting(ctx);
-            var query = "INSERT INTO ProductPool(ProductPoolKey, [Name], SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
+            var query = "INSERT INTO Product(ProductKey, IsBlocked, Balance, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser, ProductPoolId, ProductType) " +
                 "OUTPUT Inserted.Id " +
-                "VALUES(1, 'Pool 1', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4')";
+                "VALUES(1, false, false, GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', 0)";
             Guid productPoolId = await PopulateDatabaseAndReturnIdentity(query, ctx);
             return productPoolId;
         }
     }
 }
+

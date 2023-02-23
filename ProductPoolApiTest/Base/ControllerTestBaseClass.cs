@@ -13,7 +13,7 @@ using CCProductPoolService.DapperDbConnection;
 using System.Data.Common;
 using System.Data;
 
-namespace ProductPoolApiTest
+namespace CCApiTest.Base
 {
     public class ControllerTestBaseClass
     {
@@ -32,24 +32,14 @@ namespace ProductPoolApiTest
 
             return new WebApplicationFactory<Program>().WithWebHostBuilder(builder => {
                 builder.ConfigureTestServices(services => {
-                    var oldOptions = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AramarkDbProduction20210816Context>));
-                    if (oldOptions != null)
-                    {
-                        services.Remove(oldOptions);
-                    }
                     var dbConnectionDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection));
                     if (dbConnectionDescriptor != null)
                     {
                         services.Remove(dbConnectionDescriptor);
                     }
-                    var options = new DbContextOptionsBuilder<AramarkDbProduction20210816Context>()
-                    .UseSqlServer(configuration.GetConnectionString("AramarkStaging"))
-                                    .Options;
+                   
                     services.AddSingleton<IConfiguration>(configuration);
-                    services.AddSingleton(options);
-                    services.AddSingleton<AramarkDbProduction20210816Context>();
                     services.AddSingleton<IApplicationDbConnection, ApplicationWriteDbConnection>();
-                    services.AddSingleton<IApplicationReadDbConnection, ApplicationReadDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));
