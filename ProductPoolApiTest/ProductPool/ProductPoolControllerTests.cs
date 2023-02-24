@@ -7,17 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ProductPoolApiTest.ProductPool;
 using System.Data;
 using System.Data.Common;
 using System.Net;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using CCApiTest.Base;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
-namespace ProductPoolApiTest
+namespace CCApiTest.ProductPool
 {
-    public class ProductPoolControllerTests : ProductPoolControllerBase, IClassFixture<ProductPoolStart>
+    public class ProductPoolControllerTests : ProductPoolControllerBase, IClassFixture<CCApiTestStart>
     {
         public ProductPoolControllerTests() {}
 

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCProductPoolService", "CCP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCApiGateway", "CCApiGateway\CCApiGateway.csproj", "{92E65876-9A2D-4797-A2FB-E46F5C0512D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductPoolApiTest", "ProductPoolApiTest\ProductPoolApiTest.csproj", "{F3B095F5-7A1E-4427-B17D-99E5B76C8606}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCApiTest", "ProductPoolApiTest\CCApiTest.csproj", "{F3B095F5-7A1E-4427-B17D-99E5B76C8606}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCAuthServer", "CCAuthServer\CCAuthServer.csproj", "{8FEE1428-236A-41D7-A711-A2F89A55B8D1}"
 EndProject

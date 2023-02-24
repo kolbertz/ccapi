@@ -2,7 +2,7 @@
 using CCProductPoolService.Interface;
 using System.Data;
 
-namespace ProductPoolApiTest.Interface
+namespace CCApiTest.Interface
 {
     internal interface IPopulateDbControllerTest
     {

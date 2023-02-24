@@ -132,13 +132,12 @@ namespace CCProductService.Controller
         /// <summary>
         /// Patch a "<see cref="ProductDto"/>" using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="jsonPatchDocument"></param>
+        /// <param name="id"></param>       
         /// <returns></returns>
         [HttpPatch]
         [Route("{id}")]
-        [SwaggerOperation("Patch a Product using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
-        public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatchDocument)
+        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
+        public async Task<IActionResult> Patch(Guid id)
         {
             ProductDto dto;
             UserClaim userClaim = null;
@@ -150,7 +149,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                dto = await productRepository.PatchProductAsync(id, jsonPatchDocument).ConfigureAwait(false);
+                dto = await productRepository.PatchProductAsync(id, userClaim).ConfigureAwait(false);
                 return Ok(dto);
             }
         }
@@ -170,7 +169,14 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-
+            if (await _serviceProvider.GetService<IProductRepository>().DeleteProductAsync(id, userClaim).ConfigureAwait(false) > 0)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);

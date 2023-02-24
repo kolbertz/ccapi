@@ -6,4 +6,3 @@ OBJ
 bin
 packages
 !packages/repositories.config
-/.vs/CCProductService/DesignTimeBuild/.dtbcache.v2
