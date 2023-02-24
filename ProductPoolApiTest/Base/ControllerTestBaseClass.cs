@@ -12,6 +12,9 @@ using CCProductPoolService.Repositories;
 using CCProductPoolService.DapperDbConnection;
 using System.Data.Common;
 using System.Data;
+using CCProductService.Interface;
+using CCProductService.Repositories;
+using IApplicationDbConnection = CCProductPoolService.Interface.IApplicationDbConnection;
 
 namespace CCApiTest.Base
 {
@@ -41,6 +44,7 @@ namespace CCApiTest.Base
                     services.AddSingleton<IConfiguration>(configuration);
                     services.AddSingleton<IApplicationDbConnection, ApplicationWriteDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
+                    services.AddSingleton<IProductRepository, ProductRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));
                     services.AddAuthorization(config => {
