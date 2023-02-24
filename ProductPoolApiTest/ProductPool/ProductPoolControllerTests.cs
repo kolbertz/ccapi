@@ -13,6 +13,7 @@ using System.Net;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using CCApiTest.Base;
+using CCApiLibrary.Interfaces;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace CCApiTest.ProductPool

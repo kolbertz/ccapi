@@ -1,11 +1,8 @@
-﻿using CCProductPoolService.Data;
+﻿using CCApiLibrary.Interfaces;
+using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
-using Dapper;
-using Dapper.Contrib.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace CCProductPoolService.Repositories
 {

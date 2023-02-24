@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CCApiLibrary\CCApiLibrary.csproj" />
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
   </ItemGroup>
 

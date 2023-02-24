@@ -9,9 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using CCProductPoolService.Repositories;
-using CCProductPoolService.DapperDbConnection;
 using System.Data.Common;
-using System.Data;
+using CCApiLibrary.Interfaces;
+using CCApiLibrary.DbConnection;
 
 namespace CCApiTest.Base
 {
@@ -39,7 +39,7 @@ namespace CCApiTest.Base
                     }
                    
                     services.AddSingleton<IConfiguration>(configuration);
-                    services.AddSingleton<IApplicationDbConnection, ApplicationWriteDbConnection>();
+                    services.AddSingleton<IApplicationDbConnection, ApplicationDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));

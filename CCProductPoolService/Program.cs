@@ -1,21 +1,17 @@
+using CCApiLibrary.DbConnection;
+using CCApiLibrary.Interfaces;
 using CCProductPoolService;
-using CCProductPoolService.DapperDbConnection;
 using CCProductPoolService.Data;
 using CCProductPoolService.Interface;
 using CCProductPoolService.Repositories;
-using IdentityModel.AspNetCore.OAuth2Introspection;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 
 public class Program
@@ -108,8 +104,7 @@ public class Program
 
         builder.Services.AddDbContext<AramarkDbProduction20210816Context>(options =>
             options.UseSqlServer(configuration.GetConnectionString("AramarkStaging")));
-        builder.Services.AddScoped<IApplicationDbConnection, ApplicationWriteDbConnection>();
-        builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();
+        builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductPoolRepository, ProductPoolRepository>();
         builder.Services.AddScoped<ValidateModelAttribute>();
         builder.Services.Configure<ApiBehaviorOptions>(Options=> Options.SuppressModelStateInvalidFilter = true);

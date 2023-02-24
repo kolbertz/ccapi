@@ -1,10 +1,8 @@
-﻿using CCProductService.Data;
+﻿using CCApiLibrary.Interfaces;
+using CCProductService.Data;
 using CCProductService.DTOs;
-using CCProductService.DTOs.Enums;
 using CCProductService.Helper;
 using CCProductService.Interface;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.JsonPatch;
 using System.Dynamic;
 
 namespace CCProductService.Repositories

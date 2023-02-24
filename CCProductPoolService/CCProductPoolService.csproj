@@ -42,4 +42,8 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="ProductPoolApiTest" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CCApiLibrary\CCApiLibrary.csproj" />
+	</ItemGroup>
 </Project>
