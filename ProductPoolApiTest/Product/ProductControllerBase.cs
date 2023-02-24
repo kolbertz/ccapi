@@ -1,4 +1,5 @@
-﻿using CCApiTest.Base;
+﻿using CCApiLibrary.Interfaces;
+using CCApiTest.Base;
 using CCApiTest.Interface;
 using CCProductPoolService.Interface;
 

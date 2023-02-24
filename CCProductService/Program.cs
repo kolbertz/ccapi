@@ -1,4 +1,5 @@
-﻿using CCProductService.DapperDbConnection;
+﻿using CCApiLibrary.DbConnection;
+using CCApiLibrary.Interfaces;
 using CCProductService.Helper;
 using CCProductService.Interface;
 using CCProductService.Repositories;
@@ -97,7 +98,6 @@ internal class Program
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddScoped<IClaimsRepository, ClaimsRepository>();
         builder.Services.AddControllers().AddNewtonsoftJson();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
