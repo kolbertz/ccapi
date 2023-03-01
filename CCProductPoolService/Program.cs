@@ -102,8 +102,6 @@ public class Program
             });
         });
 
-        builder.Services.AddDbContext<AramarkDbProduction20210816Context>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("AramarkStaging")));
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductPoolRepository, ProductPoolRepository>();
         builder.Services.AddScoped<ValidateModelAttribute>();
@@ -115,7 +113,7 @@ public class Program
         {
             options.Audience = "all";
             options.ClaimsIssuer = "localhost";
-            options.Authority = "http://localhost:7298";
+            options.Authority = "http://localhost:7085";
             options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
             {
                 AuthorizationEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/Authorize\",
