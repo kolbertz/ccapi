@@ -10,15 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using CCProductPoolService.Repositories;
 using System.Data.Common;
-<<<<<<< HEAD
 using System.Data;
+using CCApiLibrary.DbConnection;
+using CCApiLibrary.Interfaces;
 using CCProductService.Interface;
 using CCProductService.Repositories;
-using IApplicationDbConnection = CCProductPoolService.Interface.IApplicationDbConnection;
-=======
-using CCApiLibrary.Interfaces;
-using CCApiLibrary.DbConnection;
->>>>>>> d758429d047184e61f809ec653572ce791dc4b6a
 
 namespace CCApiTest.Base
 {

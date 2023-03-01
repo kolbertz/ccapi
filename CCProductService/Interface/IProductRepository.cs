@@ -8,7 +8,7 @@ namespace CCProductService.Interface
     public interface IProductRepository : IDisposable
     {
         void Init(string database);
-        Task<IEnumerable<ProductDto>> GetAllProducts(int? take, int? skip, UserClaim userClaim);
+        Task<IEnumerable<ProductStandardPrice>> GetAllProducts(int? take, int? skip, UserClaim userClaim);
         Task<ProductDto> GetProductById(Guid id, UserClaim userClaim);
         Task<Guid> AddProductAsync(ProductDto productDto, UserClaim userClaim);
         Task<bool> UpdateProductAsync(ProductDto productDto, UserClaim userClaim);

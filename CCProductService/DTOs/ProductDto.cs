@@ -1,23 +1,40 @@
 ﻿using CCProductService.Data;
 using CCProductService.DTOs.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace CCProductService.DTOs
 {
-    public class ProductDto
+    public class ProductDto 
     {
         public Guid Id { get; set; }
-        public Guid? ProductPoolId { get; set; }
-        public int? Key { get; set; }
+
+        [Required]
+        public Guid ProductPoolId { get; set; }
+
+        [Required]
+        public int Key { get; set; }
+
         public List<string> Barcodes { get; set; }
+
+        [Required]
         public List<MultilanguageText> ShortNames { get; set; }
+
+        [Required]
         public List<MultilanguageText> LongNames { get; set; }
+        
         public List<MultilanguageText> Descriptions { get; set; }
+
+        [Required]
         public ProductType ProductType { get; set; }
+
         public IEnumerable<ImageUrl> ImageUrls { get; set; }
+
         public Balance Balance { get; set; }
+
         public bool IsBlocked { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public ProductDto() { }

@@ -26,7 +26,7 @@ namespace CCProductService.Repositories
             _dbContext?.Dispose();
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllProducts(int? take, int? skip, UserClaim userClaim)
+        public async Task<IEnumerable<ProductStandardPrice>> GetAllProducts(int? take, int? skip, UserClaim userClaim) 
         {
             string query;
             string productPoolQuery = string.Empty;
@@ -40,27 +40,41 @@ namespace CCProductService.Repositories
 
             if (take.HasValue && skip.HasValue)
             {
-                query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
-                    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
-                    $"OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t LEFT JOIN ProductString on t.Id = ProductString.ProductId";
+                query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Language, ShortName, LongName, Description, Value " +
+                    $"from (Select prod.Id, prod.ProductKey, prod.ProductPoolId, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, d.Value," +
+                    $" ROW_NUMBER() Over (Partition by prod.id order by StartDate desc ) as row from " +
+                    $"(Select p.Id, p.ProductPoolId, p.ProductKey, p.IsBlocked, p.Balance, p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue " +
+                    $"From Product p order by p.ProductKey OFFSET 0 Rows Fetch next 20 Rows only) as prod join ProductPool pool on prod.ProductPoolId = pool.Id " +
+                    $"join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId " +
+                    $"join ProductPrice pp on prod.Id = pp.ProductId join ProductPriceDate d on pp.Id = d.ProductPriceId) as tmp join ProductString ps on tmp.Id = ps.ProductId where tmp.row = 1 ";
+
+                //query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
+                //    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
+                //    $"OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t LEFT JOIN ProductString on t.Id = ProductString.ProductId";
                 paramObj.TryAdd("offset", skip.Value);
                 paramObj.TryAdd("fetch", take.Value);
             }
             else
             {
-                query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
-                    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
-                    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
-                    "ORDER BY ProductKey";
+                query = $"SELECT Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, ProductId, Language, ShortName, LongName, Description,Value " +
+                    $"from (select  p.Id, p.ProductKey , p.ProductPoolId,p.IsBlocked,p.Balance,p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue,s.ProductId,s.Language,s.ShortName,s.LongName,s.Description ,d.Value, " +
+                    $"ROW_NUMBER() Over (Partition by s.id order by  StartDate desc ) as row from Product p join ProductString s on p.Id = s.ProductId join ProductPool pool on p.ProductPoolId = pool.Id  join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId " +
+                    $" join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId join ProductPrice pp on p.Id = pp.ProductId join ProductPriceDate d on pp.Id =d.ProductPriceId{productPoolQuery}  and pl.IsDefault='1'  and StartDate  < GetDate()) as tmp where tmp.row = 1 ";
+                                
+                //query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
+                //    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
+                //    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
+                //    "ORDER BY ProductKey";                
                 paramObj.TryAdd("usergroup", userClaim.UserGroupId);
             }
-            var stringMap = new Dictionary<Guid, ProductDto>();
-            IEnumerable<ProductDto> result = await _dbContext.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
+            
+            var stringMap = new Dictionary<Guid, ProductStandardPrice>();
+            IEnumerable<ProductStandardPrice> result = await _dbContext.QueryAsync<Product, ProductString, ProductStandardPrice>(query, (p, ps) =>
             {
-                ProductDto dto;
+                ProductStandardPrice dto;
                 if (!stringMap.TryGetValue(p.Id, out dto))
                 {
-                    dto = new ProductDto(p);
+                    dto = new ProductStandardPrice(p);
                     stringMap.Add(p.Id, dto);
                 }
                 dto.SetMultilanguageText(ps);
@@ -300,5 +314,6 @@ namespace CCProductService.Repositories
             return _dbContext.ExecuteAsync(query, param: new { Productid = id });
 
         }
+
     }
 }

@@ -85,5 +85,6 @@ namespace CCProductPoolService.Repositories
             var query = "DELETE FROM ProductPool WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
+               
     }
 }
