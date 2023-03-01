@@ -5,6 +5,8 @@ using CCProductService.Interface;
 using CCProductService.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -15,7 +17,10 @@ internal class Program
     private static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        IdentityModelEventSource.ShowPII = true;
         ConfigurationManager configuration = builder.Configuration;
+        builder.Services.AddControllers().AddNewtonsoftJson();
 
         // Add services to the container.
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -92,13 +97,12 @@ internal class Program
                 }
             });
 
-            c.SchemaFilter<SwaggerSchemaFilter>();
+            //c.SchemaFilter<SwaggerSchemaFilter>();
 
         });
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddControllers().AddNewtonsoftJson();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer("monolithAuth", options =>
@@ -172,6 +176,10 @@ internal class Program
             opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
             opt.OAuthUsePkce();
         });
+        app.UseCors(builder => builder
+         .AllowAnyOrigin()
+         .AllowAnyMethod()
+         .AllowAnyHeader()); app.UseHttpsRedirection();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

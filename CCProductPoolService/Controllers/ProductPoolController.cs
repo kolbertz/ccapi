@@ -4,16 +4,8 @@ using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using System.Collections.Generic;
-using System.Net;
-using System.Security.Claims;
-using System.Web.Http.Controllers;
 
 namespace CCProductPoolService.Controllers
 {
