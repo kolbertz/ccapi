@@ -7,7 +7,11 @@ namespace CCProductService.DTOs
     {
         public decimal Standardprice { get; set; }
 
-        public ProductStandardPrice(Product product) : base(product) { }
+        public ProductStandardPrice(Product product) : base(product) 
+        
+        {
+           Standardprice = product.Standardprice;
+        }
         
 
     }

@@ -15,6 +15,12 @@ namespace CCProductPoolService.Repositories
             _dbContext = writeDbConnection;
         }
 
+        public void Dispose()
+        {
+            _dbContext?.Dispose();
+        }
+
+
         public void Init(string database)
         {
             _dbContext.Init(database);

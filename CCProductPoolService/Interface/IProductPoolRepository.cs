@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 
 namespace CCProductPoolService.Interface
 {
-    public interface IProductPoolRepository
+    public interface IProductPoolRepository : IDisposable
     {
         void Init(string database);
         Task<IEnumerable<ProductPoolDto>> GetProductPoolsAsync();

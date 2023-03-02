@@ -9,6 +9,8 @@ public partial class Product
 
     public int ProductKey { get; set; }
 
+    public decimal Standardprice { get; set; }
+
     public bool IsBlocked { get; set; }
 
     public string Comment { get; set; }

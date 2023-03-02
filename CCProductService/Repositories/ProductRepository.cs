@@ -40,13 +40,13 @@ namespace CCProductService.Repositories
 
             if (take.HasValue && skip.HasValue)
             {
-                query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Language, ShortName, LongName, Description, Value " +
+                query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description  " +
                     $"from (Select prod.Id, prod.ProductKey, prod.ProductPoolId, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, d.Value," +
                     $" ROW_NUMBER() Over (Partition by prod.id order by StartDate desc ) as row from " +
                     $"(Select p.Id, p.ProductPoolId, p.ProductKey, p.IsBlocked, p.Balance, p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue " +
-                    $"From Product p order by p.ProductKey OFFSET 0 Rows Fetch next 20 Rows only) as prod join ProductPool pool on prod.ProductPoolId = pool.Id " +
+                    $"From Product p order by p.ProductKey OFFSET @offset Rows Fetch next @fetch Rows only) as prod join ProductPool pool on prod.ProductPoolId = pool.Id " +
                     $"join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId " +
-                    $"join ProductPrice pp on prod.Id = pp.ProductId join ProductPriceDate d on pp.Id = d.ProductPriceId) as tmp join ProductString ps on tmp.Id = ps.ProductId where tmp.row = 1 ";
+                    $"join ProductPrice pp on prod.Id = pp.ProductId join ProductPriceDate d on pp.Id = d.ProductPriceId) as tmp left join ProductString ps on tmp.Id = ps.ProductId where tmp.row = 1 ";
 
                 //query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
                 //    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
@@ -56,11 +56,13 @@ namespace CCProductService.Repositories
             }
             else
             {
-                query = $"SELECT Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, ProductId, Language, ShortName, LongName, Description,Value " +
-                    $"from (select  p.Id, p.ProductKey , p.ProductPoolId,p.IsBlocked,p.Balance,p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue,s.ProductId,s.Language,s.ShortName,s.LongName,s.Description ,d.Value, " +
-                    $"ROW_NUMBER() Over (Partition by s.id order by  StartDate desc ) as row from Product p join ProductString s on p.Id = s.ProductId join ProductPool pool on p.ProductPoolId = pool.Id  join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId " +
-                    $" join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId join ProductPrice pp on p.Id = pp.ProductId join ProductPriceDate d on pp.Id =d.ProductPriceId{productPoolQuery}  and pl.IsDefault='1'  and StartDate  < GetDate()) as tmp where tmp.row = 1 ";
-                                
+                query = $"Select u.Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description " +
+                    $"from (Select * from (Select pp.ProductId, ppd.Value, Row_Number() Over (Partition by pp.Id order by StartDate desc) as row " +
+                    $"from ProductPriceDate ppd join ProductPrice pp on pp.Id = ppd.ProductPriceId " +
+                    $"join ProductPricePoolToPriceList pl on pp.ProductPricePoolId = pl.ProductPricePoolId " +
+                    $"where pl.IsDefault = 1) as t join Product p on p.Id = t.ProductId where t.Row = 1) as u " +
+                    $"join ProductString ps on ps.ProductId = u.ProductId ";
+
                 //query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
                 //    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
                 //    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
