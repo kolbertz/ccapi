@@ -104,7 +104,9 @@ internal class Program
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        builder.Services.AddAuthentication(o => {
+            o.DefaultScheme = "monolithAuth";
+        })
         .AddJwtBearer("monolithAuth", options =>
         {
             options.Audience = "all";

@@ -108,7 +108,9 @@ public class Program
         builder.Services.Configure<ApiBehaviorOptions>(Options=> Options.SuppressModelStateInvalidFilter = true);
 
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        builder.Services.AddAuthentication(o => {
+            o.DefaultScheme = "monolithAuth";
+        })
         .AddJwtBearer("monolithAuth", options =>
         {
             options.Audience = "all";
