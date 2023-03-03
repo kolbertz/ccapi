@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CCApiLibrary\CCApiLibrary.csproj" />
+    <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Interface\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

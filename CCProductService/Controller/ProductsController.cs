@@ -11,12 +11,13 @@ namespace CCProductService.Controller
     [Route("api/v2/[controller]")]
     [ApiController]
     //[Authorize]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ControllerBase 
     {
         private IServiceProvider _serviceProvider;
 
-        public ProductsController(IServiceProvider serviceProvider) { 
-            _serviceProvider= serviceProvider;
+        public ProductsController(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
         }
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpGet]
         [SwaggerOperation("Get a list with Product items (using Dapper)")]
-        public async Task<IActionResult> Get(int? skip, int? take)
+        public async Task<IActionResult> Get(int? skip, int? take) 
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -37,7 +38,7 @@ namespace CCProductService.Controller
 
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
-                IEnumerable<ProductDto> productsList = null;
+                IEnumerable<ProductStandardPrice> productsList = null;
                 productRepository.Init(userClaim.TenantDatabase);
                 productsList = await productRepository.GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
                 return Ok(productsList);
@@ -55,7 +56,7 @@ namespace CCProductService.Controller
         [HttpGet]
         [Route("{id}")]
         [SwaggerOperation("Gets a Product by Id (using Dapper)")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id) 
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -79,7 +80,7 @@ namespace CCProductService.Controller
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)] 
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
         public async Task<IActionResult> Post([ModelBinder] ProductDto productDto)
         {
@@ -169,20 +170,21 @@ namespace CCProductService.Controller
             {
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
-            if (await _serviceProvider.GetService<IProductRepository>().DeleteProductAsync(id, userClaim).ConfigureAwait(false) > 0)
-            {
-                return NoContent();
-            }
-            else
-            {
-                return NotFound();
-            }
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                await productRepository.DeleteProductAsync(id, userClaim).ConfigureAwait(false);
-                return Ok();
+
+                if (await productRepository.DeleteProductAsync(id, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
             }
+
         }
 
         /// <summary>
@@ -286,5 +288,5 @@ namespace CCProductService.Controller
 
         //}).WithMetadata(new SwaggerOperationAttribute("Get product compilations (using Dapper)"));
 
-    }
+    }      
 }

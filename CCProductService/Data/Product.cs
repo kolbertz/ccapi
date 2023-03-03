@@ -7,7 +7,9 @@ public partial class Product
 {
     public Guid Id { get; set; }
 
-    public int? ProductKey { get; set; }
+    public int ProductKey { get; set; }
+
+    public decimal Standardprice { get; set; }
 
     public bool IsBlocked { get; set; }
 
@@ -37,7 +39,7 @@ public partial class Product
 
     public Guid LastUpdatedUser { get; set; }
 
-    public Guid? ProductPoolId { get; set; }
+    public Guid ProductPoolId { get; set; }
 
     public string Image { get; set; }
 

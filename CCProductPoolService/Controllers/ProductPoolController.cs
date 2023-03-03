@@ -1,4 +1,5 @@
-﻿using CCProductPoolService.Data;
+﻿using CCApiLibrary.CustomAttributes;
+using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -44,6 +45,12 @@ namespace CCProductPoolService.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
+            UserClaim userClaim = null;
+
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
             ProductPoolDto productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
             if 
                 (productPoolDto == null) 

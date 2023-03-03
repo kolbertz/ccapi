@@ -15,6 +15,12 @@ namespace CCProductPoolService.Repositories
             _dbContext = writeDbConnection;
         }
 
+        public void Dispose()
+        {
+            _dbContext?.Dispose();
+        }
+
+
         public void Init(string database)
         {
             _dbContext.Init(database);
@@ -85,5 +91,6 @@ namespace CCProductPoolService.Repositories
             var query = "DELETE FROM ProductPool WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
+               
     }
 }

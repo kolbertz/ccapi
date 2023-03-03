@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Net;
-using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding;
 
-namespace CCProductPoolService
+
+namespace CCApiLibrary.CustomAttributes
 {
 
     public class ValidateModelAttribute : ActionFilterAttribute

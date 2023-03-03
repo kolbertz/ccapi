@@ -10,8 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using CCProductPoolService.Repositories;
 using System.Data.Common;
-using CCApiLibrary.Interfaces;
+using System.Data;
 using CCApiLibrary.DbConnection;
+using CCApiLibrary.Interfaces;
+using CCProductService.Interface;
+using CCProductService.Repositories;
 
 namespace CCApiTest.Base
 {
@@ -41,6 +44,7 @@ namespace CCApiTest.Base
                     services.AddSingleton<IConfiguration>(configuration);
                     services.AddSingleton<IApplicationDbConnection, ApplicationDbConnection>();
                     services.AddSingleton<IProductPoolRepository, ProductPoolRepository>();
+                    services.AddSingleton<IProductRepository, ProductRepository>();
                     services.AddAuthentication()
                         .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));
                     services.AddAuthorization(config => {

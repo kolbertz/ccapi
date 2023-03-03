@@ -26,7 +26,7 @@ namespace CCProductService.Repositories
             _dbContext?.Dispose();
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllProducts(int? take, int? skip, UserClaim userClaim)
+        public async Task<IEnumerable<ProductStandardPrice>> GetAllProducts(int? take, int? skip, UserClaim userClaim) 
         {
             string query;
             string productPoolQuery = string.Empty;
@@ -40,27 +40,43 @@ namespace CCProductService.Repositories
 
             if (take.HasValue && skip.HasValue)
             {
-                query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
-                    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
-                    $"OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t LEFT JOIN ProductString on t.Id = ProductString.ProductId";
+                query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description  " +
+                    $"from (Select prod.Id, prod.ProductKey, prod.ProductPoolId, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, d.Value," +
+                    $" ROW_NUMBER() Over (Partition by prod.id order by StartDate desc ) as row from " +
+                    $"(Select p.Id, p.ProductPoolId, p.ProductKey, p.IsBlocked, p.Balance, p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue " +
+                    $"From Product p order by p.ProductKey OFFSET @offset Rows Fetch next @fetch Rows only) as prod join ProductPool pool on prod.ProductPoolId = pool.Id " +
+                    $"join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId " +
+                    $"join ProductPrice pp on prod.Id = pp.ProductId join ProductPriceDate d on pp.Id = d.ProductPriceId) as tmp left join ProductString ps on tmp.Id = ps.ProductId where tmp.row = 1 ";
+
+                //query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
+                //    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
+                //    $"OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t LEFT JOIN ProductString on t.Id = ProductString.ProductId";
                 paramObj.TryAdd("offset", skip.Value);
                 paramObj.TryAdd("fetch", take.Value);
             }
             else
             {
-                query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
-                    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
-                    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
-                    "ORDER BY ProductKey";
+                query = $"Select u.Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description " +
+                    $"from (Select * from (Select pp.ProductId, ppd.Value, Row_Number() Over (Partition by pp.Id order by StartDate desc) as row " +
+                    $"from ProductPriceDate ppd join ProductPrice pp on pp.Id = ppd.ProductPriceId " +
+                    $"join ProductPricePoolToPriceList pl on pp.ProductPricePoolId = pl.ProductPricePoolId " +
+                    $"where pl.IsDefault = 1) as t join Product p on p.Id = t.ProductId where t.Row = 1) as u " +
+                    $"join ProductString ps on ps.ProductId = u.ProductId ";
+
+                //query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
+                //    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
+                //    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
+                //    "ORDER BY ProductKey";                
                 paramObj.TryAdd("usergroup", userClaim.UserGroupId);
             }
-            var stringMap = new Dictionary<Guid, ProductDto>();
-            IEnumerable<ProductDto> result = await _dbContext.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
+            
+            var stringMap = new Dictionary<Guid, ProductStandardPrice>();
+            IEnumerable<ProductStandardPrice> result = await _dbContext.QueryAsync<Product, ProductString, ProductStandardPrice>(query, (p, ps) =>
             {
-                ProductDto dto;
+                ProductStandardPrice dto;
                 if (!stringMap.TryGetValue(p.Id, out dto))
                 {
-                    dto = new ProductDto(p);
+                    dto = new ProductStandardPrice(p);
                     stringMap.Add(p.Id, dto);
                 }
                 dto.SetMultilanguageText(ps);
@@ -300,5 +316,6 @@ namespace CCProductService.Repositories
             return _dbContext.ExecuteAsync(query, param: new { Productid = id });
 
         }
+
     }
 }
