@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CCCategoryPoolService.Controllers
+namespace CCCategoryService.Controllers
 {
     public class CategoryPoolController : ControllerBase
     {

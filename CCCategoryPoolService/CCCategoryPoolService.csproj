@@ -11,4 +11,10 @@
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Interface\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>

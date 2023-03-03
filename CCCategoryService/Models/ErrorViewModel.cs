@@ -1,4 +1,4 @@
-namespace CCCategoryPoolService.Models
+namespace CCCategoryService.Models
 {
     public class ErrorViewModel
     {

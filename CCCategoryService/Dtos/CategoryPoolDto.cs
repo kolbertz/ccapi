@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CCCategoryPoolService.Dtos
+namespace CCCategoryService.Dtos
 {
     public class CategoryPoolDto
     {

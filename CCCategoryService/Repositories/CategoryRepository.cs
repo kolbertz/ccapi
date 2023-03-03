@@ -1,13 +1,13 @@
 ﻿using CCApiLibrary.Interfaces;
-using CCCategoryPoolService.Interface;
+using CCCategoryService.Interface;
 
-namespace CCCategoryPoolService.Repositories
+namespace CCCategoryService.Repositories
 {
-    public class CategoryServiceRepository : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         public IApplicationDbConnection _dbContext { get; }
 
-        public CategoryServiceRepository(IApplicationDbConnection writeDbCoonection)
+        public CategoryRepository(IApplicationDbConnection writeDbCoonection)
 
         {
             _dbContext = writeDbCoonection;
@@ -33,7 +33,7 @@ namespace CCCategoryPoolService.Repositories
 
         public Task<bool> UpdateProductAsync()
         {
-            return  ;
+            return  null;
         }
 
         public async Task PatchAsync()
@@ -42,7 +42,7 @@ namespace CCCategoryPoolService.Repositories
 
         public Task<int> DeleteProductAsync() 
         {
-            return  ;
+            return  null;
         }
 
     }

@@ -1,8 +1,8 @@
-﻿using CCCategoryPoolService.Models;
+﻿using CCCategoryService.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CCCategoryPoolService.Controllers
+namespace CCCategoryService.Controllers
 {
     public class CategoryController : ControllerBase
     {

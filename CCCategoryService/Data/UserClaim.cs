@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CCCategoryPoolService.Data
+namespace CCCategoryService.Data
 {
     public class UserClaim
     {
