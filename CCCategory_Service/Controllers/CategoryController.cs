@@ -39,7 +39,7 @@ namespace CCCategoryService.Controllers
 
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
-                IEnumerable<CategoryDto> categorysList = null;
+                IEnumerable<Category> categorysList = null;
                 categoryRepository.Init(userClaim.TenantDatabase);
                 categorysList = await categoryRepository.GetAllCategorys(take, skip, userClaim).ConfigureAwait(false);
                 return Ok(categorysList);
@@ -66,11 +66,14 @@ namespace CCCategoryService.Controllers
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
-                CategoryDto category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
+                Category category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
             }
             return Ok();
         }
-        public async Task<IActionResult> Post([ModelBinder] CategoryDto categoryDto)
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [SwaggerOperation("Adds a new Product (using EF Core)")]
+        public async Task<IActionResult> Post([ModelBinder] Category categoryDto)
         {
             UserClaim userClaim = null;
             Guid? newCategoryId = null;
@@ -87,7 +90,11 @@ namespace CCCategoryService.Controllers
             }
 
         }
-        public async Task<IActionResult> Put(Guid id, [ModelBinder] CategoryDto categoryDto)
+
+        [HttpPut]
+        [Route("{id}")]
+        [SwaggerOperation("Updates a Product (using EF Core)")]
+        public async Task<IActionResult> Put(Guid id, [ModelBinder] Category categoryDto)
 
         {
             if (id != categoryDto.Id)
@@ -107,9 +114,13 @@ namespace CCCategoryService.Controllers
                 return Ok();
             }
         }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 ")]
         public async Task<IActionResult> Patch(Guid id)
         {
-            CategoryDto dto;
+            CategoryBase dto;
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
             {
@@ -124,6 +135,10 @@ namespace CCCategoryService.Controllers
 
             }
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [SwaggerOperation("Delete a Product ")]
         public async Task<IActionResult> Delete(Guid id)
         {
             UserClaim userClaim = null;

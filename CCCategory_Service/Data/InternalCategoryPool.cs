@@ -2,7 +2,7 @@
 
 namespace CCCategoryService.Data;
 
-public partial class CategoryPool
+public partial class InternalCategoryPool
 {
     public Guid Id { get; set; }
 

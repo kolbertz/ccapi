@@ -41,7 +41,7 @@ namespace CCCategoryService.Data
             }
             else
             {
-                TenantDatabase = "TestDatabase";
+                TenantDatabase = "DefaultDatabase";
             }
         }
     }

@@ -22,4 +22,6 @@ public partial class Category
     public virtual ICollection<CategoryString> CategoryStrings { get; } = new List<CategoryString>();
 
     public virtual ICollection<Product> Products { get; } = new List<Product>();
+
+ 
 }

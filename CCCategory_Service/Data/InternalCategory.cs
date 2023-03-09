@@ -1,6 +1,6 @@
 ﻿namespace CCCategoryService.Data;
 
-public class Category
+public class InternalCategory
 {
     public Guid Id { get; set; }
 
@@ -12,10 +12,14 @@ public class Category
 
     public DateTimeOffset LastUpdatedDate { get; set; }
 
-    public Guid LastUpdateUser { get; set; }
+    public Guid LastUpdatedUser { get; set; }
 
     public Guid CategoryPoolId { get; set; }
 
-    public virtual ICollection<CategoryString> CategoryStrings { get; } = new List<CategoryString>();
+    public virtual ICollection<InternalCategoryString> CategoryStrings { get; } = new List<InternalCategoryString>();
 
+    public InternalCategory()
+    {
+        
+    }
 }
