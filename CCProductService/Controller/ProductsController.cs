@@ -1,4 +1,5 @@
-﻿using CCProductService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Interface;
 using Microsoft.AspNetCore.Http.Extensions;

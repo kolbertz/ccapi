@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.Interfaces;
+using CCApiLibrary.Models;
 using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;

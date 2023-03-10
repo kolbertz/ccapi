@@ -1,4 +1,5 @@
-﻿using CCProductPoolService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
 

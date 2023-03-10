@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CCProductPoolService.Data
+namespace CCApiLibrary.Models
 {
     public class UserClaim
     {
@@ -9,7 +9,7 @@ namespace CCProductPoolService.Data
         public Guid UserId { get; set; }
         public Guid UserGroupId { get; set; }
         public Guid ProfileId { get; set; }
-        public IEnumerable<Guid> ProductPoolIds { get; set; }
+        public IEnumerable<Guid> CategoryPoolIds { get; set; }
         public string TenantDatabase { get; set; }
 
         public UserClaim(IEnumerable<Claim> claims)
@@ -41,7 +41,7 @@ namespace CCProductPoolService.Data
             }
             else
             {
-                TenantDatabase = "DefaultDatabase";
+                TenantDatabase = "AramarkDbProduction_20210816";
             }
         }
     }

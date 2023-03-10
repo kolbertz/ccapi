@@ -1,4 +1,5 @@
-﻿using CCProductService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductService.Data;
 using CCProductService.DTOs;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Security.Claims;

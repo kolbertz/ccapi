@@ -13,13 +13,6 @@ namespace CCApiLibrary.CustomAttributes
             if (!actionContext.ModelState.IsValid)
             {
                 actionContext.Result = new UnprocessableEntityObjectResult(actionContext.ModelState);
-                //actionContext.HttpContext.Response.StatusCode = 400;
-                //actionContext.HttpContext.Response.Body= null;
-              
-
-                //  actionContext.Response = actionContext.Request.CreateErrorResponse(
-                //HttpStatusCode.BadRequest, actionContext.ModelState);
-
             }
         }
 
