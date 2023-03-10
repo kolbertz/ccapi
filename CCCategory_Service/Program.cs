@@ -7,12 +7,15 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Logging;
 
-public class Program
+internal class Program
 {
     private static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        IdentityModelEventSource.ShowPII = true;
 
         // Add services to the container.
 
@@ -68,8 +71,8 @@ public class Program
                 {
                     AuthorizationCode = new OpenApiOAuthFlow
                     {
-                        TokenUrl = new Uri(@"https://localhost:5228/Home/token"),
-                        AuthorizationUrl = new Uri(@"https://localhost:5228/Home/Authorize"),
+                        TokenUrl = new Uri(@"https://localhost:7092/Home/token"),
+                        AuthorizationUrl = new Uri(@"https://localhost:7092/Home/Authorize"),
                     }
                 },
                 Scheme = "gloabalAuth",
@@ -102,13 +105,13 @@ public class Program
 
         builder.Services.AddAuthentication(o =>
         {
-            o.DefaultScheme = "monolitAuth";
+            o.DefaultScheme = "monolithAuth";
         })
         .AddJwtBearer("monolithAuth", options =>
         {
             options.Audience = "all";
             options.ClaimsIssuer = "localhost";
-            options.Authority = "http://localhost:7085";
+            options.Authority = "http://localhost:5228";
             options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
             {
                 AuthorizationEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/Authorize\",
@@ -183,7 +186,7 @@ public class Program
         .AllowAnyMethod()
         .AllowAnyHeader());
         app.UseHttpsRedirection();
-
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

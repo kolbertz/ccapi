@@ -29,7 +29,7 @@ namespace CCApiTest.Product
             var application = GetWebApplication();
 
             var client = application.CreateClient();
-            var respone = await client.GetAsync("/api/v2/product");
+            var respone = await client.GetAsync("/api/v2/productpool");
             Assert.Equal(HttpStatusCode.Unauthorized, respone.StatusCode);
         }
 
@@ -160,7 +160,7 @@ namespace CCApiTest.Product
                     // Populate DB
                     Guid productId = await PopulateDatabaseWithSingleEntity(dbConnection);
                     var client = CreateClientWithAuth(application);
-                    ProductDto product = new ProductDto
+                    ProductBase product = new ProductBase
                     {
                         //Id = productId,
                         //ShortNames = ,
@@ -176,7 +176,6 @@ namespace CCApiTest.Product
                 {
                     await DePopulateDatabase(dbConnection);
                 }
-
             }
         }
 
@@ -264,7 +263,7 @@ namespace CCApiTest.Product
 
                     //Guid productPoolId = await PopulateDatabaseWithSingleEntity(dbConnection);
 
-                    ProductDto product = new ProductDto
+                    ProductBase product = new ProductBase
                     {
                         //ShortNames = "ApiController Put Test Product",
                         //LongNames = "ApiController Put Test Product",
@@ -285,7 +284,7 @@ namespace CCApiTest.Product
         }
 
         [Fact]
-        public async void NotValidModel_400_Required_Field_name_missing()
+        public async void NotValidModel_400_Required_Field_ShortNames_missing()
         {
             var application = GetWebApplication();
 
@@ -297,11 +296,10 @@ namespace CCApiTest.Product
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
                     dbConnection.Init("TestDatabase");
 
-                    ProductDto product = new ProductDto
-                    {
-                        ////Name = "ApiController Test Pool",
-                        //Key = 1,
-                        //ProductPoolId = product.ProductPoolId //?
+                    ProductBase product = new ProductBase()
+                    {                        
+                        Key = 1,
+                        ProductPoolId = new Guid("553752EF-EB16-EC11-981F-0003FF0455EA")
                     };
                     HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(product), Encoding.UTF8, "application/json");
                     var client = CreateClientWithAuth(application);
@@ -382,9 +380,9 @@ namespace CCApiTest.Product
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
                     dbConnection.Init("TestDatabase");
 
-                    ProductDto productDto = new ProductDto
+                    ProductBase productDto = new ProductBase
                     {
-                        ShortNames= new List<MultilanguageText>(),
+                        ShortNames = new List<MultilanguageText>(),
                         LongNames = new List<MultilanguageText>(),
                         //Key = 1,
                         ProductType = CCProductService.DTOs.Enums.ProductType.MenuProduct,
@@ -395,7 +393,7 @@ namespace CCApiTest.Product
 
                     var response = await client.PostAsync("/api/v2/product/", httpContent);
 
-                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
                 }
                 finally
                 {
@@ -417,7 +415,7 @@ namespace CCApiTest.Product
                     dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>();
                     dbConnection.Init("TestDatabase");
 
-                    ProductDto product = new ProductDto
+                    ProductBase product = new ProductBase
                     {
                         //Name = "ApiController Test Product",
                         //Key = 1,

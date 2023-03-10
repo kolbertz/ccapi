@@ -81,7 +81,7 @@ namespace CCCategoryService.Repositories
                 return dto;
             }, splitOn: "Id, CategoryId", param: paramObj).ConfigureAwait(false);
             return stringMap.Values.ToList().AsReadOnly();
-
+            
         }
 
         public async Task<Category> GetCategoryById(Guid id, UserClaim userClaim)

@@ -9,10 +9,10 @@ namespace CCProductService.Interface
     {
         void Init(string database);
         Task<IEnumerable<ProductStandardPrice>> GetAllProducts(int? take, int? skip, UserClaim userClaim);
-        Task<ProductDto> GetProductById(Guid id, UserClaim userClaim);
-        Task<Guid> AddProductAsync(ProductDto productDto, UserClaim userClaim);
-        Task<bool> UpdateProductAsync(ProductDto productDto, UserClaim userClaim);
-        Task<ProductDto> PatchProductAsync(Guid id,UserClaim userClaim);
+        Task<ProductBase> GetProductById(Guid id, UserClaim userClaim);
+        Task<Guid> AddProductAsync(ProductBase productDto, UserClaim userClaim);
+        Task<bool> UpdateProductAsync(ProductBase productDto, UserClaim userClaim);
+        Task<ProductBase> PatchProductAsync(Guid id,UserClaim userClaim);
         Task <int>DeleteProductAsync(Guid id, UserClaim userClaim);
         Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim);
         Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim);

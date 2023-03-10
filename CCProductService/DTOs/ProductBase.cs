@@ -6,9 +6,19 @@ using System.Text.Json.Serialization;
 
 namespace CCProductService.DTOs
 {
-    public class ProductDto 
+
+    public class Product : ProductBase
     {
         public Guid Id { get; set; }
+
+        public Product (InternalProduct internalProduct) 
+        { 
+            Id= internalProduct.Id;
+        }
+
+    }
+    public class ProductBase 
+    {      
 
         [Required]
         public Guid ProductPoolId { get; set; }
@@ -36,14 +46,15 @@ namespace CCProductService.DTOs
         public bool IsBlocked { get; set; }
 
         public bool IsDeleted { get; set; }
+  
 
-        public ProductDto() { }
+        public ProductBase() { }
 
-        public ProductDto(Product product)
+        public ProductBase(InternalProduct product)
         {
             if (product != null)
             {
-                Id = product.Id;
+                
                 ProductPoolId = product.ProductPoolId;
                 Key = product.ProductKey;
                 Barcodes = product.ProductBarcodes?.Select(x => x.Barcode).ToList();
@@ -58,10 +69,9 @@ namespace CCProductService.DTOs
                 } : null;
                 IsBlocked = product.IsBlocked;
             }
-
         }
 
-        public void SetMultilanguageText(ProductString productString)
+        public void SetMultilanguageText(InternalProductString productString)
         {
             ShortNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.ShortName });
             LongNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.LongName });

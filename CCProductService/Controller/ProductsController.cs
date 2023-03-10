@@ -21,7 +21,7 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Get a list with "<see cref="ProductDto"/>" items (using Dapper)
+        /// Get a list with "<see cref="ProductBase"/>" items (using Dapper)
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>
@@ -49,7 +49,7 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Gets a "<see cref="ProductDto"/>" by Id (using Dapper)
+        /// Gets a "<see cref="ProductBase"/>" by Id (using Dapper)
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -67,7 +67,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                ProductDto product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
+                ProductBase product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
                 return Ok(product);
             }
             //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
@@ -75,14 +75,14 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Adds a new "<see cref="ProductDto"/>" (using EF Core)
+        /// Adds a new "<see cref="ProductBase"/>" (using EF Core)
         /// </summary>
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
-        public async Task<IActionResult> Post([ModelBinder] ProductDto productDto)
+        public async Task<IActionResult> Post([ModelBinder] ProductBase productDto)
         {
             UserClaim userClaim = null;
             Guid? newProductId = null;
@@ -102,7 +102,7 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Updates a "<see cref="ProductDto"/>" (using EF Core)
+        /// Updates a "<see cref="Product"/>" (using EF Core)
         /// </summary>
         /// <param name="id"></param>
         /// <param name="productDto"></param>
@@ -110,7 +110,7 @@ namespace CCProductService.Controller
         [HttpPut]
         [Route("{id}")]
         [SwaggerOperation("Updates a Product (using EF Core)")]
-        public async Task<IActionResult> Put(Guid id, [ModelBinder] ProductDto productDto)
+        public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
         {
             if (id != productDto.Id)
             {
@@ -131,7 +131,7 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Patch a "<see cref="ProductDto"/>" using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)
+        /// Patch a "<see cref="ProductBase"/>" using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)
         /// </summary>
         /// <param name="id"></param>       
         /// <returns></returns>
@@ -140,7 +140,7 @@ namespace CCProductService.Controller
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
         public async Task<IActionResult> Patch(Guid id)
         {
-            ProductDto dto;
+            ProductBase dto;
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
             {
@@ -156,7 +156,7 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Delete a "<see cref="ProductDto"/>" (using EF Core)
+        /// Delete a "<see cref="ProductBase"/>" (using EF Core)
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

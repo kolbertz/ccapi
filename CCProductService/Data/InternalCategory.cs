@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CCProductService.Data;
 
-public partial class Category
+public partial class InternalCategory
 {
     public Guid Id { get; set; }
 
@@ -19,9 +19,9 @@ public partial class Category
 
     public Guid CategoryPoolId { get; set; }
 
-    public virtual ICollection<CategoryString> CategoryStrings { get; } = new List<CategoryString>();
+    public virtual ICollection<InternalCategoryString> CategoryStrings { get; } = new List<InternalCategoryString>();
 
-    public virtual ICollection<Product> Products { get; } = new List<Product>();
+    public virtual ICollection<InternalProduct> Products { get; } = new List<InternalProduct>();
 
  
 }

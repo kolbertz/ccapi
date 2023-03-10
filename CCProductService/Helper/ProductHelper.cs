@@ -7,15 +7,15 @@ namespace CCProductService.Helper
 {
     public class ProductHelper
     {
-        public static void ParseProductToDto(Product product, ProductDto productDto)
+        public static void ParseProductToDto(InternalProduct product, ProductBase productDto)
         {
             if (product != null)
             {
                 if (productDto == null)
                 {
-                    productDto = new ProductDto();
+                    productDto = new ProductBase();
                 }
-                productDto.Id = product.Id;
+                
                 productDto.ProductPoolId = product.ProductPoolId;
                 productDto.Key = product.ProductKey;
                 productDto.Barcodes = product.ProductBarcodes?.Select(x => x.Barcode).ToList();
@@ -33,15 +33,15 @@ namespace CCProductService.Helper
 
         }
 
-        public static void ParseDtoToProduct(ProductDto productDto, Product product)
+        public static void ParseDtoToProduct(ProductBase productDto, InternalProduct product)
         {
             if (productDto != null)
             {
                 if (product == null)
                 {
-                    product = new Product();
+                    product = new InternalProduct();
                 }
-                product.Id = productDto.Id;
+                
                 product.ProductPoolId = productDto.ProductPoolId;
                 product.ProductKey = productDto.Key;
                 product.ProductType = (byte)productDto.ProductType;
@@ -58,7 +58,7 @@ namespace CCProductService.Helper
                     product.ProductBarcodes.Clear();
                     foreach (string barcode in productDto.Barcodes)
                     {
-                        product.ProductBarcodes.Add(new ProductBarcode { Barcode = barcode, ProductId = product.Id });
+                        product.ProductBarcodes.Add(new InternalProductBarcode { Barcode = barcode, ProductId = product.Id });
                     }
                 }
                 List<string> cultures = productDto.ShortNames.Select(sn => sn.Culture).ToList();
@@ -69,7 +69,7 @@ namespace CCProductService.Helper
                     product.ProductStrings.Clear();
                     foreach (string culture in cultures)
                     {
-                        product.ProductStrings.Add(new ProductString
+                        product.ProductStrings.Add(new InternalProductString
                         {
                             ProductId = product.Id,
                             Language = culture,

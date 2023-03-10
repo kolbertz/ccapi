@@ -71,7 +71,7 @@ namespace CCProductService.Repositories
             }
             
             var stringMap = new Dictionary<Guid, ProductStandardPrice>();
-            IEnumerable<ProductStandardPrice> result = await _dbContext.QueryAsync<Product, ProductString, ProductStandardPrice>(query, (p, ps) =>
+            IEnumerable<ProductStandardPrice> result = await _dbContext.QueryAsync<InternalProduct, InternalProductString, ProductStandardPrice>(query, (p, ps) =>
             {
                 ProductStandardPrice dto;
                 if (!stringMap.TryGetValue(p.Id, out dto))
@@ -85,9 +85,9 @@ namespace CCProductService.Repositories
             return stringMap.Values.ToList().AsReadOnly();
         }
 
-        public async Task<ProductDto> GetProductById(Guid id, UserClaim userClaim)
+        public async Task<ProductBase> GetProductById(Guid id, UserClaim userClaim)
         {
-            ProductDto dto = null;
+            ProductBase dto = null;
             var paramObj = new ExpandoObject();
             string productPoolQuery = string.Empty;
 
@@ -105,24 +105,24 @@ namespace CCProductService.Repositories
             paramObj.TryAdd("ProductId", id);
 
 
-            return (await _dbContext.QueryAsync<Product, ProductString, ProductDto>(query, (p, ps) =>
+            return (await _dbContext.QueryAsync<InternalProduct, InternalProductString, ProductBase>(query, (p, ps) =>
             {
                 if (dto == null)
                 {
-                    dto = new ProductDto(p);
+                    dto = new ProductBase(p);
                 }
                 dto.SetMultilanguageText(ps);
                 return dto;
             }, splitOn: "Id, ProductId", param: paramObj).ConfigureAwait(false)).FirstOrDefault();
         }
 
-        public async Task<Guid> AddProductAsync(ProductDto productDto, UserClaim userClaim)
+        public async Task<Guid> AddProductAsync(ProductBase productDto, UserClaim userClaim)
         {
             string productInsertQuery = "INSERT INTO [dbo].[Product] ([ProductKey],[IsBlocked],[Balance],[BalanceTare],[BalanceTareBarcode],[BalancePriceUnit],[BalancePriceUnitValue],[CreatedDate],[CreatedUser],[LastUpdatedUser],[LastUpdatedDate],[ProductPoolId],[ProductType])"
                + " OUTPUT INSERTED.Id"
                 + " VALUES(@ProductKey,@IsBlocked,@Balance,@BalanceTare,@BalanceTareBarcode,@BalancePriceUnit,@BalancePriceUnitValue,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@ProductPoolId,@ProductType)";
 
-            Product product = new Product();
+            InternalProduct product = new InternalProduct();
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
             product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
@@ -143,23 +143,23 @@ namespace CCProductService.Repositories
             }
         }
 
-        public Task<bool> UpdateProductAsync(ProductDto productDto, UserClaim userClaim)
+        public Task<bool> UpdateProductAsync(ProductBase productDto, UserClaim userClaim)
         {
-            Product product = new Product();
+            InternalProduct product = new InternalProduct();
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.LastUpdatedDate = DateTimeOffset.Now;
             product.LastUpdatedUser = userClaim.UserId;
             return Update(product,productDto, userClaim);
         }
 
-        public async Task<ProductDto> PatchProductAsync(Guid id, UserClaim userClaim)
+        public async Task<ProductBase> PatchProductAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT * FROM Product WHERE Id = @ProductId";
             var p = new {ProductId = id };
-            Product product = await _dbContext.QuerySingleAsync<Product>(query, p);
+            InternalProduct product = await _dbContext.QuerySingleAsync<InternalProduct>(query, p);
             if (product != null)
             {
-                ProductDto productDto = new ProductDto(product);
+                ProductBase productDto = new ProductBase(product);
                 product.LastUpdatedDate = DateTimeOffset.Now;
                 product.LastUpdatedUser = userClaim.UserId;
                 if (await Update(product, productDto, userClaim).ConfigureAwait(false))
@@ -167,7 +167,7 @@ namespace CCProductService.Repositories
                     return productDto;
                 }
             }
-            return new ProductDto();
+            return new ProductBase();
         }
 
         public Task<int> DeleteProductAsync(Guid id, UserClaim userClaim)
@@ -182,7 +182,7 @@ namespace CCProductService.Repositories
         {
             var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
                 "WHERE ProductCategory.ProductId = @ProductId";
-            IEnumerable<CategoryString> categoryStrings = await _dbContext.QueryAsync<CategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
+            IEnumerable<InternalCategoryString> categoryStrings = await _dbContext.QueryAsync<InternalCategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
             return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategoryDto
             {
                 CategoryId = c.Key,
@@ -219,7 +219,7 @@ namespace CCProductService.Repositories
                 });
         }
 
-        public async Task<bool> Update(Product product,ProductDto productDto, UserClaim userClaim)
+        public async Task<bool> Update(InternalProduct product,ProductBase productDto, UserClaim userClaim)
         {
             var productUpdateQuery = "UPDATE Product Set ProductKey = @ProductKey, [IsBlocked] = @IsBlocked, [Balance] = @Balance, [BalanceTareBarcode] = @BalanceTareBarcode, " +
                 "[BalancePriceUnit] = @BalancePriceUnit, [BalancePriceUnitValue] = @BalancePriceUnitValue, [CreatedUser] = @CreatedUser, [ProductPoolId] = ProductPoolId, [ProductType] = ProductType WHERE Id = @Id";
@@ -253,11 +253,11 @@ namespace CCProductService.Repositories
 
             //return _dbContext.ExecuteAsync(query, param: pool);
         }
-        private async Task<bool> InsertProductString(ProductDto productDto, UserClaim userClaim)
+        private async Task<bool> InsertProductString(ProductBase productDto, UserClaim userClaim)
         {
             string productStringInsertQuery = "INSERT INTO [dbo].[ProductString]([Language],[ShortName],[LongName],[Description],[ProductId])" +
                " VALUES(@Language,@ShortName,@LongName,@Description,@ProductId)";
-            Product product = new Product();
+            InternalProduct product = new InternalProduct();
 
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
@@ -277,12 +277,12 @@ namespace CCProductService.Repositories
             }
         }
 
-        private async Task<bool> InsertBarCode(ProductDto productDto, UserClaim userClaim)
+        private async Task<bool> InsertBarCode(ProductBase productDto, UserClaim userClaim)
         {
             string barcodeInsertQuery = "INSERT INTO [dbo].[ProductBarcode]([Barcode],[ProductId],[Refund])" +
             " VALUES(@Barcode,@ProductId,@Refund)";
 
-            Product product = new Product();
+            InternalProduct product = new InternalProduct();
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
             product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;

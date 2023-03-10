@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CCProductService.Data;
 
-public partial class Product
+public partial class InternalProduct
 {
     public Guid Id { get; set; }
 
@@ -45,9 +45,9 @@ public partial class Product
 
     public byte ProductType { get; set; }
 
-    public virtual ICollection<ProductBarcode> ProductBarcodes { get; } = new List<ProductBarcode>();
+    public virtual ICollection<InternalProductBarcode> ProductBarcodes { get; } = new List<InternalProductBarcode>();
 
-    public virtual ICollection<ProductString> ProductStrings { get; } = new List<ProductString>();
+    public virtual ICollection<InternalProductString> ProductStrings { get; } = new List<InternalProductString>();
 
-    public virtual ICollection<Category> Categories { get; } = new List<Category>();
+    public virtual ICollection<InternalCategory> Categories { get; } = new List<InternalCategory>();
 }

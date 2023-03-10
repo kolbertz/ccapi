@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CCProductService.Data;
 
-public partial class CategoryString
+public partial class InternalCategoryString
 {
     public Guid Id { get; set; }
 
@@ -17,5 +17,5 @@ public partial class CategoryString
 
     public Guid CategoryId { get; set; }
 
-    public virtual Category Category { get; set; }
+    public virtual InternalCategory Category { get; set; }
 }
