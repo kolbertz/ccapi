@@ -1,5 +1,4 @@
-﻿using CCApiLibrary.Models;
-using CCCategoryService.Data;
+﻿using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
 
@@ -8,15 +7,15 @@ namespace CCCategoryService.Interface
     public interface ICategoryPoolRepository : IDisposable
     {
         void Init(string database);
-        Task<IEnumerable<CategoryPoolDto>> GetCategoryPoolsAsync();
+        Task<IEnumerable<CategoryPoolBase>> GetCategoryPoolsAsync();
 
-        Task<CategoryPoolDto> GetCategoryPoolByIdAsync(Guid id);
+        Task<CategoryPoolBase> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim);
 
-        Task<Guid> AddCategoryPoolAsync(CategoryPoolDto categoryPool, UserClaim userClaim);
+        Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
 
-        Task<int> UpdateCategoryPoolAsync(CategoryPoolDto categoryPool, UserClaim userClaim);
+        Task<int> UpdateCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
 
-        Task<CategoryPoolDto> PatchCategoryPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
+        Task<CategoryPoolBase> PatchCategoryPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
 
         Task<int> DeleteCategoryPoolAsync(Guid id);
     }

@@ -2,6 +2,7 @@
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
 using CCCategoryService.Models;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Diagnostics;
@@ -36,8 +37,14 @@ namespace CCCategoryService.Controllers
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
-            
-            return Ok(userClaim);
+            using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
+            {
+                IEnumerable<Category> categorysList = null;
+                categoryRepository.Init(userClaim.TenantDatabase);
+                categorysList = await categoryRepository.GetAllCategorys(take, skip, userClaim).ConfigureAwait(false);
+                return Ok(categorysList);
+            }
+
         }
 
         /// <summary>
@@ -52,24 +59,104 @@ namespace CCCategoryService.Controllers
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
-            { 
-                userClaim = new UserClaim(HttpContext.User.Claims); 
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
-                CategoryDto category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
+                Category category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
             }
             return Ok();
         }
-        public async Task Post(Guid id)
-        { }
-        public async Task Put(Guid id)
-        { }
-        public async Task Patch(Guid id)
-        { }
-        public async Task Delete(Guid id)
-        { }
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [SwaggerOperation("Adds a new Product (using EF Core)")]
+        public async Task<IActionResult> Post([ModelBinder] Category categoryDto)
+        {
+            UserClaim userClaim = null;
+            Guid? newCategoryId = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
+            {
+                categoryRepository.Init(userClaim.TenantDatabase);
+                newCategoryId = await categoryRepository.AddCategoryAsync(categoryDto, userClaim).ConfigureAwait(false);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newCategoryId}"), null);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        [SwaggerOperation("Updates a Product (using EF Core)")]
+        public async Task<IActionResult> Put(Guid id, [ModelBinder] Category categoryDto)
+
+        {
+            if (id != categoryDto.Id)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
+            {
+                categoryRepository.Init(userClaim.TenantDatabase);
+                await categoryRepository.UpdateCategoryAsync(categoryDto, userClaim).ConfigureAwait(false);
+                return Ok();
+            }
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 ")]
+        public async Task<IActionResult> Patch(Guid id)
+        {
+            CategoryBase dto;
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
+            {
+                categoryRepository.Init(userClaim.TenantDatabase);
+                dto = await categoryRepository.PatchCategoryAsync(id, userClaim).ConfigureAwait(false);
+                return Ok(dto);
+
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [SwaggerOperation("Delete a Product ")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+
+            }
+            using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
+            {
+                categoryRepository.Init(userClaim.TenantDatabase);
+
+                if (await categoryRepository.DeleteCategoryAsync(id, userClaim).ConfigureAwait(false)>0)
+                {
+                    return NoContent();
+                }
+                else { return NotFound(); }
+            }
+        }
     }
 }

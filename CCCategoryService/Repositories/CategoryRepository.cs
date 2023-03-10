@@ -1,15 +1,22 @@
 ﻿using CCApiLibrary.Interfaces;
 using CCCategoryService.Data;
 using CCCategoryService.Dtos;
+using CCCategoryService.Helper;
 using CCCategoryService.Interface;
 using System.Collections;
 using System.Dynamic;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml.Linq;
+
 
 namespace CCCategoryService.Repositories
 {
+
+
     public class CategoryRepository : ICategoryRepository
-    {
+
+    {      
         public IApplicationDbConnection _dbContext { get; }
 
         public CategoryRepository(IApplicationDbConnection writeDbCoonection)
@@ -28,7 +35,7 @@ namespace CCCategoryService.Repositories
             _dbContext?.Dispose();
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategorys(int? take, int? skip, UserClaim userClaim)
+        public async Task<IEnumerable<Category>> GetAllCategorys(int? take, int? skip, UserClaim userClaim)
         {
             string query;
             string categoryPoolQuery = string.Empty;
@@ -53,32 +60,33 @@ namespace CCCategoryService.Repositories
             }
             else
             {
-                query = "SELECT Category.Id, CategoryKey, Category.CategoryPoolId, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
+                query = "SELECT Category.Id, CategoryKey, Category.CategoryPoolId, CategoryString.Id AS CategoryStringID, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
                     $" from Category " +
                     $"JOIN CategoryString on Category.Id = CategoryString.CategoryId{categoryPoolQuery}" +
                     $" ORDER BY CategoryKey";
-            }           
-            var stringMap = new Dictionary<Guid, CategoryDto> ();
+            }
 
-            //Baustelle
-            //IEnumerable<CategoryDto> result = await _dbContext.QueryAsync <Category, CategoryString CategoryDto > (query, (c, cs) =>
-            //{
-            //    CategoryDto dto;
-            //    if (!stringMap.TryGetValue(p.Id, out dto))
-            //    {
-            //        dto = new CategoryDto(p);
-            //        stringMap.Add(p.Id, dto);
-            //    }
-            //    //dto.SetMultilanguageText(ps);
-            //    return dto;
-            //}
-            return null;
+            var stringMap = new Dictionary<Guid, Category>();
+            IEnumerable<Category> result = await _dbContext.QueryAsync<InternalCategory, InternalCategoryString, Category>(query, (c, cs) =>
+            {
+                Category dto;
+                if (!stringMap.TryGetValue(c.Id, out dto))
+                {
+                    dto = new Category(c);
+                    //CategoryHelper.ParseCategoryToDto(c,dto);
+                    stringMap.Add(c.Id, dto);
+                }
+                
+                dto.SetMultilanguageText(cs);
+                return dto;
+            }, splitOn: "Id, CategoryId", param: paramObj).ConfigureAwait(false);
+            return stringMap.Values.ToList().AsReadOnly();
             
         }
 
-        public async Task<CategoryDto> GetCategoryById(Guid id, UserClaim userClaim)
+        public async Task<Category> GetCategoryById(Guid id, UserClaim userClaim)
         {
-            CategoryDto dto = null;
+            Category dto = null;
             var paramObj = new ExpandoObject();
             string categoryPoolQuery = string.Empty;
 
@@ -88,41 +96,43 @@ namespace CCCategoryService.Repositories
                 paramObj.TryAdd("poolIds", userClaim.CategoryPoolIds.ToArray());
             }
 
-            //Baustelle
-            string query = "$SELECT Category.Id, CategoryKey, CategoryPoolId, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
-                "$ from Category JOIN CategoryString on Category.Id = CategoryString.CategoryId " +
-                "$WHERE Category.Id = @CategoryId and Category.CategoryPoolId{productPoolQuery}";
+            string query = $"SELECT Category.Id, CategoryKey, CategoryPoolId, CategoryString.CategoryId,CategoryString.Id AS CategoryStringID, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description " +
+                 $"from Category JOIN CategoryString on Category.Id = CategoryString.CategoryId " +
+                 $"WHERE Category.Id = @CategoryId{categoryPoolQuery}";
 
             paramObj.TryAdd("CategoryId", id);
 
-            return (await _dbContext.QueryAsync<Category, CategoryString, CategoryDto>(query, (p, ps) =>
+            return (await _dbContext.QueryAsync<InternalCategory, InternalCategoryString, Category>(query, (p, ps) =>
             {
                 if (dto == null)
                 {
-                    dto = new CategoryDto(p);
+                    dto = new Category(p);
+                    CategoryHelper.ParseCategoryToDto(p, dto);
                 }
-                // dto.SetMultilanguageText(ps);
-                return dto;
+                 dto.SetMultilanguageText(ps);
+                return (Category)dto;
             }, splitOn: "Id, CategoryId", param: paramObj).ConfigureAwait(false)).FirstOrDefault();
 
-        }
-            //return _dbContext.QuerySingleAsync<CategoryDto>(query, paramObj);
+        }      
+     
 
-        
-
-        public async Task<Guid> AddCategoryAsync(CategoryDto categoryDto, UserClaim userClaim)
+        public async Task<Guid> AddCategoryAsync(CategoryBase categoryDto, UserClaim userClaim)
         {
+            string categoryInsertQuery = $"INSERT INTO [dbo].Category (CategoryKey,[CreatedDate],[CreatedUser],[LastUpdatedUser],[LastUpdatedDate],CategoryPoolId) " +
+                 $"OUTPUT INSERTED.Id " +
+                 $"VALUES(@CategoryKey,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@CategoryPoolId)";
 
-            string categoryInsertQuery = "$INSERT INTO [dbo].Category (CategoryKey,[CreatedDate],[CreatedUser],[LastUpdatedUser],[LastUpdatedDate],CategoryPoolId) " +
-                "OUTPUT INSERTED.Id " +
-                "$VALUES(@CategoryKey,@CreatedDate,@CreatedUser,@LastUpdatedUser,@LastUpdatedDate,@CategoryPoolId)";
-            Category category = new Category();
-            category.CreatedUser = category.LastUpdateUser = userClaim.UserId;
-            category.CreatedDate = category.LastUpdatedDate = DateTimeOffset.Now;
+            InternalCategory category = new InternalCategory();
+            CategoryHelper.ParseDtoToCategory(categoryDto, category);
+            //Baustelle
+            category.CreatedUser = category.LastUpdatedUser = userClaim.UserId;
+            category.CreatedDate = category.LastUpdatedDate = DateTimeOffset.Now;          
+
             try
             {
                 _dbContext.BeginTransaction();
                 Guid id = await _dbContext.ExecuteScalarAsync<Guid>(categoryInsertQuery, category);
+                await InsertCategoryString(category, userClaim);
                 _dbContext.CommitTransaction();
                 return id;
             }
@@ -133,40 +143,43 @@ namespace CCCategoryService.Repositories
             }
         }
 
-        public Task<bool> UpdateCategoryAsync(CategoryDto categoryDto, UserClaim userClaim)
+        public Task<bool> UpdateCategoryAsync(CategoryBase categoryDto, UserClaim userClaim)
         {
-            Category category = new Category();
+
+            InternalCategory category = new InternalCategory();
+            CategoryHelper.ParseDtoToCategory(categoryDto, category);
             category.LastUpdatedDate = DateTimeOffset.Now;
-            category.LastUpdateUser = userClaim.UserId;
+            category.LastUpdatedUser = userClaim.UserId;
             return Update(category, categoryDto, userClaim);
         }
 
-        public async Task<CategoryDto> PatchCategoryAsync(Guid id, UserClaim userClaim)
+        public async Task<CategoryBase> PatchCategoryAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT * FROM Product WHERE Id = @CategoryId";
-            var p = new {CategoryId= id};
-            Category category = await _dbContext.QuerySingleAsync<Category>(query, p);
-            if (category != null) 
-            { 
-             CategoryDto categoryDto = new CategoryDto();
+            var p = new { CategoryId = id };
+            InternalCategory category = await _dbContext.QuerySingleAsync<InternalCategory>(query, p);
+            if (category != null)
+            {
+                CategoryBase categoryDto = new CategoryBase();
                 category.LastUpdatedDate = DateTimeOffset.Now;
-                category.LastUpdateUser = userClaim.UserId;
+                category.LastUpdatedUser = userClaim.UserId;
                 if (await Update(category, categoryDto, userClaim).ConfigureAwait(false))
                 {
                     return categoryDto;
                 }
             }
-            return new CategoryDto();
-         }
+            return new CategoryBase();
+        }
 
         public Task<int> DeleteCategoryAsync(Guid id, UserClaim userClaim)
         {
             var query = "DELETE FROM [dbo].[Category] WHERE Id = @Id";
 
-            return _dbContext.ExecuteAsync(query, param : new {Id = id });
+            return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
 
-        public async Task<bool> Update(Category category, CategoryDto categoryDto, UserClaim userClaim)
+
+        public async Task<bool> Update(InternalCategory category, CategoryBase categoryBase, UserClaim userClaim)
         {
             var categoryUpdateQuery = "Update Category Set CategoryKey = @CategoryKey, CreatedUser = @CreatedUser, CategoryPoolId = @CategoryPoolId WHERE Id = @Id ";
             try
@@ -175,30 +188,26 @@ namespace CCCategoryService.Repositories
                 if (await _dbContext.ExecuteAsync(categoryUpdateQuery, category) > 0)
                 {
                     await DeleteCategoryAsync(category.Id, userClaim);
-                    await InsertCategoryString(categoryDto, userClaim);
+                    await InsertCategoryString(category, userClaim);
                 }
 
                 _dbContext.CommitTransaction();
                 return false;
-                
             }
-            
             catch (Exception)
             {
                 //Rollback
                 throw;
-            }                    
-                                   
+            }
+
         }
 
-        private async Task<bool> InsertCategoryString(CategoryDto categoryDto, UserClaim userClaim)
-        {
-            string categoryStringInsertQuery = "INSERT INTO [dbo].[CategoryString]([Culture],[Name],[Comment],[Description],[ProductId])" +
-               " VALUES(@Culture,@Name,@Comment,@Description,@ProductId)";
-            Category category = new Category();
 
-            category.CreatedUser = category.LastUpdateUser = userClaim.UserId;
-            category.CreatedDate = category.LastUpdatedDate= DateTime.Now;
+        private async Task<bool> InsertCategoryString(InternalCategory category, UserClaim userClaim)
+        {
+            string categoryStringInsertQuery = "INSERT INTO [dbo].[CategoryString]([Culture],[CategoryName],[Comment],[Description],[CategoryId])" +
+               " VALUES(@Culture,@CategoryName,@Comment,@Description,@CategoryId)";
+           
             try
             {
                 await _dbContext.ExecuteAsync(categoryStringInsertQuery, category.CategoryStrings);
@@ -212,12 +221,7 @@ namespace CCCategoryService.Repositories
             }
 
         }
-        
-
-
 
     }
-
-
 
 }
