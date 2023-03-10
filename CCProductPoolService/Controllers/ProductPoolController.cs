@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
@@ -175,12 +176,5 @@ namespace CCProductPoolService.Controllers
                 return StatusCode(500);
             }
         }
-
-        //[HttpPost]
-        //[ServiceFilter (typeof(ValidateModelAttribute))]
-        //public IActionResult Post(ProductPoolDto productPoolDto)
-        //{
-        //    return Created(productPoolDto);
-        //}
     }
 }

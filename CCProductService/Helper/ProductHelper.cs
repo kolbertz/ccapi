@@ -1,4 +1,5 @@
-﻿using CCProductService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.DTOs.Enums;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;

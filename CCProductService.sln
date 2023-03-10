@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCApiLibrary", "CCApiLibrar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCCategoryService", "CCCategoryService\CCCategoryService.csproj", "{FC9ADD11-5966-4710-AB97-AA09E2DDAC69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCProductPriceService", "CCProductPriceService\CCProductPriceService.csproj", "{D7BA7186-1084-4A39-8A0A-1E65238A1C91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{FC9ADD11-5966-4710-AB97-AA09E2DDAC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC9ADD11-5966-4710-AB97-AA09E2DDAC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC9ADD11-5966-4710-AB97-AA09E2DDAC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7BA7186-1084-4A39-8A0A-1E65238A1C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7BA7186-1084-4A39-8A0A-1E65238A1C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7BA7186-1084-4A39-8A0A-1E65238A1C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7BA7186-1084-4A39-8A0A-1E65238A1C91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

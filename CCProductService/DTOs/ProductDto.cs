@@ -1,4 +1,5 @@
-﻿using CCProductService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductService.Data;
 using CCProductService.DTOs.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;

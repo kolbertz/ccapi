@@ -1,4 +1,6 @@
-﻿namespace CCProductService.DTOs
+﻿using CCApiLibrary.Models;
+
+namespace CCProductService.DTOs
 {
     public class ProductCategoryDto
     {

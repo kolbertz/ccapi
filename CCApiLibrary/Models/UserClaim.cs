@@ -1,11 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace CCProductService.Data
+namespace CCApiLibrary.Models
 {
     public class UserClaim
     {
-        public Guid Tenant { get; set; }
+        public Guid TenantId { get; set; }
         public Guid SystemId { get; set; }
         public Guid UserId { get; set; }
         public Guid UserGroupId { get; set; }
@@ -13,11 +12,12 @@ namespace CCProductService.Data
         public IEnumerable<Guid> ProductPoolIds { get; set; }
         public string TenantDatabase { get; set; }
 
-        public UserClaim(IEnumerable<Claim> claims) {
+        public UserClaim(IEnumerable<Claim> claims)
+        {
             string tenant = claims.Where(x => x.Type == "Tenant").Select(x => x.Value).FirstOrDefault();
             if (!string.IsNullOrEmpty(tenant))
             {
-                Tenant = new Guid(tenant);
+                TenantId = new Guid(tenant);
             }
             string system = claims.Where(x => x.Type == "SystemId").Select(x => x.Value).FirstOrDefault();
             if (!string.IsNullOrEmpty(system))
@@ -41,7 +41,7 @@ namespace CCProductService.Data
             }
             else
             {
-                TenantDatabase = "DefaultDatabase";
+                TenantDatabase = "AramarkDbProduction_20210816";
             }
         }
     }
