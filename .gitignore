@@ -1,5 +1,6 @@
 #NuGet
 .* 
+.vs
 !.gitignore 
 *.log 
 OBJ
