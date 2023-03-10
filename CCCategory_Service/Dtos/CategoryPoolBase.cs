@@ -3,9 +3,16 @@ using System.Text;
 
 namespace CCCategoryService.Dtos
 {
-    public class CategoryPoolDto
+    public class CategoryPool : CategoryPoolBase
     {
         public Guid Id { get; set; }
+        public CategoryPool() { }
+    }
+
+
+    public class CategoryPoolBase
+    {
+        //public Guid Id { get; set; }
 
         [Required]
         public int Key { get; set; }
@@ -20,10 +27,10 @@ namespace CCCategoryService.Dtos
         [Required]
         public Guid SystemSettingsId { get; set; }
 
-        public CategoryPoolDto() { }
+        public CategoryPoolBase() { }
 
-        public CategoryPoolDto(CategoryPoolDto categoryPool) {
-            Id = categoryPool.Id;
+        public CategoryPoolBase(CategoryPoolBase categoryPool) {
+            //Id = categoryPool.Id;
             Key = categoryPool.Key;
             Name = categoryPool.Name;
             Description = categoryPool.Description;

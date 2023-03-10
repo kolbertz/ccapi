@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CCApiLibrary.Models
+namespace CCCategoryService.Data
 {
     public class UserClaim
     {
@@ -41,7 +41,7 @@ namespace CCApiLibrary.Models
             }
             else
             {
-                TenantDatabase = "AramarkDbProduction_20210816";
+                TenantDatabase = "DefaultDatabase";
             }
         }
     }
