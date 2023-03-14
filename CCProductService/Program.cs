@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
-internal class Program
+public class Program
 {
     private static void Main(string[] args)
     {

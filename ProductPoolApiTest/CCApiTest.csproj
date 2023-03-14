@@ -29,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Bazinga.AspNetCore.Authentication.Basic" Version="2.0.1" />
     <PackageReference Include="FakeItEasy" Version="7.3.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -44,9 +44,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CCApiTestLibrary\CCApiTestLibrary.csproj" />
     <ProjectReference Include="..\CCCategoryService\CCCategoryService.csproj" />
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
     <ProjectReference Include="..\CCProductService\CCProductService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Base\" />
   </ItemGroup>
 
 </Project>

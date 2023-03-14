@@ -38,6 +38,7 @@ namespace CCProductPriceService.Repositories
             {
                 ProductPricePoolBase pricePoolBase = new ProductPricePoolBase();
                 pricePoolBase.Id = pricePool.Id;
+                // TODO: Change when multilanguage for ProcePool is available
                 pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
                 if (!string.IsNullOrEmpty(pricePool.Description))
                 {

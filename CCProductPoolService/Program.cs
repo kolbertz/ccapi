@@ -11,7 +11,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
-public class Program : IProgram
+public class Program
 {
     private static void Main(string[] args)
     {
