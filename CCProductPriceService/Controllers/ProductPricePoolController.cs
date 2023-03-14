@@ -101,7 +101,7 @@ namespace CCProductPriceService.Controllers
                 using (IProductPricePoolRepository repo = _serviceProvider.GetService<IProductPricePoolRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    return Ok(await _serviceProvider.GetService<IProductPricePoolRepository>().DeletePricePool(id,userClaim).ConfigureAwait(false));
+                    return Ok(await _serviceProvider.GetService<IProductPricePoolRepository>().DeletePricePool(id).ConfigureAwait(false));
                 }
             }
             catch (Exception ex)

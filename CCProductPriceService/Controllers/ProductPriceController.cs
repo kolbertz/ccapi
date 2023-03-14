@@ -86,6 +86,13 @@ namespace CCProductPriceService.Controllers
 
         //[HttpPatch]
         //[Route("{id}")]
+        //public async Task<IActionResult> Update(Guid id, JsonPatchDocument jsonPatch)
+        //{
+
+        //}
+
+        //[HttpPatch]
+        //[Route("{id}")]
         //public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
         //{
 

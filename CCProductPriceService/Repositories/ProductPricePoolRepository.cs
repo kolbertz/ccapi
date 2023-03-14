@@ -60,29 +60,56 @@ namespace CCProductPriceService.Repositories
             ProductPricePool pricePool = new ProductPricePool(internalPool);
             return pricePool;
         }
-
-
+               
         public Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePoolBase, UserClaim userClaim) 
         {
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
-            throw new NotImplementedException();
+            var query = "INSERT INTO ProductPricePool( [Name], Description, ParentProductPricePoolId, CurrencyId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
+                "OUTPUT Inserted.Id " +
+                "VALUES( @Name, @Description, @ParentProductPricePoolId,@CurrencyId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
+            InternalProductPricePool pricePool = new InternalProductPricePool(pricePoolBase);
+            pricePool.CreatedDate = pricePool.LastUpdatedDate = DateTimeOffset.Now;
+            pricePool.CreatedUser = pricePool.LastUpdatedUser = userClaim.UserId;
+            return _dbContext.ExecuteScalarAsync<Guid>(query, pricePool);
         }
-        public Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim)
+        public Task<int> UpdatePricePool(ProductPricePool productPricePool, UserClaim userClaim)
         {
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
-            throw new NotImplementedException();
+            InternalProductPricePool pricePool = new InternalProductPricePool(productPricePool);
+            pricePool.LastUpdatedDate = DateTimeOffset.Now;
+            pricePool.LastUpdatedUser = userClaim.UserId;
+            return Update(pricePool);
         }
 
-        public Task<int> PatchPricePool(JsonPatchDocument pricePool, UserClaim userClaim)
+        private Task<int> Update (InternalProductPricePool pricePool)
         {
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
-            throw new NotImplementedException();
+            var query = "UPDATE ProductPricePool Set  [Name] = @Name, Description = @Description, ParentProductPricePoolId = @ParentProductPricePoolId, CurrencyId = @CurrencyId " +
+                "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser WHERE Id = @Id";
+            return _dbContext.ExecuteAsync(query, param: pricePool);
         }
 
-        public Task<int> DeletePricePool(Guid pricePoolId, UserClaim userClaim)
+        public async Task<ProductPricePoolBase> PatchPricePoolAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
         {
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
-            throw new NotImplementedException();
+            var query = "SELECT * FROM ProductPricePool WHERE Id = @ProductPricePoolId ";
+            var p = new { ProductPricePoolId = id };
+            InternalProductPricePool pricePool = await _dbContext.QuerySingleAsync<InternalProductPricePool>(query, param: p);
+            if (pricePool == null) 
+            {
+                ProductPricePoolBase pricePoolBase = new ProductPricePoolBase();
+                jsonPatchDocument.ApplyTo(pricePoolBase);
+                pricePool.MergeProductPricePool(pricePoolBase);
+                pricePool.LastUpdatedDate = DateTimeOffset.Now;
+                pricePool.LastUpdatedUser = userClaim.UserId;
+                if (await Update(pricePool).ConfigureAwait(false) > 0)
+                {
+                    return pricePoolBase;
+                }
+            }
+            return null;
+        }
+
+        public Task<int> DeletePricePool(Guid id)
+        {
+            var query = "DELETE FROM ProductPricePool WHERE Id = @Id";
+            return _dbContext.ExecuteAsync(query, param: new {Id = id });
         }
 
         private static (string sysId, ExpandoObject paramObj) GetClaimsQuery(UserClaim userClaim)

@@ -31,14 +31,13 @@ namespace CCProductService.Repositories
         {
             string query;
             string productPoolQuery = string.Empty;
-            //var paramObj = new ExpandoObject();
+            var paramObj = new ExpandoObject();
 
-            //if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
-            //{
-            //    productPoolQuery = " where Product.ProductPoolId in @poolIds";
-            //    paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
-            //}
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
+            if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
+            {
+                productPoolQuery = " where Product.ProductPoolId in @poolIds";
+                paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
+            }           
 
             if (take.HasValue && skip.HasValue)
             {
@@ -90,15 +89,14 @@ namespace CCProductService.Repositories
         public async Task<ProductBase> GetProductById(Guid id, UserClaim userClaim)
         {
             ProductBase dto = null;
-            //var paramObj = new ExpandoObject();
+            var paramObj = new ExpandoObject();
             string productPoolQuery = string.Empty;
 
-            //if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
-                //{
+            if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
+            {
                 productPoolQuery = " and Product.ProductPoolId in @poolIds";
-            //    paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
-            //}
-            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
+                paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
+            }            
 
             string query = $"SELECT Product.Id, ProductKey, ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, " +
                 $"ProductString.LongName, ProductString.Description from Product JOIN ProductString on Product.Id = ProductString.ProductId " +
