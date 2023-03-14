@@ -2,6 +2,7 @@
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
 using CCCategoryService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,7 +12,7 @@ namespace CCCategoryService.Controllers
 {
     [Route("api/v2/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private IServiceProvider _serviceProvider;

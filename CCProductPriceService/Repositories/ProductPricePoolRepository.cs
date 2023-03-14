@@ -61,6 +61,12 @@ namespace CCProductPriceService.Repositories
             return pricePool;
         }
 
+
+        public Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePoolBase, UserClaim userClaim) 
+        {
+            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
+            throw new NotImplementedException();
+        }
         public Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim)
         {
             (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);

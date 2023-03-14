@@ -124,7 +124,7 @@ namespace CCCategoryService.Repositories
 
             InternalCategory category = new InternalCategory();
             CategoryHelper.ParseDtoToCategory(categoryDto, category);
-            //Baustelle
+            
             category.CreatedUser = category.LastUpdatedUser = userClaim.UserId;
             category.CreatedDate = category.LastUpdatedDate = DateTimeOffset.Now;          
 
