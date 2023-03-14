@@ -1,6 +1,8 @@
-﻿namespace CCProductPriceService.InternalData
+﻿using CCProductPriceService.DTOs;
+
+namespace CCProductPriceService.InternalData
 {
-    public class InternalProductPricePool
+    public partial class InternalProductPricePool
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -12,5 +14,20 @@
         public Guid? ParentProductPricePoolId { get; set; }
         public Guid? CurrencyId { get; set; }
         public Guid SystemSettingsId { get; set; }
+
+        public InternalProductPricePool(ProductPricePoolBase pricePoolBase ) 
+        {
+            MergeProductPricePool(pricePoolBase);
+        }
+
+        public void MergeProductPricePool(ProductPricePoolBase pricePoolBase ) 
+        {
+            Id= pricePoolBase.Id;
+            //Name = pricePoolBase.Name;
+            //Description = pricePoolBase.Description;
+            ParentProductPricePoolId = pricePoolBase.ParentPoolId;
+            CurrencyId = pricePoolBase.CurrencyId;
+            SystemSettingsId= pricePoolBase.SystemSettingsId;
+        }
     }
 }

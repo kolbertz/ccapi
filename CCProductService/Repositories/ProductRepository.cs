@@ -37,11 +37,11 @@ namespace CCProductService.Repositories
             {
                 productPoolQuery = " where Product.ProductPoolId in @poolIds";
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
-            }
+            }           
 
             if (take.HasValue && skip.HasValue)
             {
-                query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description  " +
+                 query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description  " +
                     $"from (Select prod.Id, prod.ProductKey, prod.ProductPoolId, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, d.Value," +
                     $" ROW_NUMBER() Over (Partition by prod.id order by StartDate desc ) as row from " +
                     $"(Select p.Id, p.ProductPoolId, p.ProductKey, p.IsBlocked, p.Balance, p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue " +
@@ -96,8 +96,7 @@ namespace CCProductService.Repositories
             {
                 productPoolQuery = " and Product.ProductPoolId in @poolIds";
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
-            }
-
+            }            
 
             string query = $"SELECT Product.Id, ProductKey, ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, " +
                 $"ProductString.LongName, ProductString.Description from Product JOIN ProductString on Product.Id = ProductString.ProductId " +
@@ -316,6 +315,19 @@ namespace CCProductService.Repositories
 
             return _dbContext.ExecuteAsync(query, param: new { Productid = id });
 
+        }
+
+        private static (string sysId, ExpandoObject paramObj) GetClaimsQuery(UserClaim userClaim)
+        {
+            string sysIdQuery = string.Empty;
+            var paramObj = new ExpandoObject();
+
+            if (userClaim != null)
+            {
+                sysIdQuery = " where SystemSettingsId = @sysId";
+                paramObj.TryAdd("sysId", userClaim.SystemId);
+            }
+            return (sysIdQuery, paramObj);
         }
 
     }

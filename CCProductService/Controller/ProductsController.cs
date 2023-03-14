@@ -2,6 +2,7 @@
 using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,7 +12,7 @@ namespace CCProductService.Controller
 {
     [Route("api/v2/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ProductsController : ControllerBase 
     {
         private IServiceProvider _serviceProvider;

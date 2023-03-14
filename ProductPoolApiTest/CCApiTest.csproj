@@ -46,6 +46,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CCApiTestLibrary\CCApiTestLibrary.csproj" />
     <ProjectReference Include="..\CCCategoryService\CCCategoryService.csproj" />
+
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
     <ProjectReference Include="..\CCProductService\CCProductService.csproj" />
   </ItemGroup>
