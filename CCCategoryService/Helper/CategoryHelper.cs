@@ -1,6 +1,6 @@
-﻿using CCCategoryService.Data;
+﻿using CCApiLibrary.Models;
+using CCCategoryService.Data;
 using CCCategoryService.Dtos;
-using CCCategoryService.DTOs;
 using InternalCategory = CCCategoryService.Data.InternalCategory;
 
 namespace CCCategoryService.Helper

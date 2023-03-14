@@ -3,6 +3,7 @@ using CCCategoryService.Data;
 using CCCategoryService.Interface;
 using CCCategoryService.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
+using CCApiLibrary.Models;
 
 namespace CCCategoryService.Repositories
 {

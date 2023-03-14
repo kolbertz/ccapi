@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;

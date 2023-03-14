@@ -1,11 +1,8 @@
 ﻿using CCApiLibrary.DbConnection;
 using CCApiLibrary.Interfaces;
-using CCProductService.Helper;
 using CCProductService.Interface;
 using CCProductService.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;

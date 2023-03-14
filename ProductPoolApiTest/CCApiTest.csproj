@@ -45,7 +45,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CCCategoryService\CCCategoryService.csproj" />
+<<<<<<< HEAD
     <ProjectReference Include="..\CCCategory_Service\CCCategoryService.csproj" />
+=======
+>>>>>>> 12a647f2ad281cfe1b3c68f0b29e3a5024eaf19f
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
     <ProjectReference Include="..\CCProductService\CCProductService.csproj" />
   </ItemGroup>

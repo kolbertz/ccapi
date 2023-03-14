@@ -1,21 +1,17 @@
 using CCApiLibrary.CustomAttributes;
 using CCApiLibrary.DbConnection;
 using CCApiLibrary.Interfaces;
-using CCProductPoolService;
-using CCProductPoolService.Data;
 using CCProductPoolService.Interface;
 using CCProductPoolService.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
-public class Program
+public class Program : IProgram
 {
     private static void Main(string[] args)
     {
