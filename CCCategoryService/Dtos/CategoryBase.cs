@@ -1,5 +1,5 @@
-﻿using CCCategoryService.Data;
-using CCCategoryService.DTOs;
+﻿using CCApiLibrary.Models;
+using CCCategoryService.Data;
 using System.ComponentModel.DataAnnotations;
 
 namespace CCCategoryService.Dtos

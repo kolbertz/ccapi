@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CCCategory_Service\CCCategoryService.csproj" />
+    <ProjectReference Include="..\CCCategoryService\CCCategoryService.csproj" />
     <ProjectReference Include="..\CCProductPoolService\CCProductPoolService.csproj" />
     <ProjectReference Include="..\CCProductService\CCProductService.csproj" />
   </ItemGroup>

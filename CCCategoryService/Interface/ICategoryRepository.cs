@@ -1,4 +1,5 @@
-﻿using CCCategoryService.Data;
+﻿using CCApiLibrary.Models;
+using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 
 namespace CCCategoryService.Interface

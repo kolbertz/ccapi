@@ -22,7 +22,7 @@ namespace CCApiTest.Base
     {
         protected Guid systemSettingsId = new Guid("fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
 
-        protected WebApplicationFactory<Program> GetWebApplication()
+        protected WebApplicationFactory<IProgram> GetWebApplication()
         {
             var inMemorySettings = new Dictionary<string, string>
             {
@@ -33,7 +33,7 @@ namespace CCApiTest.Base
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            return new WebApplicationFactory<Program>().WithWebHostBuilder(builder => {
+            return new WebApplicationFactory<IProgram>().WithWebHostBuilder(builder => {
                 builder.ConfigureTestServices(services => {
                     var dbConnectionDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection));
                     if (dbConnectionDescriptor != null)
@@ -56,7 +56,7 @@ namespace CCApiTest.Base
             });
         }
 
-        protected HttpClient CreateClientWithAuth(WebApplicationFactory<Program> application)
+        protected HttpClient CreateClientWithAuth(WebApplicationFactory<IProgram> application)
         {
             HttpClient client = application.CreateClient();
             var base64EncodedAuthString = Convert.ToBase64String(Encoding.UTF8.GetBytes("Test:test"));

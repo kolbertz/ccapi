@@ -9,6 +9,7 @@ namespace CCApiLibrary.Models
         public Guid UserId { get; set; }
         public Guid UserGroupId { get; set; }
         public Guid ProfileId { get; set; }
+        public IEnumerable<Guid> ProductPoolIds { get; set; }
         public IEnumerable<Guid> CategoryPoolIds { get; set; }
         public string TenantDatabase { get; set; }
 

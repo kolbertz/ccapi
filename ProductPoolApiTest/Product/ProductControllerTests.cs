@@ -16,6 +16,7 @@ using CCApiLibrary.Interfaces;
 using CCProductPoolService.Dtos;
 using CCProductService.DTOs;
 using System.Globalization;
+using CCApiLibrary.Models;
 
 namespace CCApiTest.Product
 {
