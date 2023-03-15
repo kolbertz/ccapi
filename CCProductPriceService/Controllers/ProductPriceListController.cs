@@ -90,7 +90,6 @@ namespace CCProductPriceService.Controllers
         //[Route("{id}")]
         //public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
         //{
-
         //}
 
         [HttpDelete]

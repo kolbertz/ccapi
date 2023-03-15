@@ -72,7 +72,7 @@ namespace CCProductPriceService.Repositories
             InternalProductPrice price = await _dbContext.QuerySingleAsync<InternalProductPrice>(query, param: p);
             if (price != null)
             {
-                ProductPrice productPrice = new ProductPrice(price);
+                ProductPriceBase productPrice = new ProductPriceBase(price);
                 jsonPatchDocument.ApplyTo(productPrice);
                 price.MergeProductPrice(productPrice);
                 if (await Update(price).ConfigureAwait(false) > 0)
