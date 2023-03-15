@@ -12,6 +12,8 @@ namespace CCProductService.DTOs
     {
         public Guid Id { get; set; }
 
+        public Product() { }
+
         public Product (InternalProduct internalProduct) 
         { 
             Id= internalProduct.Id;
@@ -21,7 +23,6 @@ namespace CCProductService.DTOs
     public class ProductBase 
     {      
 
-        [Required]
         public Guid ProductPoolId { get; set; }
 
         [Required]

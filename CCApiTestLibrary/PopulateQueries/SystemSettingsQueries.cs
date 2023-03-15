@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCApiTestLibrary.PopulateQueries
 {
-    public static class BaseQueries
+    public static class SystemSettingsQueries
     {
         public static string PopulateSystemSettingsQuery(Guid systemSettingsId)
         {

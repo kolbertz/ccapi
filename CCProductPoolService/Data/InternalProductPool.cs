@@ -1,12 +1,10 @@
 ﻿using CCProductPoolService.Dtos;
 using Dapper.Contrib.Extensions;
-using System;
-using System.Collections.Generic;
 
 namespace CCProductPoolService.Data;
 
 [Table("ProductPool")]
-public partial class ProductPool
+public partial class InternalProductPool
 {
     [Key]
     public Guid Id { get; set; }
@@ -29,26 +27,19 @@ public partial class ProductPool
 
     public Guid SystemSettingsId { get; set; }
 
-    public virtual ICollection<ProductPool> InverseParentProductPool { get; } = new List<ProductPool>();
-
-    public virtual ProductPool ParentProductPool { get; set; }
-
-    public virtual ICollection<Product> Products { get; } = new List<Product>();
-
-    public ProductPool(ProductPoolDto productPoolDto)
+    public InternalProductPool(ProductPoolBase productPoolDto)
     {
         MergeProductPool(productPoolDto);
     }
 
-    public ProductPool() { }
+    public InternalProductPool() { }
 
-    public void MergeProductPool(ProductPoolDto productPoolDto)
+    public void MergeProductPool(ProductPoolBase productPoolDto)
     {
-        Id = productPoolDto.Id;
-        ProductPoolKey = productPoolDto.Key;
+        ProductPoolKey = productPoolDto.Key.Value;
         Name = productPoolDto.Name;
         Description = productPoolDto.Description;
         ParentProductPoolId = productPoolDto.ParentProductPool;
-        SystemSettingsId = productPoolDto.SystemSettingsId;
+        SystemSettingsId = productPoolDto.SystemSettingsId.Value;
     }
 }

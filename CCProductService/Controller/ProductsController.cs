@@ -1,4 +1,5 @@
-﻿using CCApiLibrary.Models;
+﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Interface;
@@ -84,6 +85,7 @@ namespace CCProductService.Controller
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Post([ModelBinder] ProductBase productDto)
         {
             UserClaim userClaim = null;
@@ -112,6 +114,7 @@ namespace CCProductService.Controller
         [HttpPut]
         [Route("{id}")]
         [SwaggerOperation("Updates a Product (using EF Core)")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
         {
             if (id != productDto.Id)

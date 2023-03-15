@@ -1,7 +1,6 @@
 ﻿using Bazinga.AspNetCore.Authentication.Basic;
 using CCApiLibrary.DbConnection;
 using CCApiLibrary.Interfaces;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
@@ -15,7 +14,7 @@ namespace CCApiTestLibrary.BaseClasses
         {
             var inMemorySettings = new Dictionary<string, string>
             {
-                { "ConnectionStrings:TestDatabase", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
+                { "ConnectionStrings:DefaultDatabase", "Server=tcp:kolbertz.database.windows.net,1433;Initial Catalog=CCServiceApiTestDatabase;Persist Security Info=False;User ID=cc_user;Password=!1cc#2§44ef!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" }
             };
 
             IConfiguration configuration = new ConfigurationBuilder()

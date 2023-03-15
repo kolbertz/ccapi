@@ -27,47 +27,47 @@ namespace CCProductPoolService.Repositories
             _dbContext.Init(database);
         }
 
-        public Task<IEnumerable<ProductPoolDto>> GetProductPoolsAsync()
+        public Task<IEnumerable<ProductPool>> GetProductPoolsAsync()
         {
 
             var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool";
-            return _dbContext.QueryAsync<ProductPoolDto>(query);
+            return _dbContext.QueryAsync<ProductPool>(query);
         }
 
-        public Task<ProductPoolDto> GetProductPoolByIdAsync(Guid id)
+        public Task<ProductPool> GetProductPoolByIdAsync(Guid id)
         {
             var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool " +
                 "WHERE Id = @ProductPoolId";
-            return _dbContext.QuerySingleAsync<ProductPoolDto>(query, param: new { ProductPoolId = id });
+            return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, param: new { ProductPoolId = id });
         }
 
-        public Task<Guid> AddProductPoolAsync(ProductPoolDto productPoolDto, UserClaim userClaim)
+        public Task<Guid> AddProductPoolAsync(ProductPoolBase productPoolDto, UserClaim userClaim)
         {
             var query = "INSERT INTO ProductPool(ProductPoolKey, [Name], Description, ParentProductPoolId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES(@ProductPoolKey, @Name, @Description, @ParentProductPoolId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
-            ProductPool pool = new ProductPool(productPoolDto);
+            InternalProductPool pool = new InternalProductPool(productPoolDto);
             pool.CreatedDate = pool.LastUpdatedDate = DateTimeOffset.Now;
             pool.CreatedUser = pool.LastUpdatedUser = userClaim.UserId;
             return _dbContext.ExecuteScalarAsync<Guid>(query, pool);
         }
 
-        public Task<int> UpdateProductPoolAsync(ProductPoolDto productPool, UserClaim userClaim)
+        public Task<int> UpdateProductPoolAsync(ProductPool productPool, UserClaim userClaim)
         {
-            ProductPool pool = new ProductPool(productPool);
+            InternalProductPool pool = new InternalProductPool(productPool);
             pool.LastUpdatedDate = DateTimeOffset.Now;
             pool.LastUpdatedUser = userClaim.UserId;
             return Update(pool);
         }
 
-        public async Task<ProductPoolDto> PatchProductPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
+        public async Task<ProductPool> PatchProductPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
         {
             var query = "SELECT * FROM ProductPool WHERE Id = @ProductPoolId";
             var p = new {ProductPoolId = id };
-            ProductPool pool = await _dbContext.QuerySingleAsync<ProductPool>(query, p);
+            InternalProductPool pool = await _dbContext.QuerySingleAsync<InternalProductPool>(query, p);
             if (pool != null)
             {
-                ProductPoolDto productPoolDto = new ProductPoolDto(pool);
+                ProductPool productPoolDto = new ProductPool(pool);
                 jsonPatchDocument.ApplyTo(productPoolDto);
                 pool.MergeProductPool(productPoolDto);
                 pool.LastUpdatedDate= DateTimeOffset.Now;
@@ -80,7 +80,7 @@ namespace CCProductPoolService.Repositories
             return null;
         }
 
-        private Task<int> Update(ProductPool pool)
+        private Task<int> Update(InternalProductPool pool)
         {
             var query = "UPDATE ProductPool Set ProductPoolKey = @ProductPoolKey, [Name] = @Name, Description = @Description, ParentProductPoolId = @ParentProductPoolId, " +
                 "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser WHERE Id = @Id";

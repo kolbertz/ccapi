@@ -1,6 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
 using CCApiLibrary.Models;
-using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -32,9 +31,11 @@ namespace CCProductPoolService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>();
-                productPoolRepository.Init(userClaim.TenantDatabase);
-                return Ok(await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync());
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
+                {
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    return Ok(await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync());
+                }
             }
             catch (Exception ex)
             {
@@ -48,22 +49,30 @@ namespace CCProductPoolService.Controllers
         {
             UserClaim userClaim = null;
 
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
+                {
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    ProductPool productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
+                    if (productPoolDto == null)
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        return Ok(productPoolDto);
+                    }
+                }
             }
-            ProductPoolDto productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
-            if 
-                (productPoolDto == null) 
+            catch (Exception ex)
             {
-                return NotFound(); 
+                return StatusCode(500);
             }
-            else
-            {
-                return Ok(productPoolDto);
-            }
-            
-
         }
 
         [HttpPost]
@@ -71,7 +80,7 @@ namespace CCProductPoolService.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
 
-        public async Task<IActionResult> Post(ProductPoolDto productPoolDto)
+        public async Task<IActionResult> Post(ProductPoolBase productPoolDto)
         {
             try
             {
@@ -83,8 +92,12 @@ namespace CCProductPoolService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                poolId = await _serviceProvider.GetService<IProductPoolRepository>().AddProductPoolAsync(productPoolDto, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{poolId}"), null);
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
+                {
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    poolId = await _serviceProvider.GetService<IProductPoolRepository>().AddProductPoolAsync(productPoolDto, userClaim);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{poolId}"), null);
+                }
             }
             catch (Exception ex)
             {
@@ -96,14 +109,11 @@ namespace CCProductPoolService.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Put(Guid id, ProductPoolDto productPoolDto)
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        public async Task<IActionResult> Put(Guid id, ProductPool productPoolDto)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
                 if (id != productPoolDto.Id)
                 {
                     return BadRequest("The id inside the body do not match the query parameter");
@@ -113,8 +123,12 @@ namespace CCProductPoolService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
-                return Ok();
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
+                {
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
+                    return Ok();
+                }
             }
             catch (Exception ex)
             {
@@ -128,20 +142,24 @@ namespace CCProductPoolService.Controllers
         {
             try
             {
-                ProductPoolDto productPoolDto = null;
+                ProductPool productPoolDto = null;
                 UserClaim userClaim = null;
                 if (HttpContext.User.Claims != null)
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().PatchProductPoolAsync(id, productPoolPatch, userClaim).ConfigureAwait(false);
-                if (productPoolDto != null)
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
                 {
-                    return Ok(productPoolDto);
-                }
-                else
-                {
-                    return NotFound();
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().PatchProductPoolAsync(id, productPoolPatch, userClaim).ConfigureAwait(false);
+                    if (productPoolDto != null)
+                    {
+                        return Ok(productPoolDto);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
             }
             catch (Exception ex)
@@ -162,13 +180,17 @@ namespace CCProductPoolService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                if (await _serviceProvider.GetService<IProductPoolRepository>().DeleteProductPoolAsync(id).ConfigureAwait(false) > 0)
+                using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
                 {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
+                    productPoolRepository.Init(userClaim.TenantDatabase);
+                    if (await productPoolRepository.DeleteProductPoolAsync(id).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
             }
             catch (Exception ex)

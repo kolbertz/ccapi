@@ -1,15 +1,12 @@
 ﻿using CCProductPoolService.Data;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CCProductPoolService.Dtos
 {
-    public class ProductPoolDto
+    public class ProductPoolBase
     {
-        public Guid Id { get; set; }
-
         [Required]
-        public int Key { get; set; }
+        public int? Key { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -19,12 +16,12 @@ namespace CCProductPoolService.Dtos
         public Guid? ParentProductPool { get; set; }
 
         [Required]
-        public Guid SystemSettingsId { get; set; }
+        public Guid? SystemSettingsId { get; set; }
 
-        public ProductPoolDto() { }
+        public ProductPoolBase() { }
 
-        public ProductPoolDto(ProductPool productPool) {
-            Id = productPool.Id;
+        public ProductPoolBase(InternalProductPool productPool)
+        {
             Key = productPool.ProductPoolKey;
             Name = productPool.Name;
             Description = productPool.Description;
