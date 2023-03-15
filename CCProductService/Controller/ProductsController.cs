@@ -56,7 +56,7 @@ namespace CCProductService.Controller
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{id}")]
+        [Route("api/v2/[controller]")]
         [SwaggerOperation("Gets a Product by Id (using Dapper)")]
         public async Task<IActionResult> Get(Guid id) 
         {
@@ -82,6 +82,7 @@ namespace CCProductService.Controller
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("api/v2/[controller]")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
         public async Task<IActionResult> Post([ModelBinder] ProductBase productDto)
@@ -110,7 +111,7 @@ namespace CCProductService.Controller
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("{id}")]
+        [Route("api/v2/[controller]")]
         [SwaggerOperation("Updates a Product (using EF Core)")]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
         {
@@ -138,7 +139,7 @@ namespace CCProductService.Controller
         /// <param name="id"></param>       
         /// <returns></returns>
         [HttpPatch]
-        [Route("{id}")]
+        [Route("api/v2/[controller]")]
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
         public async Task<IActionResult> Patch(Guid id)
         {
@@ -163,7 +164,7 @@ namespace CCProductService.Controller
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("{id}")]
+        [Route("api/v2/[controller]")]
         [SwaggerOperation("Delete a Product (using EF Core)")]
         public async Task<IActionResult> Delete(Guid id)
         {

@@ -20,13 +20,14 @@ namespace CCProductPriceService.DTOs
         [Required]
         public Guid SystemSettingsId { get; set; }
 
-        //public ProductPricePoolBase(InternalProductPricePool internalProductPricePool) { 
+        //public ProductPricePoolBase(InternalProductPricePool internalProductPricePool)
+        //{
         //    Id = internalProductPricePool.Id;
-        //    Name = internalProductPricePool.Name;
-        //    Description= internalProductPricePool.Description;
+        //    Name = new List<MultilanguageText>();
+        //    Description = new List<MultilanguageText>();
         //    ParentPoolId = internalProductPricePool.ParentProductPricePoolId;
         //    CurrencyId = internalProductPricePool.CurrencyId;
-        //    SystemSettingsId= internalProductPricePool.SystemSettingsId;
+        //    SystemSettingsId = internalProductPricePool.SystemSettingsId;
         //}
     }
 }

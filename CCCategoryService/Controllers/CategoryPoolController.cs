@@ -20,6 +20,7 @@ namespace CCCategoryService.Controllers
         }
 
         [HttpGet]
+        [Route("api/v2/[controller]")]
         public async Task<IActionResult> Get()
         {
             try
@@ -62,6 +63,7 @@ namespace CCCategoryService.Controllers
         }
 
         [HttpPost]
+        [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]

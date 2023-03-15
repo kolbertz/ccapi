@@ -9,15 +9,7 @@ namespace CCProductPriceService.DTOs
 
         public ProductPrice(ProductPriceBase productPriceBase) { }
 
-        public ProductPrice(InternalProductPrice internalProductPrice)
-        {
-            if (internalProductPrice != null)
-            {
-
-            }
-        }
-
-
+      
 
     }
 
@@ -34,9 +26,18 @@ namespace CCProductPriceService.DTOs
        
         public int ManualPrice { get; set; }
 
-        public ProductPriceBase()
+        public ProductPriceBase() { }
+
+        public ProductPriceBase(InternalProductPrice internalProductPrice)
         {
-           
+            if (internalProductPrice != null)
+            {                
+                Id= internalProductPrice.Id;
+                ProductId= internalProductPrice.ProductId;
+                ProductPricePoolId= internalProductPrice.ProductPricePoolId;
+                ProductPriceListId= internalProductPrice.ProductPriceListId;
+                ManualPrice= internalProductPrice.ManualPrice;
+            }
         }
     }
 }
