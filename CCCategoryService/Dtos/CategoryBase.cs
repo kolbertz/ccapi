@@ -48,6 +48,7 @@ namespace CCCategoryService.Dtos
         }
         public void SetMultilanguageText(InternalCategoryString categoryString)
         {
+            //Bei Get/GetById Multilanguageproblem
             CategoryNames.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.CategoryName });
             Descriptions.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.Description });
             Comments.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.Comment });

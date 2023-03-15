@@ -158,7 +158,7 @@ namespace CCCategoryService.Repositories
         {
             var query = "SELECT * FROM Product WHERE Id = @CategoryId";
             var p = new { CategoryId = id };
-            InternalCategory category = await _dbContext.QuerySingleAsync<InternalCategory>(query, p);
+            InternalCategory category = await _dbContext.QueryFirstOrDefaultAsync<InternalCategory>(query, p);
             if (category != null)
             {
                 CategoryBase categoryDto = new CategoryBase();

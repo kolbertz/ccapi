@@ -17,7 +17,7 @@ namespace CCProductPriceService.Interfaces
         //Baustelle
         //Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim);
 
-        //Task<int> PatchPricePool(JsonPatchDocument pricePool, UserClaim userClaim);
+        Task<ProductPriceList> PatchProductPriceList(Guid id, JsonPatchDocument pricePool, UserClaim userClaim);
 
         Task<int> DeletePriceListAsync(Guid id);
     }

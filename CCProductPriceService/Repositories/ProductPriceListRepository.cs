@@ -2,6 +2,8 @@
 using CCApiLibrary.Models;
 using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
+using CCProductPriceService.InternalData;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace CCProductPriceService.Repositories
 {
@@ -27,23 +29,47 @@ namespace CCProductPriceService.Repositories
         
         public Task<IEnumerable<ProductPriceListBase>> GetAllProductPriceLists()
         {
-            var query = "SELECT Id, [Name], Key,Priority,SystemSettingsId FROM ProductPriceList";
+            var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList";
             return _dbContext.QueryAsync<ProductPriceListBase>(query);            
         }
 
         public  Task<ProductPriceList> GetProductPriceListById(Guid id)
         {
-            var query = "SELECT Id, [Name], Key,Priority,SystemSettingsId FROM ProductPriceList " +
+            var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList " +
                 "WHERE Id = @ProductPriceListId";
             return _dbContext.QuerySingleAsync< ProductPriceList>(query,param: new {ProductPriceListId = id });
         }
 
         public Task<Guid> AddProductPriceListAsync(ProductPriceList productPriceList, UserClaim userClaim)
         {
-            var query = "INSERT INTO ProductPriceList(Id, [Name],Key, Priority, SystemSettingsId) " +
+            var query = "INSERT INTO ProductPriceList(Id, [Name] ,[Key] , Priority, SystemSettingsId) " +
                "OUTPUT Inserted.Id " +
                "VALUES(@Id, @Name, @Key, @Priority, @SystemSettingsId);";
             return null;
+        }
+        public async Task<ProductPriceList> PatchProductPriceList(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
+        {
+            var query = "SELECT * FROM ProductPriceList WHERE Id = @ProductPriceListId ";
+            var p = new { ProductPriceListId = id };
+            InternalProductPriceList productPriceList = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPriceList>(query, param: p);
+            if (productPriceList == null) { }
+            { 
+                ProductPriceList priceList = new ProductPriceList();
+                jsonPatchDocument.ApplyTo(priceList);
+                productPriceList.MergeProductPriceList(priceList);
+                if (await Update(productPriceList).ConfigureAwait(false)>0)                 
+                {
+                    return priceList;
+                }
+            }
+            return new ProductPriceList();
+            
+        }
+        private Task<int> Update(InternalProductPriceList priceList)
+        {
+            var query = "UPDATE ProductPriceList Set  [Name] = @Name, [Key] = @Key, Priority = @Priority " +
+                "SystemSettingsId = @SystemSettingsId WHERE Id = @Id";
+            return _dbContext.ExecuteAsync(query, param: priceList);
         }
 
         public Task<int> DeletePriceListAsync(Guid id)

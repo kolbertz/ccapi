@@ -83,12 +83,24 @@ namespace CCProductPriceService.Controllers
             }
         }
 
-        //[HttpPatch]
-        //[Route("{id}")]
-        //public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
-        //{
+        [HttpPatch]
+        [Route("{id}")]
+        public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
+        {
+            ProductPricePool dto;
+            UserClaim userClaim= null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
 
-        //}
+            using (IProductPricePoolRepository productPricePoolRepository = _serviceProvider.GetService<IProductPricePoolRepository>()) 
+            {
+                productPricePoolRepository.Init(userClaim.TenantDatabase);
+                dto = await productPricePoolRepository.PatchPricePoolAsync(id, jsonPatch, userClaim).ConfigureAwait(false);
+                return Ok(dto);
+            }
+        }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

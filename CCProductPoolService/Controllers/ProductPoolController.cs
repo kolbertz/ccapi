@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CCProductPoolService.Controllers
 {
@@ -79,7 +80,7 @@ namespace CCProductPoolService.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
-
+        [SwaggerOperation("Adds a new ProductPool")]
         public async Task<IActionResult> Post(ProductPoolBase productPoolDto)
         {
             try
@@ -110,6 +111,7 @@ namespace CCProductPoolService.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Updates a Product (using EF Core)")]
         public async Task<IActionResult> Put(Guid id, ProductPool productPoolDto)
         {
             try
@@ -138,6 +140,7 @@ namespace CCProductPoolService.Controllers
 
         [HttpPatch]
         [Route("{id}")]
+        [SwaggerOperation("Patch a ProductPool not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPoolPatch)
         {
             try

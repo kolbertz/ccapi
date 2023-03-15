@@ -27,18 +27,18 @@ namespace CCCategoryService.Repositories
             _dbContext.Init(database);
         }
 
-        public Task<IEnumerable<CategoryPoolBase>> GetCategoryPoolsAsync()
+        public Task<IEnumerable<CategoryPool>> GetCategoryPoolsAsync()
         {
 
             var query = "SELECT Id, [Name], Description, ParentCategoryPoolId ,PoolType, SystemSettingsId FROM CategoryPool";
-            return _dbContext.QueryAsync<CategoryPoolBase>(query);
+            return _dbContext.QueryAsync<CategoryPool>(query);
         }
 
-        public Task<CategoryPoolBase> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim)
+        public Task<CategoryPool> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT Id, [Name], Description, ParentCategoryPoolId ,PoolType, SystemSettingsId FROM CategoryPool " +
                 "WHERE Id = @CategoryPoolId";
-            return _dbContext.QuerySingleAsync<CategoryPoolBase>(query, param: new { CategoryPoolId = id });
+            return _dbContext.QueryFirstOrDefaultAsync<CategoryPool>(query, param: new { CategoryPoolId = id });
         }
 
         public Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPoolDto, UserClaim userClaim)
@@ -64,7 +64,7 @@ namespace CCCategoryService.Repositories
         {
             var query = "SELECT * FROM CategoryPool WHERE Id = @CategoryPoolId";
             var p = new { CategoryPoolId = id };
-            InternalCategoryPool pool = await _dbContext.QuerySingleAsync<InternalCategoryPool>(query, p);
+            InternalCategoryPool pool = await _dbContext.QueryFirstOrDefaultAsync<InternalCategoryPool>(query, p);
             if (pool != null)
             {
                 CategoryPoolBase categoryPoolDto = new CategoryPoolBase();

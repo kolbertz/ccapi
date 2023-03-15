@@ -87,14 +87,14 @@ namespace CCProductPriceService.Repositories
             return _dbContext.ExecuteAsync(query, param: pricePool);
         }
 
-        public async Task<ProductPricePoolBase> PatchPricePoolAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
+        public async Task<ProductPricePool> PatchPricePoolAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
         {
             var query = "SELECT * FROM ProductPricePool WHERE Id = @ProductPricePoolId ";
             var p = new { ProductPricePoolId = id };
-            InternalProductPricePool pricePool = await _dbContext.QuerySingleAsync<InternalProductPricePool>(query, param: p);
+            InternalProductPricePool pricePool = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPricePool>(query, param: p);
             if (pricePool == null) 
             {
-                ProductPricePoolBase pricePoolBase = new ProductPricePoolBase();
+                ProductPricePool pricePoolBase = new ProductPricePool();
                 jsonPatchDocument.ApplyTo(pricePoolBase);
                 pricePool.MergeProductPricePool(pricePoolBase);
                 pricePool.LastUpdatedDate = DateTimeOffset.Now;

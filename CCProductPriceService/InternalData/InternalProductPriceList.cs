@@ -1,11 +1,26 @@
-﻿namespace CCProductPriceService.InternalData
+﻿using CCApiLibrary.Models;
+using CCProductPriceService.DTOs;
+
+namespace CCProductPriceService.InternalData
 {
-    public class InternalProductPriceList
+    public partial class InternalProductPriceList
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int Key { get; set; }
         public int Priority { get; set; }
         public Guid SystemSettingsId { get; set; }
+    
+        public void MergeProductPriceList(ProductPriceList priceList)
+        {
+            Id= priceList.Id;
+            if (priceList.Name != null && priceList.Name.Count > 0)
+            {
+                Name = priceList.Name.First().Text;
+            }            
+            Key = priceList.Key;
+            Priority = priceList.Priority;
+            SystemSettingsId= priceList.SystemSettingsId;
+        }
     }
 }

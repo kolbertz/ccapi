@@ -74,7 +74,7 @@ namespace CCCategoryService.Controllers
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [SwaggerOperation("Adds a new Product (using EF Core)")]
+        [SwaggerOperation("Adds a new Category (using EF Core)")]
         public async Task<IActionResult> Post([ModelBinder] Category categoryDto)
         {
             UserClaim userClaim = null;
@@ -95,7 +95,7 @@ namespace CCCategoryService.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [SwaggerOperation("Updates a Product (using EF Core)")]
+        [SwaggerOperation("Updates a Category (using EF Core)")]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Category categoryDto)
 
         {
@@ -119,7 +119,7 @@ namespace CCCategoryService.Controllers
 
         [HttpPatch]
         [Route("{id}")]
-        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 ")]
+        [SwaggerOperation("Patch a Category not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 ")]
         public async Task<IActionResult> Patch(Guid id)
         {
             CategoryBase dto;
@@ -140,7 +140,7 @@ namespace CCCategoryService.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        [SwaggerOperation("Delete a Product ")]
+        [SwaggerOperation("Deletes a Category ")]
         public async Task<IActionResult> Delete(Guid id)
         {
             UserClaim userClaim = null;
