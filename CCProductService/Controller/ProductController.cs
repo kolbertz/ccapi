@@ -143,7 +143,7 @@ namespace CCProductService.Controller
         [HttpPatch]
         [Route("{id}")]
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
-        public async Task<IActionResult> Patch(Guid id)
+        public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPatch)
         {
             ProductBase productBase;
             UserClaim userClaim = null;
@@ -155,7 +155,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                productBase = await productRepository.PatchProductAsync(id, userClaim).ConfigureAwait(false);
+                productBase = await productRepository.PatchProductAsync(id,productPatch, userClaim).ConfigureAwait(false);
                 if (productBase != null)
                 {
                     return NoContent();

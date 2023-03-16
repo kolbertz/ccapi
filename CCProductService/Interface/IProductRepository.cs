@@ -13,7 +13,7 @@ namespace CCProductService.Interface
         Task<ProductBase> GetProductById(Guid id, UserClaim userClaim);
         Task<Guid> AddProductAsync(ProductBase productDto, UserClaim userClaim);
         Task<bool> UpdateProductAsync(ProductBase productDto, UserClaim userClaim);
-        Task<ProductBase> PatchProductAsync(Guid id,UserClaim userClaim);
+        Task<ProductBase> PatchProductAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
         Task <int>DeleteProductAsync(Guid id, UserClaim userClaim);
         Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim);
         Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim);

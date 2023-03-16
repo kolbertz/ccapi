@@ -4,6 +4,7 @@ using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Helper;
 using CCProductService.Interface;
+using Microsoft.AspNetCore.JsonPatch;
 using System.Dynamic;
 
 namespace CCProductService.Repositories
@@ -163,7 +164,7 @@ namespace CCProductService.Repositories
             return Update(product,productDto, userClaim);
         }
 
-        public async Task<ProductBase> PatchProductAsync(Guid id, UserClaim userClaim)
+        public async Task<ProductBase> PatchProductAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
         {
             var query = "SELECT * FROM Product WHERE Id = @ProductId";
             var p = new {ProductId = id };
@@ -275,7 +276,6 @@ namespace CCProductService.Repositories
             product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
             try
             {
-
                 await _dbContext.ExecuteAsync(productStringInsertQuery, product.ProductStrings);
 
                 return true;
@@ -299,7 +299,6 @@ namespace CCProductService.Repositories
             product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
             try
             {
-
                 await _dbContext.ExecuteAsync(barcodeInsertQuery, product.ProductBarcodes);
 
                 return true;
@@ -314,17 +313,17 @@ namespace CCProductService.Repositories
 
         public Task<int> DeleteProductStringAsync(Guid id, UserClaim userClaim)
         {
-            var query = "DELETE FROM [dbo].[ProductString] WHERE ProductId = @Id";
+            var query = "DELETE FROM [dbo].[ProductString] WHERE ProductId = @ProductId";
 
-            return _dbContext.ExecuteAsync(query, param: new { Productid = id });
+            return _dbContext.ExecuteAsync(query, param: new { ProductId = id });
 
         }
 
         public Task<int> DeleteBarCodeAsync(Guid id, UserClaim userClaim)
         {
-            var query = "DELETE FROM [dbo].[ProductBarcode] WHERE ProductId = @Id";
+            var query = "DELETE FROM [dbo].[ProductBarcode] WHERE ProductId = @ProductId";
 
-            return _dbContext.ExecuteAsync(query, param: new { Productid = id });
+            return _dbContext.ExecuteAsync(query, param: new { ProductId = id });
 
         }
 
