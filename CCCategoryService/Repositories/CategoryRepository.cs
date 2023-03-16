@@ -54,14 +54,14 @@ namespace CCCategoryService.Repositories
                     $"				FROM (Select Id, CategoryKey, CategoryPoolId	From Category{categoryPoolQuery}	" +
                     $"				ORDER BY CategoryKey      " +
                     $"              OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t 		" +
-                    $"			LEFT JOIN CategoryString on t.Id = CategoryString.CategoryId";
+                    $"			    LEFT JOIN CategoryString on t.Id = CategoryString.CategoryId";
 
                 paramObj.TryAdd("offset", skip.Value);
-                paramObj.TryAdd("fetch", skip.Value);
+                paramObj.TryAdd("fetch", take.Value);
             }
             else
             {
-                query = "SELECT Category.Id, CategoryKey, Category.CategoryPoolId, CategoryString.Id AS CategoryStringID, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
+                query = "SELECT Category.Id, Category.CategoryKey, Category.CategoryPoolId, CategoryString.Id AS CategoryStringID, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
                     $" from Category " +
                     $"JOIN CategoryString on Category.Id = CategoryString.CategoryId{categoryPoolQuery}" +
                     $" ORDER BY CategoryKey";
@@ -74,11 +74,14 @@ namespace CCCategoryService.Repositories
                 if (!stringMap.TryGetValue(c.Id, out dto))
                 {
                     dto = new Category(c);
-                    //CategoryHelper.ParseCategoryToDto(c,dto);
+                    CategoryHelper.ParseCategoryToDto(c, dto);
                     stringMap.Add(c.Id, dto);
                 }
+                if (cs != null)
+                {
+                    dto.SetMultilanguageText(cs);
+                }
                 
-                dto.SetMultilanguageText(cs);
                 return dto;
             }, splitOn: "Id, CategoryId", param: paramObj).ConfigureAwait(false);
             return stringMap.Values.ToList().AsReadOnly();
@@ -111,7 +114,7 @@ namespace CCCategoryService.Repositories
                     CategoryHelper.ParseCategoryToDto(p, dto);
                 }
                  dto.SetMultilanguageText(ps);
-                return (Category)dto;
+                return dto;
             }, splitOn: "Id, CategoryId", param: paramObj).ConfigureAwait(false)).FirstOrDefault();
 
         }      

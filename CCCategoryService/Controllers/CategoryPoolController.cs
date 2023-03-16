@@ -30,11 +30,11 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>();
-               //Fehler beim Aufruf der Methode Get
-               //Baustelle
-                categoryPoolRepository.Init(userClaim.TenantDatabase);
-                return Ok(await _serviceProvider.GetService<ICategoryPoolRepository>().GetCategoryPoolsAsync());
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())                
+                {
+                    categoryPoolRepository.Init(userClaim.TenantDatabase);
+                    return Ok(await _serviceProvider.GetService<ICategoryPoolRepository>().GetCategoryPoolsAsync());
+                }
             }
             catch (Exception)
             {
@@ -146,7 +146,6 @@ namespace CCCategoryService.Controllers
             }
             catch (Exception)
             {
-
                 return StatusCode(500);
             }
         }
@@ -163,8 +162,8 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                using (ICategoryPoolRepository categoryPoolRepository =_serviceProvider.GetService<ICategoryPoolRepository>()) 
-                
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
+
                 {
                     categoryPoolRepository.Init(userClaim.TenantDatabase);
                     if (await categoryPoolRepository.DeleteCategoryPoolAsync(id).ConfigureAwait(false) > 0)
@@ -175,8 +174,8 @@ namespace CCCategoryService.Controllers
                     else
                     {
                         return NotFound();
-                    }                
-                }               
+                    }
+                }
             }
             catch (Exception)
             {

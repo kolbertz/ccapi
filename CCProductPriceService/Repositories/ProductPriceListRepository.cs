@@ -52,9 +52,9 @@ namespace CCProductPriceService.Repositories
             var query = "SELECT * FROM ProductPriceList WHERE Id = @ProductPriceListId ";
             var p = new { ProductPriceListId = id };
             InternalProductPriceList productPriceList = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPriceList>(query, param: p);
-            if (productPriceList == null) { }
+            if (productPriceList != null) { }
             { 
-                ProductPriceList priceList = new ProductPriceList();
+                ProductPriceList priceList = new ProductPriceList(productPriceList);
                 jsonPatchDocument.ApplyTo(priceList);
                 productPriceList.MergeProductPriceList(priceList);
                 if (await Update(productPriceList).ConfigureAwait(false)>0)                 
@@ -62,7 +62,7 @@ namespace CCProductPriceService.Repositories
                     return priceList;
                 }
             }
-            return new ProductPriceList();
+            return null;
             
         }
         private Task<int> Update(InternalProductPriceList priceList)

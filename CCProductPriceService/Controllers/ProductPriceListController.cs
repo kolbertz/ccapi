@@ -31,7 +31,7 @@ namespace CCProductPriceService.Controllers
                 {
                     repo.Init(userClaim.TenantDatabase);
                     return Ok(await repo.GetAllProductPriceLists().ConfigureAwait(false));
-                    //MultiLanguageFehler
+                    
                 }
             }
             catch (Exception)

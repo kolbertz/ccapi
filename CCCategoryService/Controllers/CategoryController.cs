@@ -65,12 +65,14 @@ namespace CCCategoryService.Controllers
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
+
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
                 Category category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
+                return Ok(category);
             }
-            return Ok();
+            
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]

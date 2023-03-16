@@ -7,6 +7,7 @@ namespace CCCategoryService.Dtos
     public class Category : CategoryBase
     {
         public Guid Id { get; set; }
+        
         public Category(InternalCategory intcategory)
         {            
             Id = intcategory.Id;
@@ -30,25 +31,34 @@ namespace CCCategoryService.Dtos
         [Required]
         public Guid CategoryPoolId { get; set; }
 
-        public CategoryBase() {
+
+        public CategoryBase()  
+        {
             CategoryNames = new List<MultilanguageText>();
             Descriptions = new List<MultilanguageText>();
-            Comments = new List<MultilanguageText>();
+            Comments = new List<MultilanguageText>();           
+        }
+        public CategoryBase(InternalCategory internalCategory) :base()
+        {
+            if (internalCategory != null)
+            {
+                CategoryPoolId= internalCategory.CategoryPoolId;
+                CategoryKey= internalCategory.CategoryKey;
+               
+            }          
         }
 
         public CategoryBase(Category category)
-            :base()
+            : base()
         {
             if (category != null)
-            {                
+            {
                 CategoryPoolId = category.CategoryPoolId;
                 CategoryKey = category.CategoryKey;
-                
             }
         }
         public void SetMultilanguageText(InternalCategoryString categoryString)
-        {
-            //Bei Get/GetById Multilanguageproblem
+        {            
             CategoryNames.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.CategoryName });
             Descriptions.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.Description });
             Comments.Add(new MultilanguageText { Culture = categoryString.Culture, Text = categoryString.Comment });

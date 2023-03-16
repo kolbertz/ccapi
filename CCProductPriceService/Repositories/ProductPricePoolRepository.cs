@@ -36,7 +36,7 @@ namespace CCProductPriceService.Repositories
             List<ProductPricePoolBase> poolBases= new List<ProductPricePoolBase>();
             foreach (var pricePool in pricePools)
             {
-                ProductPricePoolBase pricePoolBase = new ProductPricePoolBase();
+                ProductPricePool pricePoolBase = new ProductPricePool(pricePool);
                 pricePoolBase.Id = pricePool.Id;
                 // TODO: Change when multilanguage for ProcePool is available
                 pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
@@ -94,7 +94,7 @@ namespace CCProductPriceService.Repositories
             InternalProductPricePool pricePool = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPricePool>(query, param: p);
             if (pricePool == null) 
             {
-                ProductPricePool pricePoolBase = new ProductPricePool();
+                ProductPricePool pricePoolBase = new ProductPricePool(pricePool);
                 jsonPatchDocument.ApplyTo(pricePoolBase);
                 pricePool.MergeProductPricePool(pricePoolBase);
                 pricePool.LastUpdatedDate = DateTimeOffset.Now;
