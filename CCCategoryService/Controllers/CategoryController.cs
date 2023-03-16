@@ -1,4 +1,5 @@
-﻿using CCApiLibrary.Models;
+﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
@@ -70,14 +71,22 @@ namespace CCCategoryService.Controllers
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
                 Category category = await categoryRepository.GetCategoryById(id, userClaim).ConfigureAwait(false);
-                return Ok(category);
+                if (category != null)
+                {
+                    return Ok(category);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         [SwaggerOperation("Adds a new Category (using EF Core)")]
-        public async Task<IActionResult> Post([ModelBinder] Category categoryDto)
+        public async Task<IActionResult> Post([ModelBinder] CategoryBase categoryDto)
         {
             UserClaim userClaim = null;
             Guid? newCategoryId = null;
@@ -98,6 +107,7 @@ namespace CCCategoryService.Controllers
         [HttpPut]
         [Route("{id}")]
         [SwaggerOperation("Updates a Category (using EF Core)")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Category categoryDto)
 
         {
@@ -114,8 +124,14 @@ namespace CCCategoryService.Controllers
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
-                await categoryRepository.UpdateCategoryAsync(categoryDto, userClaim).ConfigureAwait(false);
-                return Ok();
+                if (await categoryRepository.UpdateCategoryAsync(categoryDto, userClaim).ConfigureAwait(false))
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
         }
 

@@ -8,6 +8,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
+using CCApiLibrary.CustomAttributes;
+using Microsoft.AspNetCore.Mvc;
 
 public class Program
 {
@@ -94,15 +96,14 @@ public class Program
                     new string[] {}
                 }
                     });
-
-            //c.SchemaFilter<SwaggerSchemaFilter>();
-
         });
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
 
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
         builder.Services.AddScoped<ICategoryPoolRepository, CategoryPoolRepository>();
+        builder.Services.AddScoped<ValidateModelAttribute>();
+        builder.Services.Configure<ApiBehaviorOptions>(Options => Options.SuppressModelStateInvalidFilter = true);
 
         builder.Services.AddAuthentication(o =>
         {

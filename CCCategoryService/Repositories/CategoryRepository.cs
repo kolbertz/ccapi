@@ -147,11 +147,10 @@ namespace CCCategoryService.Repositories
             }
         }
 
-        public Task<bool> UpdateCategoryAsync(CategoryBase categoryDto, UserClaim userClaim)
+        public Task<bool> UpdateCategoryAsync(Category categoryDto, UserClaim userClaim)
         {
 
-            InternalCategory category = new InternalCategory();
-            CategoryHelper.ParseDtoToCategory(categoryDto, category);
+            InternalCategory category = new InternalCategory(categoryDto);
             category.LastUpdatedDate = DateTimeOffset.Now;
             category.LastUpdatedUser = userClaim.UserId;
             return Update(category, categoryDto, userClaim);
@@ -175,13 +174,20 @@ namespace CCCategoryService.Repositories
             return new CategoryBase();
         }
 
-        public Task<int> DeleteCategoryAsync(Guid id, UserClaim userClaim)
+        public async Task<int> DeleteCategoryAsync(Guid id, UserClaim userClaim)
         {
+            await DeleteCategoryStringAsync(id, userClaim).ConfigureAwait(false);
             var query = "DELETE FROM [dbo].[Category] WHERE Id = @Id";
+
+            return await _dbContext.ExecuteAsync(query, param: new { Id = id });
+        }
+
+        public Task<int> DeleteCategoryStringAsync(Guid id, UserClaim userClaim)
+        {
+            var query = "DELETE FROM [dbo].[CategoryString] WHERE CategoryId = @Id";
 
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
-
 
         public async Task<bool> Update(InternalCategory category, CategoryBase categoryBase, UserClaim userClaim)
         {
@@ -191,12 +197,12 @@ namespace CCCategoryService.Repositories
                 _dbContext.BeginTransaction();
                 if (await _dbContext.ExecuteAsync(categoryUpdateQuery, category) > 0)
                 {
-                    await DeleteCategoryAsync(category.Id, userClaim);
+                    await DeleteCategoryStringAsync(category.Id, userClaim);
                     await InsertCategoryString(category, userClaim);
                 }
 
                 _dbContext.CommitTransaction();
-                return false;
+                return true;
             }
             catch (Exception)
             {
