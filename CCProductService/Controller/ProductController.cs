@@ -14,11 +14,11 @@ namespace CCProductService.Controller
     [Route("api/v2/[controller]")]
     [ApiController]
     [Authorize]
-    public class ProductsController : ControllerBase 
+    public class ProductController : ControllerBase 
     {
         private IServiceProvider _serviceProvider;
 
-        public ProductsController(IServiceProvider serviceProvider)
+        public ProductController(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -57,7 +57,7 @@ namespace CCProductService.Controller
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/v2/[controller]")]
+        [Route("{id}")]
         [SwaggerOperation("Gets a Product by Id (using Dapper)")]
         public async Task<IActionResult> Get(Guid id) 
         {
@@ -83,11 +83,10 @@ namespace CCProductService.Controller
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/v2/[controller]")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
-        public async Task<IActionResult> Post([ModelBinder] ProductBase productDto)
+        public async Task<IActionResult> Post(ProductBase productDto)
         {
             UserClaim userClaim = null;
             Guid? newProductId = null;
@@ -113,14 +112,14 @@ namespace CCProductService.Controller
         /// <param name="productDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/v2/[controller]")]
+        [Route("{id}")]
         [SwaggerOperation("Updates a Product (using EF Core)")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
         {
             if (id != productDto.Id)
             {
-                return BadRequest();
+                return BadRequest("The id inside the body do not match the query parameter");
             }
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -132,7 +131,7 @@ namespace CCProductService.Controller
             {
                 productRepository.Init(userClaim.TenantDatabase);
                 await productRepository.UpdateProductAsync(productDto, userClaim).ConfigureAwait(false);
-                return Ok();
+                return NoContent();
             }
         }
 
@@ -142,11 +141,11 @@ namespace CCProductService.Controller
         /// <param name="id"></param>       
         /// <returns></returns>
         [HttpPatch]
-        [Route("api/v2/[controller]")]
+        [Route("{id}")]
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
         public async Task<IActionResult> Patch(Guid id)
         {
-            ProductBase dto;
+            ProductBase productBase;
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
             {
@@ -156,8 +155,15 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                dto = await productRepository.PatchProductAsync(id, userClaim).ConfigureAwait(false);
-                return Ok(dto);
+                productBase = await productRepository.PatchProductAsync(id, userClaim).ConfigureAwait(false);
+                if (productBase != null)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
         }
 
@@ -167,7 +173,7 @@ namespace CCProductService.Controller
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("api/v2/[controller]")]
+        [Route("{id}")]
         [SwaggerOperation("Delete a Product (using EF Core)")]
         public async Task<IActionResult> Delete(Guid id)
         {

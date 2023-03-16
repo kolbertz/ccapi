@@ -39,7 +39,7 @@ public partial class InternalProduct
 
     public Guid LastUpdatedUser { get; set; }
 
-    public Guid ProductPoolId { get; set; }
+    public Guid? ProductPoolId { get; set; }
 
     public string Image { get; set; }
 
@@ -48,6 +48,4 @@ public partial class InternalProduct
     public virtual ICollection<InternalProductBarcode> ProductBarcodes { get; } = new List<InternalProductBarcode>();
 
     public virtual ICollection<InternalProductString> ProductStrings { get; } = new List<InternalProductString>();
-
-    public virtual ICollection<InternalCategory> Categories { get; } = new List<InternalCategory>();
 }

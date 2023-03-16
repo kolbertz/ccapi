@@ -4,11 +4,11 @@ namespace CCApiLibrary.Models
 {
     public class UserClaim
     {
-        public Guid TenantId { get; set; }
-        public Guid SystemId { get; set; }
+        public Guid? TenantId { get; set; }
+        public Guid? SystemId { get; set; }
         public Guid UserId { get; set; }
-        public Guid UserGroupId { get; set; }
-        public Guid ProfileId { get; set; }
+        public Guid? UserGroupId { get; set; }
+        public Guid? ProfileId { get; set; }
         public IEnumerable<Guid> ProductPoolIds { get; set; }
         public IEnumerable<Guid> CategoryPoolIds { get; set; }
         public string TenantDatabase { get; set; }

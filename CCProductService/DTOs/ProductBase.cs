@@ -23,10 +23,10 @@ namespace CCProductService.DTOs
     public class ProductBase 
     {      
 
-        public Guid ProductPoolId { get; set; }
+        public Guid? ProductPoolId { get; set; }
 
         [Required]
-        public int Key { get; set; }
+        public int? Key { get; set; }
 
         public List<string> Barcodes { get; set; }
 
@@ -39,7 +39,7 @@ namespace CCProductService.DTOs
         public List<MultilanguageText> Descriptions { get; set; }
 
         [Required]
-        public ProductType ProductType { get; set; }
+        public ProductType? ProductType { get; set; }
 
         public IEnumerable<ImageUrl> ImageUrls { get; set; }
 
