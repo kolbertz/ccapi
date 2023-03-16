@@ -4,9 +4,9 @@
   },
   "Routes": [
     {
-      "UpstreamPathTemplate": "/products",
+      "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/products",
+      "DownstreamPathTemplate": "/api/v2/product",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -14,12 +14,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}",
+      "DownstreamPathTemplate": "/api/v2/product/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -27,12 +27,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products",
+      "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "Post" ],
-      "DownstreamPathTemplate": "/api/v2/products",
+      "DownstreamPathTemplate": "/api/v2/product",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -40,12 +40,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Put" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}",
+      "DownstreamPathTemplate": "/api/v2/product/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -53,12 +53,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Patch" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}",
+      "DownstreamPathTemplate": "/api/v2/product/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -66,12 +66,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Delete" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}",
+      "DownstreamPathTemplate": "/api/v2/product/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -79,12 +79,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}/categories",
+      "UpstreamPathTemplate": "/product/{id}/categories",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}/categories",
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -92,12 +92,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}/barcodes",
+      "UpstreamPathTemplate": "/product/{id}/barcodes",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}/barcodes",
+      "DownstreamPathTemplate": "/api/v2/product/{id}/barcodes",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -105,12 +105,12 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
-      "UpstreamPathTemplate": "/products/{id}/pricings",
+      "UpstreamPathTemplate": "/product/{id}/pricings",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/products/{id}/pricings",
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -118,7 +118,7 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "products"
+      "SwaggerKey": "product"
     },
     {
       "UpstreamPathTemplate": "/productpool",
@@ -214,7 +214,7 @@
   ],
   "SwaggerEndPoints": [
     {
-      "Key": "products",
+      "Key": "product",
       "Config": [
         {
           "Name": "CCProductService",

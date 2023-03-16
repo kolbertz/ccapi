@@ -44,7 +44,7 @@ namespace CCProductService.Helper
                 }
                 
                 product.ProductPoolId = productDto.ProductPoolId;
-                product.ProductKey = productDto.Key;
+                product.ProductKey = productDto.Key.Value;
                 product.ProductType = (byte)productDto.ProductType;
                 product.IsBlocked = productDto.IsBlocked;
                 if (productDto.Balance != null)
@@ -62,10 +62,12 @@ namespace CCProductService.Helper
                         product.ProductBarcodes.Add(new InternalProductBarcode { Barcode = barcode, ProductId = product.Id });
                     }
                 }
-                List<string> cultures = productDto.ShortNames.Select(sn => sn.Culture).ToList();
-                cultures.AddRange(productDto.LongNames.Where(ln => !cultures.Contains(ln.Culture)).Select(ln => ln.Culture));
-                cultures.AddRange(productDto.Descriptions.Where(ld => !cultures.Contains(ld.Culture)).Select(ld => ld.Culture));
-                if (cultures != null && cultures.Count > 0)
+                List<string> cultures = new List<string>();
+                if (productDto.ShortNames != null)
+                {
+                    cultures.AddRange(productDto.ShortNames.Select(sn => sn.Culture));
+                }
+                if (cultures.Count > 0)
                 {
                     product.ProductStrings.Clear();
                     foreach (string culture in cultures)
@@ -74,9 +76,9 @@ namespace CCProductService.Helper
                         {
                             ProductId = product.Id,
                             Language = culture,
-                            ShortName = productDto.ShortNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
-                            LongName = productDto.LongNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
-                            Description = productDto.Descriptions.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault()
+                            ShortName = productDto.ShortNames?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                            LongName = productDto.LongNames?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                            Description = productDto.Descriptions?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault()
                         });
                     }
                 }

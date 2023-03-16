@@ -31,46 +31,50 @@ namespace CCProductService.Repositories
         {
             string query;
             string productPoolQuery = string.Empty;
+            string sysIdQuery = string.Empty;
             var paramObj = new ExpandoObject();
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " WHERE ProductPool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
 
             if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
             {
-                productPoolQuery = " where Product.ProductPoolId in @poolIds";
+                productPoolQuery = " AND Product.ProductPoolId in @poolIds";
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
-            }           
+            } 
 
             if (take.HasValue && skip.HasValue)
             {
-                 query = $"Select tmp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description  " +
-                    $"from (Select prod.Id, prod.ProductKey, prod.ProductPoolId, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, d.Value," +
-                    $" ROW_NUMBER() Over (Partition by prod.id order by StartDate desc ) as row from " +
-                    $"(Select p.Id, p.ProductPoolId, p.ProductKey, p.IsBlocked, p.Balance, p.BalanceTare, p.BalancePriceUnit, p.BalancePriceUnitValue " +
-                    $"From Product p order by p.ProductKey OFFSET @offset Rows Fetch next @fetch Rows only) as prod join ProductPool pool on prod.ProductPoolId = pool.Id " +
-                    $"join ProductPricePool ppp on ppp.SystemSettingsId = pool.SystemSettingsId join ProductPricePoolToPriceList pl on ppp.Id = pl.ProductPricePoolId " +
-                    $"join ProductPrice pp on prod.Id = pp.ProductId join ProductPriceDate d on pp.Id = d.ProductPriceId) as tmp left join ProductString ps on tmp.Id = ps.ProductId where tmp.row = 1 ";
+                query = $"SELECT temp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, [Value] AS Standardprice," +
+                    $" ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
+                    $"FROM (SELECT prod.Id, prod.ProductPoolId, prod.ProductKey, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, ProductPriceDate.Value, " +
+                    $"ROW_NUMBER() OVER (Partition by prod.Id order by StartDate desc) as row " +
+                    $"FROM (SELECT Product.Id, Product.ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue " +
+                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery} order by Product.ProductKey OFFSET @offset Rows Fetch next @fetch Rows only) as prod " +
+                    $"LEFT JOIN ProductPrice ON prod.Id = ProductPrice.ProductId LEFT JOIN ProductPricePoolToPriceList ON ProductPricePoolToPriceList.ProductPricePoolId = ProductPrice.ProductPricePoolId " +
+                    $"LEFT JOIN ProductPriceDate ON ProductPriceDate.ProductPriceId = ProductPrice.Id WHERE ProductPricePoolToPriceList.IsDefault = 1 OR ProductPricePoolToPriceList.IsDefault IS NULL) as temp " +
+                    $"LEFT JOIN ProductString on ProductString.ProductId = temp.Id where temp.row = 1";
 
-                //query = $"Select t.Id, t.ProductPoolId, t.ProductKey, t.IsBlocked, t.Balance, t.BalanceTare, t.BalancePriceUnit, t.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, " +
-                //    $"ProductString.Description FROM (Select Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue From Product{productPoolQuery} ORDER BY ProductKey " +
-                //    $"OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t LEFT JOIN ProductString on t.Id = ProductString.ProductId";
                 paramObj.TryAdd("offset", skip.Value);
                 paramObj.TryAdd("fetch", take.Value);
             }
             else
             {
-                query = $"Select u.Id, ProductKey, ProductPoolId, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, Value AS Standardprice, ps.ProductId, ps.Language, ps.ShortName, ps.LongName, ps.Description " +
-                    $"from (Select * from (Select pp.ProductId, ppd.Value, Row_Number() Over (Partition by pp.Id order by StartDate desc) as row " +
-                    $"from ProductPriceDate ppd join ProductPrice pp on pp.Id = ppd.ProductPriceId " +
-                    $"join ProductPricePoolToPriceList pl on pp.ProductPricePoolId = pl.ProductPricePoolId " +
-                    $"where pl.IsDefault = 1) as t join Product p on p.Id = t.ProductId where t.Row = 1) as u " +
-                    $"join ProductString ps on ps.ProductId = u.ProductId ";
-
-                //query = "SELECT Product.Id, ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, " +
-                //    "ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
-                //    $"from Product JOIN ProductString on Product.Id = ProductString.ProductId{productPoolQuery} " +
-                //    "ORDER BY ProductKey";                
-                paramObj.TryAdd("usergroup", userClaim.UserGroupId);
+                query = $"SELECT temp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, [Value] AS Standardprice," +
+                    $" ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
+                    $"FROM (SELECT prod.Id, prod.ProductPoolId, prod.ProductKey, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, ProductPriceDate.Value, " +
+                    $"ROW_NUMBER() OVER (Partition by prod.Id order by StartDate desc) as row " +
+                    $"FROM (SELECT Product.Id, Product.ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue " +
+                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery}) as prod " +
+                    $"LEFT JOIN ProductPrice ON prod.Id = ProductPrice.ProductId LEFT JOIN ProductPricePoolToPriceList ON ProductPricePoolToPriceList.ProductPricePoolId = ProductPrice.ProductPricePoolId " +
+                    $"LEFT JOIN ProductPriceDate ON ProductPriceDate.ProductPriceId = ProductPrice.Id WHERE ProductPricePoolToPriceList.IsDefault = 1 OR ProductPricePoolToPriceList.IsDefault IS NULL) as temp " +
+                    $"LEFT JOIN ProductString on ProductString.ProductId = temp.Id where temp.row = 1";
             }
-            
+
+
             var stringMap = new Dictionary<Guid, ProductStandardPrice>();
             IEnumerable<ProductStandardPrice> result = await _dbContext.QueryAsync<InternalProduct, InternalProductString, ProductStandardPrice>(query, (p, ps) =>
             {
@@ -91,16 +95,23 @@ namespace CCProductService.Repositories
             ProductBase dto = null;
             var paramObj = new ExpandoObject();
             string productPoolQuery = string.Empty;
+            string sysIdQuery = string.Empty;
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " AND ProductPool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
 
             if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
             {
-                productPoolQuery = " and Product.ProductPoolId in @poolIds";
+                productPoolQuery = " AND Product.ProductPoolId IN @poolIds";
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
             }            
 
             string query = $"SELECT Product.Id, ProductKey, ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, " +
-                $"ProductString.LongName, ProductString.Description from Product JOIN ProductString on Product.Id = ProductString.ProductId " +
-                $"WHERE Product.Id = @ProductId{productPoolQuery}";
+                $"ProductString.LongName, ProductString.Description FROM Product JOIN ProductString on Product.Id = ProductString.ProductId " +
+                $"WHERE Product.Id = @ProductId{sysIdQuery}{productPoolQuery}";
 
             paramObj.TryAdd("ProductId", id);
 

@@ -176,6 +176,7 @@ public class Program
         app.UseSwaggerUI(opt =>
         {
             opt.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+            opt.DefaultModelsExpandDepth(-1); // Disable swagger schemas at bottomopt.
             opt.OAuthClientId(configuration["Authentication:ClientId"]);
             opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
             opt.OAuthUsePkce();

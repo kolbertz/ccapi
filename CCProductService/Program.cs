@@ -1,8 +1,10 @@
-﻿using CCApiLibrary.DbConnection;
+﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.DbConnection;
 using CCApiLibrary.Interfaces;
 using CCProductService.Interface;
 using CCProductService.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -100,6 +102,8 @@ public class Program
         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<ValidateModelAttribute>();
+        builder.Services.Configure<ApiBehaviorOptions>(Options => Options.SuppressModelStateInvalidFilter = true);
 
         builder.Services.AddAuthentication(o => {
             o.DefaultScheme = "monolithAuth";

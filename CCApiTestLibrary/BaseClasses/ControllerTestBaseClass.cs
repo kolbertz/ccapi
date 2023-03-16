@@ -10,6 +10,8 @@ namespace CCApiTestLibrary.BaseClasses
 {
     public class ControllerTestBaseClass
     {
+        protected const string databaseKey = "DefaultDatabase";
+
         private IConfiguration GetTestConfiguration()
         {
             var inMemorySettings = new Dictionary<string, string>
@@ -36,7 +38,7 @@ namespace CCApiTestLibrary.BaseClasses
                 services.Remove(dbConnectionDescriptor);
             }
             services.AddSingleton<IConfiguration>(GetTestConfiguration());
-            services.AddSingleton<IApplicationDbConnection, ApplicationDbConnection>();
+            services.AddTransient<IApplicationDbConnection, ApplicationDbConnection>();
             services.AddAuthentication()
                 .AddBasicAuthentication(credentials => Task.FromResult(credentials.username == "Test" && credentials.password == "test"));
             services.AddAuthorization(config => {

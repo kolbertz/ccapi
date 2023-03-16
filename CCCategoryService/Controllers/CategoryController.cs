@@ -75,7 +75,7 @@ namespace CCCategoryService.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [SwaggerOperation("Adds a new Product (using EF Core)")]
-        public async Task<IActionResult> Post([ModelBinder] Category categoryDto)
+        public async Task<IActionResult> Post(Category categoryDto)
         {
             UserClaim userClaim = null;
             Guid? newCategoryId = null;

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
 
-internal class Program
+public class Program
 {
     private static void Main(string[] args)
     {

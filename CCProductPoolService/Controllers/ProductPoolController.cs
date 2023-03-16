@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CCProductPoolService.Controllers
 {
@@ -22,6 +23,9 @@ namespace CCProductPoolService.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(ProductPool))]
+        [ProducesResponseType(204)]
+        [SwaggerOperation("Returns a list of productPools")]
         public async Task<IActionResult> Get()
         {
             try
@@ -45,6 +49,9 @@ namespace CCProductPoolService.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(200, Type = typeof(ProductPool))]
+        [ProducesResponseType(404)]
+        [SwaggerOperation("Returns a ProductPool by the given ID")]
         public async Task<IActionResult> Get(Guid id)
         {
             UserClaim userClaim = null;
@@ -78,13 +85,14 @@ namespace CCProductPoolService.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
 
+        [SwaggerOperation("Adds a ProductPool")]
         public async Task<IActionResult> Post(ProductPoolBase productPoolDto)
         {
             try
             {
-
                 Guid? poolId = null;
                 UserClaim userClaim = null;
 
@@ -107,9 +115,12 @@ namespace CCProductPoolService.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Updates a ProductPool via put request")]
         public async Task<IActionResult> Put(Guid id, ProductPool productPoolDto)
         {
             try
@@ -127,7 +138,7 @@ namespace CCProductPoolService.Controllers
                 {
                     productPoolRepository.Init(userClaim.TenantDatabase);
                     await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
-                    return Ok();
+                    return NoContent();
                 }
             }
             catch (Exception ex)
@@ -138,6 +149,9 @@ namespace CCProductPoolService.Controllers
 
         [HttpPatch]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation("Updates the given properties of a ProductPool via patch request")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPoolPatch)
         {
             try
@@ -154,7 +168,7 @@ namespace CCProductPoolService.Controllers
                     productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().PatchProductPoolAsync(id, productPoolPatch, userClaim).ConfigureAwait(false);
                     if (productPoolDto != null)
                     {
-                        return Ok(productPoolDto);
+                        return NoContent();
                     }
                     else
                     {
@@ -169,8 +183,10 @@ namespace CCProductPoolService.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation("Deletes the ProductPool with the given ID")]
         public async Task<IActionResult> Delete(Guid id)
         {
             try
