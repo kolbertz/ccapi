@@ -7,8 +7,11 @@ namespace CCCategoryService.Dtos
     public class Category : CategoryBase
     {
         public Guid Id { get; set; }
+
+        public Category() { }
         
         public Category(InternalCategory intcategory)
+            :base(intcategory)
         {            
             Id = intcategory.Id;
         }
@@ -22,14 +25,14 @@ namespace CCCategoryService.Dtos
         public List<MultilanguageText> CategoryNames { get; set; }
 
         [Required]
-        public int CategoryKey { get; set; }
+        public int? CategoryKey { get; set; }
 
         public List<MultilanguageText> Descriptions { get; set; }
 
         public List<MultilanguageText> Comments { get; set; }
 
         [Required]
-        public Guid CategoryPoolId { get; set; }
+        public Guid? CategoryPoolId { get; set; }
 
 
         public CategoryBase()  

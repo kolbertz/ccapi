@@ -10,7 +10,7 @@ namespace CCCategoryService.Interface
         Task<IEnumerable<Category>> GetAllCategorys(int? take, int? skip, UserClaim userClaim);
         Task<Category> GetCategoryById(Guid id, UserClaim userClaim);
         Task<Guid> AddCategoryAsync(CategoryBase categoryDto, UserClaim userClaim);
-        Task<bool> UpdateCategoryAsync(CategoryBase categoryDto, UserClaim userClaim);
+        Task<bool> UpdateCategoryAsync(Category categoryDto, UserClaim userClaim);
         Task<CategoryBase> PatchCategoryAsync(Guid id, UserClaim userClaim);
         Task<int> DeleteCategoryAsync(Guid id, UserClaim userClaim);
     }

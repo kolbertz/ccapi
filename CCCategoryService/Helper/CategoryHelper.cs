@@ -35,8 +35,8 @@ namespace CCCategoryService.Helper
                     category = new InternalCategory();
                 }
                 
-                category.CategoryPoolId = CategoryDto.CategoryPoolId;
-                category.CategoryKey = CategoryDto.CategoryKey;
+                category.CategoryPoolId = CategoryDto.CategoryPoolId.Value;
+                category.CategoryKey = CategoryDto.CategoryKey.Value;
 
 
 

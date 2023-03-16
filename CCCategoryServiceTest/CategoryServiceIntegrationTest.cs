@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Data.Common;
 using System.Net;
 using System.Text;
 
@@ -41,15 +40,15 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-                    Guid categoryId;
+                    (Guid categoryId, Guid categoryPoolId) Ids;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        categoryId = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
+                        Ids = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    var response = await client.DeleteAsync("/api/v2/category/" + categoryId);
+                    var response = await client.DeleteAsync("/api/v2/category/" + Ids.categoryId);
                     Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
                 }
                 finally
@@ -102,12 +101,12 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-                    Guid categoryOne, categoryTwo;
+                    (Guid categoryId, Guid categoryPoolId) IdOne, IdTwo;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        categoryOne = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
-                        categoryTwo = await PopulateCategory(dbConnection, "Heißgetränke", 2, 0, "Getränke", false);
+                        IdOne = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
+                        IdTwo = await PopulateCategory(dbConnection, "Heißgetränke", 2, 0, "Getränke", false);
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
@@ -118,7 +117,7 @@ namespace CCCategoryServiceTest
                     Assert.Equal(2, categories.Count);
                     Assert.Equal("Glutenfrei", (string)categories[0].categoryNames[0].text);
                     Assert.Equal(2, (int)categories[1].categoryKey);
-                    Assert.Equal(categoryOne, (Guid)categories[0].id);
+                    Assert.Equal(IdOne.categoryId, (Guid)categories[0].id);
                 }
                 finally
                 {
@@ -141,21 +140,21 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-                    Guid categoryId;
+                    (Guid categoryId, Guid categoryPoolId) Ids;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        categoryId = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
+                        Ids = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    HttpResponseMessage respone = await client.GetAsync("/api/v2/category/" + categoryId);
+                    HttpResponseMessage respone = await client.GetAsync("/api/v2/category/" + Ids.categoryId);
                     string messsage = await respone.Content.ReadAsStringAsync();
                     dynamic category = JObject.Parse(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
-                    Assert.Equal(1, (int)category.key);
+                    Assert.Equal(1, (int)category.categoryKey);
                     Assert.Equal("Glutenfrei", (string)category.categoryNames[0].text);
-                    Assert.Equal(categoryId, (Guid)category.id);
+                    Assert.Equal(Ids.categoryId, (Guid)category.id);
                 }
                 finally
                 {
@@ -238,8 +237,7 @@ namespace CCCategoryServiceTest
                     };
                     HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PostAsync("/api/v2/category/", httpContent);
-                    var message = await response.Content.ReadAsStringAsync();
+                    HttpResponseMessage response = await client.PostAsync("/api/v2/category", httpContent);
                     Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 }
                 finally
@@ -255,6 +253,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Post_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -262,7 +261,19 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryBase category = new CategoryBase
+                    {
+                        CategoryNames = new List<MultilanguageText>()
+                        {
+                            new MultilanguageText("de-DE", "Glutenfrei")
+                        },
+                        CategoryKey = 15
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync("/api/v2/category", httpContent);
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
                 }
                 finally
                 {
@@ -277,6 +288,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Put_Returns_204_if_successful()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -284,7 +296,35 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    (Guid categoryId, Guid categoryPoolId) Ids;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        Ids = await PopulateCategory(dbConnection, "Glutenfrei", 1, 0, "Allergene");
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    Category category = new Category
+                    {
+                        Id = Ids.categoryId,
+                        CategoryNames = new List<MultilanguageText>()
+                        {
+                            new MultilanguageText("de-DE", "Ungesund")
+                        },
+                        CategoryKey = 15,
+                        CategoryPoolId = Ids.categoryPoolId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/category/" + Ids.categoryId, httpContent);
+                    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                    // if PATCH return successful status code, proove it by sending a corresponding GET request
+                    if (response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        HttpResponseMessage getResponse = await client.GetAsync("/api/v2/category/" + Ids.categoryId);
+                        dynamic result = JObject.Parse(await getResponse.Content.ReadAsStringAsync());
+                        Assert.Equal(15, (int)result.categoryKey);
+                        Assert.Equal("Ungesund", (string)result.categoryNames[0].text);
+                    }
                 }
                 finally
                 {
@@ -299,6 +339,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Put_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -306,7 +347,19 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    Category category = new Category
+                    {
+                        CategoryNames = new List<MultilanguageText>()
+                        {
+                            new MultilanguageText("de-DE", "Ungesund")
+                        },
+                        CategoryKey = 15,
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/category/fab8c985-6147-4eba-b2c7-5f7012c4aeeb", httpContent);
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
                 }
                 finally
                 {
@@ -321,6 +374,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -328,7 +382,21 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    Category category = new Category
+                    {
+                        Id = new Guid("dbd0ce34-ea1f-437d-8719-920c615fd6f9"),
+                        CategoryNames = new List<MultilanguageText>()
+                        {
+                            new MultilanguageText("de-DE", "Ungesund")
+                        },
+                        CategoryKey = 15,
+                        CategoryPoolId = new Guid("6748e96a-27e0-4573-a907-a49c941b2a25")
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/category/6748e96a-27e0-4573-a907-a49c941b2a25", httpContent);
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 }
                 finally
                 {
@@ -343,12 +411,12 @@ namespace CCCategoryServiceTest
             }
         }
 
-        private async Task<Guid> PopulateCategory(IApplicationDbConnection dbConnection, string categoryName, int categoryKey, int type, string poolName, bool setSystemId = true)
+        private async Task<(Guid catgoryId, Guid categoryPoolId)> PopulateCategory(IApplicationDbConnection dbConnection, string categoryName, int categoryKey, int type, string poolName, bool setSystemId = true)
         {
             Guid categoryPoolId = await PrepareDatabaseForTest(dbConnection, type, poolName, setSystemId);
             Guid categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(categoryKey, categoryPoolId));
             await dbConnection.ExecuteAsync(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, categoryName));
-            return categoryId;
+            return (categoryId, categoryPoolId);
         }
 
         private async Task<Guid> PrepareDatabaseForTest(IApplicationDbConnection dbConnection, int type, string poolName, bool setSystemId = true)
