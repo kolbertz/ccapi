@@ -34,7 +34,7 @@ namespace CCProductPriceService.DTOs
         public Guid LastUpdatedUser { get; set; }
         public Guid? CurrencyId { get; set; }
 
-        public ProductPricePool(InternalProductPricePool internalPool)
+        public ProductPricePool(InternalProductPricePool internalPool) : base(internalPool)
         {
             Id = internalPool.Id;
         }
