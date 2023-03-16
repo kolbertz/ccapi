@@ -102,6 +102,7 @@ public class Program
 
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddScoped<ICategoryPoolRepository, CategoryPoolRepository>();
 
         builder.Services.AddAuthentication(o =>
         {

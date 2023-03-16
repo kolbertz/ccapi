@@ -21,8 +21,7 @@ namespace CCProductPriceService.InternalData
         }
 
         public void MergeProductPricePool(ProductPricePoolBase pricePoolBase ) 
-        {
-            Id= pricePoolBase.Id;
+        {            
             //Name = pricePoolBase.Name;
             //Description = pricePoolBase.Description;
             ParentProductPricePoolId = pricePoolBase.ParentPoolId;

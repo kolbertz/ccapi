@@ -5,7 +5,7 @@ namespace CCProductPriceService.DTOs
 {
     public class ProductPriceList : ProductPriceListBase
     {
-        public ProductPriceList() { }
+        public Guid Id { get; set; }
 
         public ProductPriceList(InternalProductPriceList internalProductPriceList)
 

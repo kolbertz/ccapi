@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 
 namespace CCProductPriceService.Controllers
@@ -21,7 +22,7 @@ namespace CCProductPriceService.Controllers
             _serviceProvider = serviceProvider;
         }
 
-        [HttpGet("ProductPrice")]
+        [HttpGet]
         public async Task<IActionResult> Get()
         {
             try
@@ -84,19 +85,46 @@ namespace CCProductPriceService.Controllers
             }
         }
 
-        //[HttpUpdate]
+        //[HttpPost]
         //[Route("{id}")]
-        //public async Task<IActionResult> Update(Guid id, JsonPatchDocument jsonPatch)
+        //[SwaggerOperation("Adds a new ProductPrice")]
+        //public async Task<IActionResult> Post([ModelBinder] ProductPriceBase productDto)
         //{
+        //    UserClaim userClaim = null;
+        //    Guid? newproductId = null;
+        //    if (HttpContext.User.Claims != null)
+        //    {
+        //        userClaim = new UserClaim(HttpContext.User.Claims);
+        //    }
 
+        //    using (IProductPriceRepository productPriceRepository = _serviceProvider.GetService<IProductPriceRepository>())
+
+        //    {
+        //        productPriceRepository.Init(userClaim.TenantDatabase);
+        //        newproductId = await productPriceRepository.AddProductPriceAsync(productDto, userClaim).ConfigureAwait(false);
+        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newproductId}"), null);
+        //    }
         //}
 
-        //[HttpPatch]
-        //[Route("{id}")]
-        //public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
-        //{
+        [HttpPatch]
+        [Route("{id}")]
+        public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
+        {
+            ProductPriceBase dto;
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
 
-        //}
+            using (IProductPriceRepository productPriceRepository = _serviceProvider.GetService<IProductPriceRepository>())
+            {
+                productPriceRepository.Init(userClaim.TenantDatabase);
+                dto = await productPriceRepository.PatchProductPriceAsync(id, jsonPatch, userClaim).ConfigureAwait(false);
+                return Ok(dto);
+            }
+            return null;
+        }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

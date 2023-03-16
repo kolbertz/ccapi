@@ -6,7 +6,7 @@ namespace CCProductPriceService.DTOs
 {
     public class ProductPricePoolBase
     {
-        public Guid Id { get; set; }
+        
 
         [Required]
         public List<MultilanguageText> Name { get; set; }
@@ -20,14 +20,17 @@ namespace CCProductPriceService.DTOs
         [Required]
         public Guid SystemSettingsId { get; set; }
 
-        //public ProductPricePoolBase(InternalProductPricePool internalProductPricePool)
-        //{
-        //    Id = internalProductPricePool.Id;
-        //    Name = new List<MultilanguageText>();
-        //    Description = new List<MultilanguageText>();
-        //    ParentPoolId = internalProductPricePool.ParentProductPricePoolId;
-        //    CurrencyId = internalProductPricePool.CurrencyId;
-        //    SystemSettingsId = internalProductPricePool.SystemSettingsId;
-        //}
+        public ProductPricePoolBase(InternalProductPricePool internalProductPricePool)
+        {
+            if (internalProductPricePool != null)
+            {                
+                Name = new List<MultilanguageText>();
+                Description = new List<MultilanguageText>();
+                ParentPoolId = internalProductPricePool.ParentProductPricePoolId;
+                CurrencyId = internalProductPricePool.CurrencyId;
+                SystemSettingsId = internalProductPricePool.SystemSettingsId;
+            }
+          
+        }
     }
 }

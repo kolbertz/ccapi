@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CCProductPriceService.DTOs
 {
+  
     public class ProductPriceListBase
     {
-        public Guid Id { get; set; }
 
         [Required]
         public List<MultilanguageText> Name { get; set; }
@@ -20,7 +20,13 @@ namespace CCProductPriceService.DTOs
         public ProductPriceListBase()
         {
             Name = new List<MultilanguageText>();
-
+        }
+        public ProductPriceListBase(List<MultilanguageText> name, int key, int priority, Guid systemSettingsId)
+        {
+            Name = name;
+            Key = key;
+            Priority = priority;
+            SystemSettingsId = systemSettingsId;
         }
     }
 }

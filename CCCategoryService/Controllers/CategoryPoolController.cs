@@ -30,9 +30,11 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>();
-                categoryPoolRepository.Init(userClaim.TenantDatabase);
-                return Ok(await _serviceProvider.GetService<ICategoryPoolRepository>().GetCategoryPoolsAsync());
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())                
+                {
+                    categoryPoolRepository.Init(userClaim.TenantDatabase);
+                    return Ok(await _serviceProvider.GetService<ICategoryPoolRepository>().GetCategoryPoolsAsync());
+                }
             }
             catch (Exception)
             {
@@ -53,6 +55,8 @@ namespace CCCategoryService.Controllers
 
             using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
             {
+                //Fehler beim Aufruf der Methode GetById
+                //Baustelle
                 categoryPoolRepository.Init(userClaim.TenantDatabase);
                 CategoryPoolBase categoryPoolDto = await categoryPoolRepository.GetCategoryPoolByIdAsync(id, userClaim).ConfigureAwait(false);
                 return Ok(categoryPoolDto);
@@ -142,7 +146,6 @@ namespace CCCategoryService.Controllers
             }
             catch (Exception)
             {
-
                 return StatusCode(500);
             }
         }
@@ -159,13 +162,19 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                if (await _serviceProvider.GetService<ICategoryPoolRepository>().DeleteCategoryPoolAsync(id).ConfigureAwait(false) > 0)
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
+
                 {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
+                    categoryPoolRepository.Init(userClaim.TenantDatabase);
+                    if (await categoryPoolRepository.DeleteCategoryPoolAsync(id).ConfigureAwait(false) > 0)
+
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
             }
             catch (Exception)

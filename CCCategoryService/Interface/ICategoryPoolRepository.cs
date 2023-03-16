@@ -8,9 +8,9 @@ namespace CCCategoryService.Interface
     public interface ICategoryPoolRepository : IDisposable
     {
         void Init(string database);
-        Task<IEnumerable<CategoryPoolBase>> GetCategoryPoolsAsync();
+        Task<IEnumerable<CategoryPool>> GetCategoryPoolsAsync();
 
-        Task<CategoryPoolBase> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim);
+        Task<CategoryPool> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim);
 
         Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
 

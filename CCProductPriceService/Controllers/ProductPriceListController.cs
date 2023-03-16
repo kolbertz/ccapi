@@ -25,12 +25,13 @@ namespace CCProductPriceService.Controllers
         public async Task<IActionResult> Get()
         {
             try
-            {               
+            {
                 UserClaim userClaim = GetUserClaim();
                 using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
                     return Ok(await repo.GetAllProductPriceLists().ConfigureAwait(false));
+                    
                 }
             }
             catch (Exception)
@@ -48,7 +49,7 @@ namespace CCProductPriceService.Controllers
             {
                 UserClaim userClaim = GetUserClaim();
                 using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
-                { 
+                {
                     repo.Init(userClaim.TenantDatabase);
                     return Ok(await repo.GetProductPriceListById(id).ConfigureAwait(false));
                 }
@@ -69,7 +70,7 @@ namespace CCProductPriceService.Controllers
                 Guid? listId = null;
                 UserClaim userClaim = GetUserClaim();
 
-                if (HttpContext.User.Claims!=null)
+                if (HttpContext.User.Claims != null)
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
@@ -83,14 +84,27 @@ namespace CCProductPriceService.Controllers
             }
 
 
-        }            
-        
+        }
 
-        //[HttpPatch]
-        //[Route("{id}")]
-        //public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
-        //{
-        //}
+
+        [HttpPatch]
+        [Route("{id}")]
+        public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
+        {
+            ProductPriceList dto;
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>()) 
+            {
+                productPriceListRepository.Init(userClaim.TenantDatabase);
+                dto = await productPriceListRepository.PatchProductPriceList(id, jsonPatch, userClaim).ConfigureAwait(false);
+                return Ok(dto);
+            }           
+        }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

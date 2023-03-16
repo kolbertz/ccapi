@@ -69,7 +69,7 @@ namespace CCProductPriceService.Repositories
         {
             var query = "SELECT * FROM ProductPrice WHERE Id = @ProductPriceId";
             var p = new { ProductPriceId = id };
-            InternalProductPrice price = await _dbContext.QuerySingleAsync<InternalProductPrice>(query, param: p);
+            InternalProductPrice price = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPrice>(query, param: p);
             if (price != null)
             {
                 ProductPriceBase productPrice = new ProductPriceBase(price);
