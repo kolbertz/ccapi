@@ -4,6 +4,7 @@ using CCCategoryService.Interface;
 using CCCategoryService.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
 using CCApiLibrary.Models;
+using System.Diagnostics;
 
 namespace CCCategoryService.Repositories
 {
@@ -30,23 +31,31 @@ namespace CCCategoryService.Repositories
         public Task<IEnumerable<CategoryPool>> GetCategoryPoolsAsync()
         {
 
-            var query = "SELECT Id, [Name], Description, ParentCategoryPoolId ,PoolType, SystemSettingsId FROM CategoryPool";
-            return _dbContext.QueryAsync<CategoryPool>(query);
+            var query = "SELECT Id, ParentCategoryPoolId ,PoolType, SystemSettingsId, [Name], Description FROM CategoryPool";
+
+            return _dbContext.QueryAsync<InternalCategoryPool, String, CategoryPool>(query, (internalPool, categoryPoolString) => {
+                return new CategoryPool(internalPool);
+            }, splitOn: "[Name], Description");
         }
 
-        public Task<CategoryPool> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim)
+        public async Task<CategoryPool> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT Id, [Name], Description, ParentCategoryPoolId ,PoolType, SystemSettingsId FROM CategoryPool " +
                 "WHERE Id = @CategoryPoolId";
-            return _dbContext.QueryFirstOrDefaultAsync<CategoryPool>(query, param: new { CategoryPoolId = id });
+            InternalCategoryPool internalCategoryPool = await _dbContext.QueryFirstOrDefaultAsync<InternalCategoryPool>(query, param: new { CategoryPoolId = id }).ConfigureAwait(false);
+            if (internalCategoryPool != null)
+            {
+                return new CategoryPool(internalCategoryPool);
+            }
+            return null;
         }
 
         public Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPoolDto, UserClaim userClaim)
         {
-            var query = "INSERT INTO CategoryPool( [Name], Description, ParentProductPoolId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
+            var query = "INSERT INTO CategoryPool( [Name], Description, ParentCategoryPoolId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
                 "OUTPUT Inserted.Id " +
-                "VALUES( @Name, @Description, @ParentCategeoryPoolId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
-            InternalCategoryPool pool = new InternalCategoryPool();
+                "VALUES( @Name, @Description, @ParentCategoryPoolId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
+            InternalCategoryPool pool = new InternalCategoryPool(categoryPoolDto);
             pool.CreatedDate = pool.LastUpdatedDate = DateTimeOffset.Now;
             pool.CreatedUser = pool.LastUpdatedUser = userClaim.UserId;
             return _dbContext.ExecuteScalarAsync<Guid>(query, pool);
