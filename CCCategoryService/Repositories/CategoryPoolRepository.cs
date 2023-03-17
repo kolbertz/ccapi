@@ -33,8 +33,7 @@ namespace CCCategoryService.Repositories
 
             var query = "SELECT Id, ParentCategoryPoolId ,PoolType, SystemSettingsId, [Name], Description FROM CategoryPool";
 
-            return _dbContext.QueryAsync<InternalCategoryPool, String, CategoryPool>(query, (internalPool, description) => {
-                Debug.WriteLine("");
+            return _dbContext.QueryAsync<InternalCategoryPool, String, CategoryPool>(query, (internalPool, categoryPoolString) => {
                 return new CategoryPool(internalPool);
             }, splitOn: "[Name], Description");
         }
