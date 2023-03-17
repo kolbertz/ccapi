@@ -136,6 +136,7 @@ namespace CCProductService.Repositories
 
             InternalProduct product = new InternalProduct();
             ProductHelper.ParseDtoToProduct(productDto, product);
+
             product.CreatedUser = product.LastUpdatedUser = userClaim.UserId;
             product.CreatedDate = product.LastUpdatedDate = DateTimeOffset.Now;
             try
@@ -155,9 +156,9 @@ namespace CCProductService.Repositories
             }
         }
 
-        public Task<bool> UpdateProductAsync(ProductBase productDto, UserClaim userClaim)
+        public Task<bool> UpdateProductAsync(Product productDto, UserClaim userClaim)
         {
-            InternalProduct product = new InternalProduct();
+            InternalProduct product = new InternalProduct(productDto);
             ProductHelper.ParseDtoToProduct(productDto, product);
             product.LastUpdatedDate = DateTimeOffset.Now;
             product.LastUpdatedUser = userClaim.UserId;

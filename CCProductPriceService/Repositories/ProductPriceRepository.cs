@@ -42,9 +42,9 @@ namespace CCProductPriceService.Repositories
 
         public Task<Guid> AddProductPriceAsync(ProductPriceBase productPriceBase, UserClaim userClaim)
         {           
-            var query = "INSERT INTO ProductPrice(Id, ProductId,ProductPricePoolId, ProductPriceListId, ManualPrice) " +
+            var query = "INSERT INTO ProductPrice( ProductId,ProductPricePoolId, ProductPriceListId, ManualPrice) " +
                 "OUTPUT Inserted.Id " +
-                "VALUES(@ProductId, @ProductPricePoolId, @ProductPriceListId, @ManualPrice);";
+                "VALUES( @ProductId, @ProductPricePoolId, @ProductPriceListId, @ManualPrice);";
             InternalProductPrice  price = new InternalProductPrice(productPriceBase);            
             return _dbContext.ExecuteScalarAsync<Guid>(query, price);            
             

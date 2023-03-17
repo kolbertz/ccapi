@@ -32,7 +32,7 @@ public partial class InternalCategoryPool
     //public void MergeProductPool(CategoryPoolDto productPoolDto)
     //{
     //    Id = categoryPoolDto.Id;
-        
+
     //    Name = categoryPoolDto.Name;
     //    Description = categoryPoolDto.Description;
     //    ParentPoolId = categoryPoolDto.ParentProductPool;
