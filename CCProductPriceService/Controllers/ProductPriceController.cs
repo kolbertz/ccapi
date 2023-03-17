@@ -74,9 +74,12 @@ namespace CCProductPriceService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                priceId = await _serviceProvider.GetService<IProductPriceRepository>().AddProductPriceAsync(productPrice, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{priceId}"), null);
-
+                using (IProductPriceRepository productPriceRepository = _serviceProvider.GetService<IProductPriceRepository>())
+                {
+                    productPriceRepository.Init(userClaim.TenantDatabase);
+                    priceId = await _serviceProvider.GetService<IProductPriceRepository>().AddProductPriceAsync(productPrice, userClaim);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{priceId}"), null);
+                }               
             }
             catch (Exception)
             {

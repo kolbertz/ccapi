@@ -5,6 +5,7 @@ namespace CCProductPoolService.Dtos
 {
     public class ProductPoolBase
     {
+       // public Guid Id { get; set; }
         [Required]
         public int? Key { get; set; }
 
@@ -20,13 +21,17 @@ namespace CCProductPoolService.Dtos
 
         public ProductPoolBase() { }
 
-        public ProductPoolBase(InternalProductPool productPool)
+        public ProductPoolBase(InternalProductPool internalProductPool)
         {
-            Key = productPool.ProductPoolKey;
-            Name = productPool.Name;
-            Description = productPool.Description;
-            ParentProductPool = productPool.ParentProductPoolId;
-            SystemSettingsId = productPool.SystemSettingsId;
+            if (internalProductPool != null)
+            {                
+                Key = internalProductPool.ProductPoolKey;
+                Name = internalProductPool.Name;
+                Description = internalProductPool.Description;
+                ParentProductPool = internalProductPool.ParentProductPoolId;
+                SystemSettingsId = internalProductPool.SystemSettingsId;
+            }
+            
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CCProductService.DTOs;
+using System;
 using System.Collections.Generic;
 
 namespace CCProductService.Data;
@@ -48,4 +49,34 @@ public partial class InternalProduct
     public virtual ICollection<InternalProductBarcode> ProductBarcodes { get; } = new List<InternalProductBarcode>();
 
     public virtual ICollection<InternalProductString> ProductStrings { get; } = new List<InternalProductString>();
+
+    public InternalProduct() { }
+
+    public InternalProduct(Product product)
+    {
+
+        if (product != null)
+        {
+            Id = product.Id;
+            ProductKey = product.Key.Value;
+            List<string> cultures = product.ShortNames.Select(sn => sn.Culture).ToList();
+            cultures.AddRange(product.LongNames.Where(ln => !cultures.Contains(ln.Culture)).Select(ln => ln.Culture));
+            cultures.AddRange(product.Descriptions.Where(ld => !cultures.Contains(ld.Culture)).Select(ld => ld.Culture));
+            if (cultures != null && cultures.Count > 0)
+            {
+                foreach (string culture in cultures)
+                {
+                    ProductStrings.Add(new InternalProductString
+                    {
+                        ProductId = product.Id,
+                        Language = culture,
+                        ShortName = product.ShortNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                        LongName = product.LongNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                        Description = product.Descriptions.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault()
+                    });
+                }
+            }
+
+        }
+    }
 }
