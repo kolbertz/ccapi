@@ -88,27 +88,7 @@ namespace CCProductPriceService.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("{id}")]
-        //[SwaggerOperation("Adds a new ProductPrice")]
-        //public async Task<IActionResult> Post([ModelBinder] ProductPriceBase productDto)
-        //{
-        //    UserClaim userClaim = null;
-        //    Guid? newproductId = null;
-        //    if (HttpContext.User.Claims != null)
-        //    {
-        //        userClaim = new UserClaim(HttpContext.User.Claims);
-        //    }
-
-        //    using (IProductPriceRepository productPriceRepository = _serviceProvider.GetService<IProductPriceRepository>())
-
-        //    {
-        //        productPriceRepository.Init(userClaim.TenantDatabase);
-        //        newproductId = await productPriceRepository.AddProductPriceAsync(productDto, userClaim).ConfigureAwait(false);
-        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newproductId}"), null);
-        //    }
-        //}
-
+     
         [HttpPatch]
         [Route("{id}")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)

@@ -1,5 +1,7 @@
 ﻿using CCApiLibrary.Models;
+using CCProductPriceService.InternalData;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace CCProductPriceService.DTOs
 {
@@ -21,12 +23,25 @@ namespace CCProductPriceService.DTOs
         {
             Name = new List<MultilanguageText>();
         }
-        public ProductPriceListBase(List<MultilanguageText> name, int key, int priority, Guid systemSettingsId)
+
+        public ProductPriceListBase(InternalProductPriceList internalProductPriceList) : base()
         {
-            Name = name;
-            Key = key;
-            Priority = priority;
-            SystemSettingsId = systemSettingsId;
+            if (internalProductPriceList != null)
+            {
+                Key = internalProductPriceList.Key;
+                Name = new List<MultilanguageText>();
+                Priority= internalProductPriceList.Priority;
+                SystemSettingsId = internalProductPriceList.SystemSettingsId;
+            }
         }
+
+       
+        //public ProductPriceListBase(List<MultilanguageText> name, int key, int priority, Guid systemSettingsId)
+        //{
+        //    Name = name;
+        //    Key = key;
+        //    Priority = priority;
+        //    SystemSettingsId = systemSettingsId;
+        //}
     }
 }

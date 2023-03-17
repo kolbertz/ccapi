@@ -27,10 +27,15 @@ namespace CCProductPriceService.Repositories
         }
 
         
-        public Task<IEnumerable<ProductPriceListBase>> GetAllProductPriceLists()
+        public Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists()
         {
             var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList";
-            return _dbContext.QueryAsync<ProductPriceListBase>(query);            
+            ProductPriceList dto;
+            InternalProductPriceList pl;
+           
+            return _dbContext.QueryAsync<ProductPriceList>(query); 
+            
+
         }
 
         public  Task<ProductPriceList> GetProductPriceListById(Guid id)

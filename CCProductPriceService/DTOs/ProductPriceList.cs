@@ -18,7 +18,9 @@ namespace CCProductPriceService.DTOs
                 SystemSettingsId= internalProductPriceList.SystemSettingsId;
                
             }
-        }        
+        } 
+        public ProductPriceList() { }
+
 
     }
 }
