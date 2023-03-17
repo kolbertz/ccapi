@@ -34,7 +34,7 @@ namespace CCProductPriceService.Controllers
                     
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 return StatusCode(500);

@@ -4,6 +4,7 @@ using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
 using CCProductPriceService.InternalData;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CCProductPriceService.Repositories
 {
@@ -29,11 +30,12 @@ namespace CCProductPriceService.Repositories
         
         public Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists()
         {
-            var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList";
-            ProductPriceList dto;
-            InternalProductPriceList pl;
-           
-            return _dbContext.QueryAsync<ProductPriceList>(query); 
+            var query = "SELECT Id, [Key], Priority,[Name], SystemSettingsId FROM ProductPriceList";
+
+            return _dbContext.QueryAsync<InternalProductPriceList, Guid, ProductPriceList>(query, (internalProductPriceList, sysId) =>
+            { 
+                return new ProductPriceList(internalProductPriceList, sysId);
+           }, splitOn: "[Name], SystemSettingsId");
             
 
         }
