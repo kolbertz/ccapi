@@ -1,14 +1,9 @@
 ﻿using CCApiLibrary.Interfaces;
 using CCApiLibrary.Models;
-using CCApiTestLibrary;
 using CCApiTestLibrary.BaseClasses;
 using CCApiTestLibrary.Interfaces;
-using CCApiTestLibrary.PopulateQueries;
 using CCCategoryService.Dtos;
-using CCCategoryService.Interface;
-using CCCategoryService.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,25 +13,13 @@ using System.Text;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace CCCategoryServiceTest
 {
-    public class CategoryServiceIntegrationTest : ControllerTestBaseClass, IServiceIntegrationTestBase, IClassFixture<CCApiTestStart>
+    public class CategoryServiceIntegrationTest : CategoryTestBase, IServiceIntegrationTestBase, IClassFixture<CCApiTestStart>
     {
-        private WebApplicationFactory<Program> GetWebApplication()
-        {
-            return new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureTestServices(services =>
-                {
-                    services.AddSingleton<ICategoryRepository, CategoryRepository>();
-                    PrepareServiceCollectionForTest(services);
-                });
-            });
-        }
-
         [Fact]
         public async void Delete_Returns_204_if_successful()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
-            using (var services = application.Services.CreateScope())
+            using (IServiceScope services = application.Services.CreateScope())
             {
                 try
                 {
@@ -53,13 +36,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -121,13 +98,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -158,13 +129,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -199,13 +164,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -242,13 +201,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -277,13 +230,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -328,13 +275,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -363,13 +304,7 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
         }
@@ -400,33 +335,9 @@ namespace CCCategoryServiceTest
                 }
                 finally
                 {
-                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
-                    {
-                        dbConnection.Init(databaseKey);
-                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
-                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
-                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
-                    }
+                    await ResetDatabaseAfterTesting(services);
                 }
             }
-        }
-
-        private async Task<(Guid catgoryId, Guid categoryPoolId)> PopulateCategory(IApplicationDbConnection dbConnection, string categoryName, int categoryKey, int type, string poolName, bool setSystemId = true)
-        {
-            Guid categoryPoolId = await PrepareDatabaseForTest(dbConnection, type, poolName, setSystemId);
-            Guid categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(categoryKey, categoryPoolId));
-            await dbConnection.ExecuteAsync(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, categoryName));
-            return (categoryId, categoryPoolId);
-        }
-
-        private async Task<Guid> PrepareDatabaseForTest(IApplicationDbConnection dbConnection, int type, string poolName, bool setSystemId = true)
-        {
-            if (setSystemId)
-            {
-                await dbConnection.ExecuteAsync(SystemSettingsQueries.PopulateSystemSettingsQuery(StaticTestGuids.SystemSettingsId));
-            }
-            Guid categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool(poolName, type));
-            return categoryPoolId;
         }
     }
 }

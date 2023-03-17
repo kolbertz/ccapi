@@ -1,15 +1,17 @@
 ﻿using CCApiLibrary.CustomAttributes;
 using CCApiLibrary.Models;
-using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace CCCategoryService.Controllers
 {
+    [Route("api/v2/[controller]")]
+    [ApiController]
+    [Authorize]
     public class CategoryPoolController : ControllerBase
     {
         private IServiceProvider _serviceProvider;
@@ -20,7 +22,6 @@ namespace CCCategoryService.Controllers
         }
 
         [HttpGet]
-        [Route("api/v2/[controller]")]
         public async Task<IActionResult> Get()
         {
             try
@@ -59,15 +60,18 @@ namespace CCCategoryService.Controllers
                 //Baustelle
                 categoryPoolRepository.Init(userClaim.TenantDatabase);
                 CategoryPoolBase categoryPoolDto = await categoryPoolRepository.GetCategoryPoolByIdAsync(id, userClaim).ConfigureAwait(false);
-                return Ok(categoryPoolDto);
+                if (categoryPoolDto != null)
+                {
+                    return Ok(categoryPoolDto);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-
-
-
         }
 
         [HttpPost]
-        [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
@@ -82,8 +86,12 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                categorypoolId = await _serviceProvider.GetService<ICategoryPoolRepository>().AddCategoryPoolAsync(categoryPoolDto, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{categorypoolId}"), null);
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
+                {
+                    categoryPoolRepository.Init(userClaim.TenantDatabase);
+                    categorypoolId = await categoryPoolRepository.AddCategoryPoolAsync(categoryPoolDto, userClaim);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{categorypoolId}"), null);
+                }
             }
             catch (Exception)
             {

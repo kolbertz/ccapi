@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CCApiLibrary.Models;
+using CCCategoryService.Data;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Text;
 
 namespace CCCategoryService.Dtos
@@ -7,35 +10,40 @@ namespace CCCategoryService.Dtos
     {
         public Guid Id { get; set; }
         public CategoryPool() { }
+
+        public CategoryPool(InternalCategoryPool internalPool)
+        {
+            Id = internalPool.Id;
+            Names = new List<MultilanguageText>
+            {
+                new MultilanguageText("de-DE", internalPool.Name)
+            };
+            Descriptions = new List<MultilanguageText>
+            {
+                new MultilanguageText ("de-DE", internalPool.Description)
+            };
+            ParentCategoryPool = internalPool.ParentCategoryPoolId;
+            Type = internalPool.PoolType;
+            this.SystemSettingsId = SystemSettingsId;
+        }
     }
 
 
     public class CategoryPoolBase
     {
-        //public Guid Id { get; set; }
+        [Required]
+        public int? Type { get; set; }
 
         [Required]
-        public int Key { get; set; }
+        public List<MultilanguageText> Names { get; set; }
+
+        public List<MultilanguageText> Descriptions { get; set; }
+
+        public Guid? ParentCategoryPool { get; set; }
 
         [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public Guid? ParentProductPool { get; set; }
-
-        [Required]
-        public Guid SystemSettingsId { get; set; }
+        public Guid? SystemSettingsId { get; set; }
 
         public CategoryPoolBase() { }
-
-        public CategoryPoolBase(CategoryPoolBase categoryPool) {
-            //Id = categoryPool.Id;
-            Key = categoryPool.Key;
-            Name = categoryPool.Name;
-            Description = categoryPool.Description;
-            ParentProductPool = categoryPool.ParentProductPool;
-            SystemSettingsId = categoryPool.SystemSettingsId;
-        }
     }
 }

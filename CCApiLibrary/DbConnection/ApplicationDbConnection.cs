@@ -95,6 +95,11 @@ namespace CCApiLibrary.DbConnection
             return _connection.QueryAsync<TFirst, TSecond, TReturn>(sql, map, param, _transaction, splitOn: splitOn);
         }
 
+        public Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, object param = null, string splitOn = null)
+        {
+            return _connection.QueryAsync<TFirst, TSecond, TThird, TReturn>(sql, map, param, _transaction, splitOn: splitOn);
+        }
+
         public Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, CancellationToken cancellationToken = default)
         {
             return _connection.QueryFirstOrDefaultAsync<T>(sql, param, _transaction);

@@ -1,14 +1,11 @@
 ﻿using CCApiLibrary.CustomAttributes;
 using CCApiLibrary.Models;
-using CCCategoryService.Data;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
-using CCCategoryService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Diagnostics;
 
 namespace CCCategoryService.Controllers
 {

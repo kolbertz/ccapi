@@ -1,4 +1,5 @@
-﻿using CCCategoryService.Dtos;
+﻿
+using CCCategoryService.Dtos;
 
 namespace CCCategoryService.Data;
 
@@ -24,18 +25,14 @@ public partial class InternalCategoryPool
 
     public Guid SystemSettingsId { get; set; }
 
-    //public CategoryPool(CategoryPoolDto categoryPoolDto)
-    //{
-    //    MergeCategoryPool(categoryPoolDto);
-    //}
+    public InternalCategoryPool() { }
 
-    //public void MergeProductPool(CategoryPoolDto productPoolDto)
-    //{
-    //    Id = categoryPoolDto.Id;
-        
-    //    Name = categoryPoolDto.Name;
-    //    Description = categoryPoolDto.Description;
-    //    ParentPoolId = categoryPoolDto.ParentProductPool;
-    //    SystemSettingsId = categoryPoolDto.SystemSettingsId;
-    //}
+    public InternalCategoryPool(CategoryPoolBase categoryPoolBase)
+    {
+        Name = categoryPoolBase.Names?.Select(x => x.Text).FirstOrDefault();
+        Description = categoryPoolBase.Descriptions?.Select(x => x.Text).FirstOrDefault();
+        ParentCategoryPoolId = categoryPoolBase.ParentCategoryPool;
+        PoolType = categoryPoolBase.Type.Value;
+        SystemSettingsId = categoryPoolBase.SystemSettingsId.Value;
+    }
 }
