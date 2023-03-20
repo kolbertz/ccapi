@@ -40,7 +40,7 @@ namespace CCProductPriceService.Repositories
 
         }
 
-        public  Task<ProductPriceList> GetProductPriceListById(Guid id)
+        public  Task<InternalProductPriceList> GetProductPriceListById(Guid id)
         {
             var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList " +
                 "WHERE Id = @ProductPriceListId";
