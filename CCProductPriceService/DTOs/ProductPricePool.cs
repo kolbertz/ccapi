@@ -32,7 +32,8 @@ namespace CCProductPriceService.DTOs
         public Guid CreatedUser { get; set; }
         public DateTimeOffset LastUpdatedDate { get; set; }
         public Guid LastUpdatedUser { get; set; }
-        public Guid? CurrencyId { get; set; }
+
+        public ProductPricePool() { }
 
         public ProductPricePool(InternalProductPricePool internalPool) : base(internalPool)
         {

@@ -20,6 +20,8 @@ namespace CCProductPriceService.DTOs
         [Required]
         public Guid SystemSettingsId { get; set; }
 
+        public ProductPricePoolBase() { }
+
         public ProductPricePoolBase(InternalProductPricePool internalProductPricePool)
         {
             if (internalProductPricePool != null)

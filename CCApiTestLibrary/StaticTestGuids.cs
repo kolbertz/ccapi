@@ -12,5 +12,6 @@ namespace CCApiTestLibrary
 
         public static Guid UserId = new Guid("1f11e600-4b51-4ae5-9feb-d372d096acb4");
 
+        public static Guid CurrencyId = new Guid("eaef39b8-b63a-4217-bb07-c2da473cc374");
     }
 }
