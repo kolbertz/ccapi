@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Interfaces;
 using CCApiLibrary.Models;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
@@ -103,14 +104,11 @@ namespace CCCategoryService.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, CategoryPool categoryPoolDto)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
                 if (id != categoryPoolDto.Id)
                 {
                     return BadRequest("The id inside the body do not match the query parameter");
@@ -121,8 +119,15 @@ namespace CCCategoryService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                await _serviceProvider.GetService<ICategoryPoolRepository>().UpdateCategoryPoolAsync(categoryPoolDto, userClaim);
-                return Ok();
+                using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
+                {
+                    categoryPoolRepository.Init(userClaim.TenantDatabase);
+                    if (await categoryPoolRepository.UpdateCategoryPoolAsync(categoryPoolDto, userClaim).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    return NotFound();
+                }
             }
             catch (Exception)
             {

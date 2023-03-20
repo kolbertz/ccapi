@@ -33,8 +33,8 @@ namespace CCCategoryService.Repositories
 
             var query = "SELECT Id, ParentCategoryPoolId ,PoolType, SystemSettingsId, [Name], Description FROM CategoryPool";
 
-            return _dbContext.QueryAsync<InternalCategoryPool, String, CategoryPool>(query, (internalPool, categoryPoolString) => {
-                return new CategoryPool(internalPool);
+            return _dbContext.QueryAsync<InternalCategoryPool, String, CategoryPool>(query, (internalPool, description) => {
+                return new CategoryPool(internalPool, description);
             }, splitOn: "[Name], Description");
         }
 
@@ -61,9 +61,9 @@ namespace CCCategoryService.Repositories
             return _dbContext.ExecuteScalarAsync<Guid>(query, pool);
         }
 
-        public Task<int> UpdateCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim)
+        public Task<int> UpdateCategoryPoolAsync(CategoryPool categoryPool, UserClaim userClaim)
         {
-            InternalCategoryPool pool = new InternalCategoryPool();
+            InternalCategoryPool pool = new InternalCategoryPool(categoryPool);
             pool.LastUpdatedDate = DateTimeOffset.Now;
             pool.LastUpdatedUser = userClaim.UserId;
             return Update(pool);
@@ -92,7 +92,7 @@ namespace CCCategoryService.Repositories
         private Task<int> Update(InternalCategoryPool pool)
         {
             var query = "UPDATE CategoryPool Set  [Name] = @Name, Description = @Description, ParentCategoryPoolId = @ParentCategoryPoolId, " +
-                "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser WHERE Id = @Id";
+                "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser, PoolType = @PoolType WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: pool);
         }
 

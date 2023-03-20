@@ -60,8 +60,6 @@ public partial class InternalProduct
             Id = product.Id;
             ProductKey = product.Key.Value;
             List<string> cultures = product.ShortNames.Select(sn => sn.Culture).ToList();
-            cultures.AddRange(product.LongNames.Where(ln => !cultures.Contains(ln.Culture)).Select(ln => ln.Culture));
-            cultures.AddRange(product.Descriptions.Where(ld => !cultures.Contains(ld.Culture)).Select(ld => ld.Culture));
             if (cultures != null && cultures.Count > 0)
             {
                 foreach (string culture in cultures)
@@ -70,9 +68,9 @@ public partial class InternalProduct
                     {
                         ProductId = product.Id,
                         Language = culture,
-                        ShortName = product.ShortNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
-                        LongName = product.LongNames.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
-                        Description = product.Descriptions.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault()
+                        ShortName = product.ShortNames?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                        LongName = product.LongNames?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault(),
+                        Description = product.Descriptions?.Where(x => x.Culture == culture).Select(x => x.Text).FirstOrDefault()
                     });
                 }
             }
