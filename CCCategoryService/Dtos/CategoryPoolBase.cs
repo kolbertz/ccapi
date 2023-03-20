@@ -11,6 +11,22 @@ namespace CCCategoryService.Dtos
         public Guid Id { get; set; }
         public CategoryPool() { }
 
+        public CategoryPool(InternalCategoryPool internalPool, string description)
+        {
+            Id = internalPool.Id;
+            Names = new List<MultilanguageText>
+            {
+                new MultilanguageText("de-DE", internalPool.Name)
+            };
+            Descriptions = new List<MultilanguageText>
+            {
+                new MultilanguageText ("de-DE", description)
+            };
+            ParentCategoryPool = internalPool.ParentCategoryPoolId;
+            Type = internalPool.PoolType;
+            this.SystemSettingsId = SystemSettingsId;
+        }
+
         public CategoryPool(InternalCategoryPool internalPool)
         {
             Id = internalPool.Id;

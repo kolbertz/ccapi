@@ -3,7 +3,7 @@ using CCCategoryService.Dtos;
 
 namespace CCCategoryService.Data;
 
-public partial class InternalCategoryPool
+public class InternalCategoryPool
 {
     public Guid Id { get; set; }
 
@@ -35,4 +35,15 @@ public partial class InternalCategoryPool
         PoolType = categoryPoolBase.Type.Value;
         SystemSettingsId = categoryPoolBase.SystemSettingsId.Value;
     }
+
+    public InternalCategoryPool(CategoryPool categoryPool)
+    {
+        Id = categoryPool.Id;
+        Name = categoryPool.Names?.Select(x => x.Text).FirstOrDefault();
+        Description = categoryPool.Descriptions?.Select(x => x.Text).FirstOrDefault();
+        ParentCategoryPoolId = categoryPool.ParentCategoryPool;
+        PoolType = categoryPool.Type.Value;
+        SystemSettingsId = categoryPool.SystemSettingsId.Value;
+    }
+
 }

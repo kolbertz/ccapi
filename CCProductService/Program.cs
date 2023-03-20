@@ -182,7 +182,8 @@ public class Program
         app.UseCors(builder => builder
          .AllowAnyOrigin()
          .AllowAnyMethod()
-         .AllowAnyHeader()); app.UseHttpsRedirection();
+         .AllowAnyHeader());
+        app.UseHttpsRedirection();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
