@@ -12,10 +12,9 @@ namespace CCProductPriceService.Interfaces
 
         Task<ProductPriceList> GetProductPriceListById(Guid productPriceListId);
 
-        Task<Guid> AddProductPriceListAsync(ProductPriceList priceList, UserClaim userClaim);
-
-        //Baustelle
-        //Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim);
+        Task<Guid> AddProductPriceListAsync(ProductPriceListBase priceListBase, UserClaim userClaim);
+                
+        Task<int> UpdateProductPriceListAsync(ProductPriceList priceList, UserClaim userClaim);
 
         Task<ProductPriceList> PatchProductPriceList(Guid id, JsonPatchDocument pricePool, UserClaim userClaim);
 

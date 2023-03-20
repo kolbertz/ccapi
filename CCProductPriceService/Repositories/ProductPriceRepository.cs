@@ -45,7 +45,7 @@ namespace CCProductPriceService.Repositories
             var query = "INSERT INTO ProductPrice( ProductId,ProductPricePoolId, ProductPriceListId, ManualPrice) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES( @ProductId, @ProductPricePoolId, @ProductPriceListId, @ManualPrice);";
-            InternalProductPrice  price = new InternalProductPrice(productPriceBase);            
+            InternalProductPrice price = new InternalProductPrice(productPriceBase);            
             return _dbContext.ExecuteScalarAsync<Guid>(query, price);            
             
         }

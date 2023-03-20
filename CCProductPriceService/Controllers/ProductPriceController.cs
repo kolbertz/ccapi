@@ -1,4 +1,5 @@
-﻿using CCApiLibrary.Models;
+﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -88,7 +89,31 @@ namespace CCProductPriceService.Controllers
             }
         }
 
-     
+        [HttpPut]
+        [Route("{id}")]
+        [SwaggerOperation("Updates a ProductPrice")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        public async Task<IActionResult> Put(Guid id, [ModelBinder] ProductPrice productPrice)
+        {
+            if (id!=productPrice.Id)
+            {
+                return BadRequest("The id inside the body do not match the query parameter");
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductPriceRepository productPriceRepository = _serviceProvider.GetService<IProductPriceRepository>())
+            {
+                productPriceRepository.Init(userClaim.TenantDatabase);
+                await productPriceRepository.UpdateProductPriceAsync(productPrice, userClaim).ConfigureAwait(false);
+                return NoContent();
+            }
+            
+        }
+
         [HttpPatch]
         [Route("{id}")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
@@ -104,9 +129,16 @@ namespace CCProductPriceService.Controllers
             {
                 productPriceRepository.Init(userClaim.TenantDatabase);
                 dto = await productPriceRepository.PatchProductPriceAsync(id, jsonPatch, userClaim).ConfigureAwait(false);
-                return Ok(dto);
+                if (dto!=null)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            return null;
+            
         }
 
         [HttpDelete]

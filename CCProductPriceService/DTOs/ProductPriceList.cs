@@ -7,14 +7,16 @@ namespace CCProductPriceService.DTOs
     {
         public Guid Id { get; set; }
 
-        public ProductPriceList(InternalProductPriceList internalProductPriceList)
+        public ProductPriceList(InternalProductPriceList internalProductPriceList) :base (internalProductPriceList)
 
         {
             if (internalProductPriceList != null)
 
             {
                 Id = internalProductPriceList.Id;
+                Key = internalProductPriceList.Key;
                 Name.Add(new MultilanguageText { Culture = "de-DE", Text = internalProductPriceList.Name });
+                Priority = internalProductPriceList.Priority;
                 SystemSettingsId = internalProductPriceList.SystemSettingsId;
 
             }
@@ -25,19 +27,15 @@ namespace CCProductPriceService.DTOs
             {
                 Id = internalProductPriceList.Id;
                 Key = internalProductPriceList.Key;
-                Name.Add(new MultilanguageText { Culture = "de-DE", Text = internalProductPriceList.Name });
+                Name.Add(new MultilanguageText { Culture = "de-DE", Text = internalProductPriceList.Name });                
                 Priority = internalProductPriceList.Priority;
-                SystemSettingsId = internalProductPriceList.SystemSettingsId;
+                SystemSettingsId = sysId;
             }
         }
 
-        public ProductPriceList() 
-        {
-           Name.Add(new MultilanguageText { Culture = "de-DE", Text = "Hallo" });
-        }
-             
-
-
-
+        public ProductPriceList() : base() { }
+        
+           
+                    
     }
 }

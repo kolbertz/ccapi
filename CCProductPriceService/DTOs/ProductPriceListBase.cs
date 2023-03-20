@@ -30,10 +30,10 @@ namespace CCProductPriceService.DTOs
             {
                 Key = internalProductPriceList.Key;
                 Name = new List<MultilanguageText>();
-                Priority= internalProductPriceList.Priority;
+                Priority = internalProductPriceList.Priority;
                 SystemSettingsId = internalProductPriceList.SystemSettingsId;
             }
-        }               
-        
+        }
+
     }
 }
