@@ -27,23 +27,25 @@ namespace CCProductPriceService.Repositories
             _dbContext?.Dispose();
         }
 
-        public async Task<IEnumerable<ProductPricePoolBase>> GetAllPricePools(UserClaim userClaim)
+        public async Task<IEnumerable<ProductPricePool>> GetAllPricePools(UserClaim userClaim)
         {
             (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
 
             string query = $"SELECT Id, Name, Description, ParentProductPricePoolId, SystemSettingsId FROM ProductPricePool{sysIdQuery}";
             IEnumerable<InternalProductPricePool> pricePools = await _dbContext.QueryAsync<InternalProductPricePool>(query, paramObj).ConfigureAwait(false);
-            List<ProductPricePoolBase> poolBases= new List<ProductPricePoolBase>();
+            List<ProductPricePool> poolBases= new List<ProductPricePool>();
             foreach (var pricePool in pricePools)
             {
                 ProductPricePool pricePoolBase = new ProductPricePool(pricePool);
                 pricePoolBase.Id = pricePool.Id;
                 // TODO: Change when multilanguage for ProcePool is available
-                pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
-                if (!string.IsNullOrEmpty(pricePool.Description))
-                {
-                    pricePoolBase.Description.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Description });
-                }
+                //pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
+                //if (!string.IsNullOrEmpty(pricePool.Description))
+                //{
+                //    pricePoolBase.Description.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Description });
+                //}
+                pricePoolBase.Name = pricePool.Name;
+                pricePoolBase.Description= pricePool.Description;
                 pricePoolBase.ParentPoolId = pricePool.ParentProductPricePoolId;
                 pricePoolBase.SystemSettingsId= pricePool.SystemSettingsId;
                 poolBases.Add(pricePoolBase);
@@ -67,7 +69,7 @@ namespace CCProductPriceService.Repositories
             var query = "INSERT INTO ProductPricePool( [Name], Description, ParentProductPricePoolId, CurrencyId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES( @Name, @Description, @ParentProductPricePoolId,@CurrencyId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
-            InternalProductPricePool pricePool = new InternalProductPricePool(pricePoolBase);
+            InternalProductPricePool pricePool = new InternalProductPricePool();
             pricePool.CreatedDate = pricePool.LastUpdatedDate = DateTimeOffset.Now;
             pricePool.CreatedUser = pricePool.LastUpdatedUser = userClaim.UserId;
             return _dbContext.ExecuteScalarAsync<Guid>(query, pricePool);

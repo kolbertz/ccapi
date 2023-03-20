@@ -8,7 +8,7 @@ namespace CCProductPriceService.Interfaces
     {
         void Init(string database);
 
-        Task<IEnumerable<ProductPricePoolBase>> GetAllPricePools(UserClaim userClaim);
+        Task<IEnumerable<ProductPricePool>> GetAllPricePools(UserClaim userClaim);
 
         Task<ProductPricePool> GetPricePoolById(Guid pricePoolId, UserClaim userClaim);
 

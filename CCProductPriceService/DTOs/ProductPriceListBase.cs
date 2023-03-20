@@ -33,15 +33,7 @@ namespace CCProductPriceService.DTOs
                 Priority= internalProductPriceList.Priority;
                 SystemSettingsId = internalProductPriceList.SystemSettingsId;
             }
-        }
-
-       
-        //public ProductPriceListBase(List<MultilanguageText> name, int key, int priority, Guid systemSettingsId)
-        //{
-        //    Name = name;
-        //    Key = key;
-        //    Priority = priority;
-        //    SystemSettingsId = systemSettingsId;
-        //}
+        }               
+        
     }
 }

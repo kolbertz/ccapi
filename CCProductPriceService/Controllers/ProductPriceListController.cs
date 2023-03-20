@@ -54,7 +54,7 @@ namespace CCProductPriceService.Controllers
                     return Ok(await repo.GetProductPriceListById(id).ConfigureAwait(false));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;

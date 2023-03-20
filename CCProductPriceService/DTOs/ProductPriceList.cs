@@ -7,18 +7,18 @@ namespace CCProductPriceService.DTOs
     {
         public Guid Id { get; set; }
 
-        public ProductPriceList(InternalProductPriceList internalProductPriceList) 
+        public ProductPriceList(InternalProductPriceList internalProductPriceList)
 
         {
-            if (internalProductPriceList != null) 
-            
-            { 
-                Id= internalProductPriceList.Id;
+            if (internalProductPriceList != null)
+
+            {
+                Id = internalProductPriceList.Id;
                 Name.Add(new MultilanguageText { Culture = "de-DE", Text = internalProductPriceList.Name });
-                SystemSettingsId= internalProductPriceList.SystemSettingsId;
-               
+                SystemSettingsId = internalProductPriceList.SystemSettingsId;
+
             }
-        } 
+        }
         public ProductPriceList(InternalProductPriceList internalProductPriceList, Guid sysId)  
         {
             if (internalProductPriceList != null)
@@ -30,6 +30,13 @@ namespace CCProductPriceService.DTOs
                 SystemSettingsId = internalProductPriceList.SystemSettingsId;
             }
         }
+
+        public ProductPriceList() 
+        {
+           Name.Add(new MultilanguageText { Culture = "de-DE", Text = "Hallo" });
+        }
+             
+
 
 
     }

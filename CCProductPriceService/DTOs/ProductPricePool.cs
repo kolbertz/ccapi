@@ -5,14 +5,14 @@ namespace CCProductPriceService.DTOs
 {
     public class ProductPricePool : ProductPricePoolBase
     {
-        public Guid Id { get; set; }        
+        public Guid Id { get; set; }
 
-        //public ProductPricePool(InternalProductPricePool internalPool)
+        //public ProductPricePool(InternalProductPricePool internalPool) :base(internalPool)
         //{
         //    if (internalPool != null)
         //    {
         //        Id = internalPool.Id;
-        //    TODO: Change when multilanguage for ProcePool is available
+        //    //TODO: Change when multilanguage for ProcePool is available
         //   Name.Add(new MultilanguageText { Culture = "de-DE", Text = internalPool.Name });
         //        if (!string.IsNullOrEmpty(internalPool.Description))
         //            {

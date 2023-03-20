@@ -9,9 +9,9 @@ namespace CCProductPriceService.DTOs
         
 
         [Required]
-        public List<MultilanguageText> Name { get; set; }
+        public string Name { get; set; }
         
-        public List<MultilanguageText> Description { get; set; }
+        public string Description { get; set; }
 
         public Guid? ParentPoolId { get; set; }
 
@@ -24,8 +24,8 @@ namespace CCProductPriceService.DTOs
         {
             if (internalProductPricePool != null)
             {                
-                Name = new List<MultilanguageText>();
-                Description = new List<MultilanguageText>();
+                Name = internalProductPricePool.Name;
+                Description = internalProductPricePool.Description;
                 ParentPoolId = internalProductPricePool.ParentProductPricePoolId;
                 CurrencyId = internalProductPricePool.CurrencyId;
                 SystemSettingsId = internalProductPricePool.SystemSettingsId;

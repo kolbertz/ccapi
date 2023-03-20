@@ -44,7 +44,7 @@ namespace CCProductPriceService.Repositories
         {
             var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList " +
                 "WHERE Id = @ProductPriceListId";
-            return _dbContext.QuerySingleAsync< ProductPriceList>(query,param: new {ProductPriceListId = id });
+            return _dbContext.QueryFirstOrDefaultAsync<ProductPriceList>(query,param: new {ProductPriceListId = id });
         }
 
         public Task<Guid> AddProductPriceListAsync(ProductPriceList productPriceList, UserClaim userClaim)

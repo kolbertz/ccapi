@@ -1,10 +1,13 @@
 ﻿using CCProductPriceService.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace CCProductPriceService.InternalData
 {
     public partial class InternalProductPricePool
     {
+        [Key]
         public Guid Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
@@ -15,18 +18,21 @@ namespace CCProductPriceService.InternalData
         public Guid? CurrencyId { get; set; }
         public Guid SystemSettingsId { get; set; }
 
-        public InternalProductPricePool(ProductPricePoolBase pricePoolBase ) 
+        public InternalProductPricePool(ProductPricePool pricePool ) 
         {
-            MergeProductPricePool(pricePoolBase);
+            MergeProductPricePool(pricePool);
         }
 
-        public void MergeProductPricePool(ProductPricePoolBase pricePoolBase ) 
-        {            
-            //Name = pricePoolBase.Name;
-            //Description = pricePoolBase.Description;
-            ParentProductPricePoolId = pricePoolBase.ParentPoolId;
-            CurrencyId = pricePoolBase.CurrencyId;
-            SystemSettingsId= pricePoolBase.SystemSettingsId;
+        public InternalProductPricePool() { }
+
+        public void MergeProductPricePool(ProductPricePool pricePool ) 
+        {         
+            Id= pricePool.Id;
+            Name = pricePool.Name;
+            Description = pricePool.Description;
+            ParentProductPricePoolId = pricePool.ParentPoolId;
+            CurrencyId = pricePool.CurrencyId;
+            SystemSettingsId= pricePool.SystemSettingsId;
         }
     }
 }
