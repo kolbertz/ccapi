@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CCApiTestLibrary.PopulateQueries
 {
     public static class ProductPriceQueries
@@ -18,6 +13,18 @@ namespace CCApiTestLibrary.PopulateQueries
         public static string DeleteProductPriceLists()
         {
             return "DELETE FROM ProductPriceList";
+        }
+
+        public static string PopulateSingleProductPricePool(string name, string description)
+        {
+            return $"INSERT INTO ProductPricePool([Name], Description, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser, CurrencyId, SystemSettingsId) " +
+                $"OUTPUT INSERTED.Id " +
+                $"VALUES('{name}', '{description}', GetDate(), '{StaticTestGuids.UserId}', GetDate(), '{StaticTestGuids.UserId}', '{StaticTestGuids.CurrencyId}', '{StaticTestGuids.SystemSettingsId}')";
+        }
+
+        public static string DeleteProductPricePools()
+        {
+            return "DELETE FROM ProductPricePool";
         }
     }
 }

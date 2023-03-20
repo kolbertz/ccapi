@@ -31,6 +31,11 @@ namespace CCProductPriceServiceTest
             return dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPriceList(name, key, priority));
         }
 
+        public Task<Guid> PopulateSingleProductPricePool(IApplicationDbConnection dbConnection, string name, string description)
+        {
+            return dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPricePool(name, description));
+        }
+ 
         public Task SetSystemSettingsId(IApplicationDbConnection dbConnection)
         {
             return dbConnection.ExecuteAsync(SystemSettingsQueries.PopulateSystemSettingsQuery(StaticTestGuids.SystemSettingsId));
@@ -42,6 +47,7 @@ namespace CCProductPriceServiceTest
             {
                 dbConnection.Init(databaseKey);
                 await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPriceLists());
+                await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPricePools());
                 await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
             }
         }
