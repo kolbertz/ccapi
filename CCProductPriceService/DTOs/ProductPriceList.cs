@@ -7,6 +7,8 @@ namespace CCProductPriceService.DTOs
     {
         public Guid Id { get; set; }
 
+        public ProductPriceList() { }
+
         public ProductPriceList(InternalProductPriceList internalProductPriceList) 
 
         {
