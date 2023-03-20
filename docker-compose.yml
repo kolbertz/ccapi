@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  ccproductpoolservice:
+    image: ${DOCKER_REGISTRY-}ccproductpoolservice
+    build:
+      context: .
+      dockerfile: CCProductPoolService\Dockerfile

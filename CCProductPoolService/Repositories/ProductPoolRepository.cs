@@ -46,7 +46,7 @@ namespace CCProductPoolService.Repositories
             var query = "INSERT INTO ProductPool(ProductPoolKey, [Name], Description, ParentProductPoolId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES(@ProductPoolKey, @Name, @Description, @ParentProductPoolId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
-            InternalProductPool pool = new InternalProductPool();
+            InternalProductPool pool = new InternalProductPool(productPoolDto);
             pool.CreatedDate = pool.LastUpdatedDate = DateTimeOffset.Now;
             pool.CreatedUser = pool.LastUpdatedUser = userClaim.UserId;
             return _dbContext.ExecuteScalarAsync<Guid>(query, pool);

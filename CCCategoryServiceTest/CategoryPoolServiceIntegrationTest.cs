@@ -4,19 +4,12 @@ using CCApiTestLibrary;
 using CCApiTestLibrary.BaseClasses;
 using CCApiTestLibrary.Interfaces;
 using CCCategoryService.Dtos;
-using CCCategoryService.Interface;
-using CCCategoryService.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CCCategoryServiceTest
 {
@@ -216,6 +209,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Post_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -223,7 +217,25 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryPoolBase categoryPoolBase = new CategoryPoolBase()
+                    {
+                        Names = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Warengruppe")
+                            },
+                        Descriptions = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Beschreibung")
+                            },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(categoryPoolBase), Encoding.UTF8, "application/json");
 
+                    HttpResponseMessage response = await client.PostAsync("/api/v2/categorypool/", httpContent);
+                    var message = await response.Content.ReadAsStringAsync();
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
                 }
                 finally
                 {
@@ -232,6 +244,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Put_Returns_204_if_successful()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -239,7 +252,40 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    Guid categoryPoolId;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        categoryPoolId = await PrepareDatabaseForTest(dbConnection, 10, "Warengruppe");
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryPool categoryPoolBase = new CategoryPool()
+                    {
+                        Id = categoryPoolId,
+                        Type = 99,
+                        Names = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Allergene")
+                            },
+                        Descriptions = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Unverträglichkeiten")
+                            },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(categoryPoolBase), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/categorypool/" + categoryPoolId, httpContent);
+                    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                    // if PATCH return successful status code, proove it by sending a corresponding GET request
+                    if (response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        HttpResponseMessage getResponse = await client.GetAsync("/api/v2/categorypool/" + categoryPoolId);
+                        CategoryPool pool = JsonConvert.DeserializeObject<CategoryPool>(await getResponse.Content.ReadAsStringAsync());
+                        Assert.Equal(99, pool.Type);
+                        Assert.Equal("Allergene", pool.Names[0].Text);
+                        Assert.Equal("Unverträglichkeiten", pool.Descriptions[0].Text);
+                    }
                 }
                 finally
                 {
@@ -248,6 +294,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Put_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -255,7 +302,20 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryPool categoryPoolBase = new CategoryPool()
+                    {
+                        Id = new Guid("fab8c985-6147-4eba-b2c7-5f7012c4aeeb"),
+                        Descriptions = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Unverträglichkeiten")
+                            },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(categoryPoolBase), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/categorypool/fab8c985-6147-4eba-b2c7-5f7012c4aeeb", httpContent);
+                    Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
                 }
                 finally
                 {
@@ -264,6 +324,7 @@ namespace CCCategoryServiceTest
             }
         }
 
+        [Fact]
         public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -271,7 +332,25 @@ namespace CCCategoryServiceTest
             {
                 try
                 {
-
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryPool categoryPoolBase = new CategoryPool()
+                    {
+                        Id = new Guid("1118c985-6147-4eba-b2c7-5f7012c4aeeb"),
+                        Type = 99,
+                        Names = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Allergene")
+                            },
+                        Descriptions = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Unverträglichkeiten")
+                            },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(categoryPoolBase), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/categorypool/fab8c985-6147-4eba-b2c7-5f7012c4aeeb", httpContent);
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 }
                 finally
                 {

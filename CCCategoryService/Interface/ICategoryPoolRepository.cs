@@ -14,7 +14,7 @@ namespace CCCategoryService.Interface
 
         Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
 
-        Task<int> UpdateCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
+        Task<int> UpdateCategoryPoolAsync(CategoryPool categoryPool, UserClaim userClaim);
 
         Task<CategoryPoolBase> PatchCategoryPoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
 
