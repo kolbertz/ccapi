@@ -1,6 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
 using CCApiLibrary.Models;
-using CCProductService.Data;
 using CCProductService.DTOs;
 using CCProductService.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -46,9 +45,6 @@ namespace CCProductService.Controller
                 productsList = await productRepository.GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
                 return Ok(productsList);
             }
-            //await _serviceProvider.GetService<IClaimsRepository>().GetProfileId(userClaim);
-            //await _serviceProvider.GetService<IClaimsRepository>().GetProductPoolIds(userClaim);
-
         }
 
         /// <summary>
@@ -73,8 +69,6 @@ namespace CCProductService.Controller
                 ProductBase product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
                 return Ok(product);
             }
-            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
-            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
         }
 
         /// <summary>
@@ -101,8 +95,6 @@ namespace CCProductService.Controller
                 newProductId = await productRepository.AddProductAsync(productDto, userClaim).ConfigureAwait(false);
                 return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newProductId}"), null);
             }
-            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProfileId(userClaim);
-            //await _serviceProvider.GetRequiredService<IClaimsRepository>().GetProductPoolIds(userClaim);
         }
 
         /// <summary>
@@ -200,14 +192,14 @@ namespace CCProductService.Controller
         }
 
         /// <summary>
-        /// Get a list of "<see cref="ProductCategoryDto"/>" for a product
+        /// Get a list of "<see cref="ProductCategory"/>" for a product
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{id}/categories")]
         [SwaggerOperation("Get a list of Categories for a product (using Dapper)")]
-        public Task<IEnumerable<ProductCategoryDto>> GetProductCategories(Guid id)
+        public Task<IEnumerable<ProductCategory>> GetProductCategories(Guid id)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -243,8 +235,9 @@ namespace CCProductService.Controller
 
         [HttpGet]
         [Route("{id}/pricings")]
-        [SwaggerOperation("Get a list of the current pricings for the product (using Dapper)")]
-        public async Task<IEnumerable<ProductPriceDto>> GetProductPricings(Guid id)
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductPrice>))]
+        [SwaggerOperation("Get a list of the current prices for the product")]
+        public async Task<IEnumerable<ProductPrice>> GetProductPricings(Guid id)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -255,7 +248,8 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                return await productRepository.GetProductPrices(id, userClaim);
+                var pricings = await productRepository.GetProductPrices(id, userClaim);
+                return pricings;
             }
         }
 

@@ -42,6 +42,19 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
+        public async void Delete_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                HttpClient client = application.CreateClient();
+                CreateBasicClientWithAuth(client);
+                var response = await client.DeleteAsync("/api/v2/category/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
         public async void GetByID_returns_404_If_given_Id_not_found()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -281,6 +294,37 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
+        public async void Put_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+                try
+                {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    Category category = new Category
+                    {
+                        Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        CategoryNames = new List<MultilanguageText>()
+                        {
+                            new MultilanguageText("de-DE", "Ungesund")
+                        },
+                        CategoryKey = 15,
+                        CategoryPoolId = new Guid("f56af880-55b0-4b03-ae44-8dc72ccdeff3")
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/category/82a4252e-c58f-49d0-8476-b7e1a5fa4b11", httpContent);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    await ResetDatabaseAfterTesting(services);
+                }
+            }
+        }
+
+        [Fact]
         public async void Put_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -310,7 +354,7 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
-        public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
+        public async void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
             using (var services = application.Services.CreateScope())

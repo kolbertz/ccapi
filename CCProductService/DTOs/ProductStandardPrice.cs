@@ -1,9 +1,8 @@
 ﻿using CCProductService.Data;
-using System.Data.SqlTypes;
 
 namespace CCProductService.DTOs
 {
-    public class ProductStandardPrice : ProductBase
+    public class ProductStandardPrice : Product
     {
         public decimal Standardprice { get; set; }
 

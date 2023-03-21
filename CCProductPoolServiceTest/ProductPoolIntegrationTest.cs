@@ -316,7 +316,7 @@ namespace CCProductPoolServiceTest
         }
 
         [Fact]
-        public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
+        public async void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
             using (var services = application.Services.CreateScope())
@@ -416,6 +416,54 @@ namespace CCProductPoolServiceTest
                 HttpResponseMessage response = await client.PostAsync("/api/v2/productpool/", httpContent);
 
                 Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async void Put_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+
+                try
+                {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    ProductPool productPool = new ProductPool
+                    {
+                        Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        Description = "ApiController Put Test Pool",
+                        Name = "ApiController Put Test Pool",
+                        Key = 2,
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/productpool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11", httpContent);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(SystemSettingsQueries.DeleteSystemSettingsQuery());
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public async void Delete_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpResponseMessage response = await client.DeleteAsync("/api/v2/productpool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
     }

@@ -5,6 +5,7 @@ using CCProductService.DTOs;
 using CCProductService.Helper;
 using CCProductService.Interface;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Diagnostics;
 using System.Dynamic;
 
 namespace CCProductService.Repositories
@@ -191,12 +192,12 @@ namespace CCProductService.Repositories
 
         }
 
-        public async Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
+        public async Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
         {
             var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
                 "WHERE ProductCategory.ProductId = @ProductId";
             IEnumerable<InternalCategoryString> categoryStrings = await _dbContext.QueryAsync<InternalCategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
-            return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategoryDto
+            return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategory
             {
                 CategoryId = c.Key,
                 CategoryNames = c.Select(x => new MultilanguageText
@@ -213,32 +214,46 @@ namespace CCProductService.Repositories
             return _dbContext.QueryAsync<string>(query, param: new { ProductId = id });
         }
 
-        public async Task<IEnumerable<ProductPriceDto>> GetProductPrices(Guid id, UserClaim userClaim)
+        public Task<IEnumerable<ProductPrice>> GetProductPrices(Guid id, UserClaim userClaim)
         {
-            var query = "Select ppp.Name as PricePool, ppl.Name as PriceList, [Value] From " +
-                "(Select pp.ProductPriceListId, pp.ProductPricePoolId, ppd.Value, " +
-                "ROW_NUMBER() Over (Partition by pp.Id Order by ppd.StartDate desc) as row from Product p " +
-                "join ProductPrice pp on pp.ProductId = p.Id join ProductPriceDate ppd on ppd.ProductPriceId = pp.Id " +
-                "where p.Id = @ProductId) as tmp " +
-                "join ProductPriceList ppl on ppl.Id = tmp.ProductPriceListId " +
-                "join ProductPricePool ppp on ppp.Id = tmp.ProductPricePoolId Where tmp.row = 1";
+            ExpandoObject paramObj = new ExpandoObject();
+            string sysIdQuery = string.Empty;
+            string productPoolQuery = string.Empty;
 
-            var result = await _dbContext.QueryAsync<(string pool, string list, decimal value)>(query, param: new { ProductId = id });
-            return result.GroupBy(r => r.pool)
-                .Select(r => new ProductPriceDto
-                {
-                    PoolName = r.Key,
-                    PriceListPrice = r.Select(x => new PriceListPrice { PriceList = x.list, Value = x.value })
-                });
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " AND ProductPricePool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
+
+            if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
+            {
+                productPoolQuery = " AND Product.ProductPoolId IN @poolIds";
+                paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
+            }
+
+            var query = "with cte as " +
+                "(Select ProductPriceDate.ProductPriceId, ProductPriceDate.StartDate, ProductPriceDate.Value, ProductPrice.ProductPricePoolId, ProductPrice.ProductPriceListId, " +
+                "ROW_NUMBER() OVER (PARTITION BY ProductPrice.Id ORDER BY ProductPriceDate.StartDate desc) as row " +
+                "FROM ProductPrice JOIN ProductPriceDate ON ProductPrice.Id = ProductPriceDate.ProductPriceId JOIN Product ON Product.Id = ProductPrice.ProductId " +
+                $"WHERE ProductPrice.ProductId = @productId AND ProductPriceDate.StartDate <= Convert(date, GetDate()){productPoolQuery}) " +
+                "SELECT cte.ProductPricePoolId, ProductPricePool.Name as PricePoolName, cte.ProductPriceListId, ProductPriceList.Name as PriceListName, cte.ProductPriceId, cte.StartDate, cte.Value, Currency.SymbolShort as CurrencySymbol " +
+                "FROM cte JOIN ProductPricePool ON ProductPricePool.Id = cte.ProductPricePoolId JOIN ProductPriceList ON ProductPriceList.Id = cte.ProductPriceListId " +
+                "JOIN Currency ON Currency.Id = ProductPricePool.CurrencyId " +
+                $"WHERE cte.row = 1{sysIdQuery}";
+
+            paramObj.TryAdd("productId", id);
+
+            return _dbContext.QueryAsync<InternalProductPricePool, InternalProductPriceList, InternalProductPrice,  ProductPrice>(query, (pool, list, productPrice) => {
+                return new ProductPrice(pool, list, productPrice);
+            },
+                splitOn: "ProductPriceListId, ProductPriceId", param: paramObj);
         }
 
         public async Task<bool> Update(InternalProduct product,ProductBase productDto, UserClaim userClaim)
         {
             var productUpdateQuery = "UPDATE Product Set ProductKey = @ProductKey, [IsBlocked] = @IsBlocked, [Balance] = @Balance, [BalanceTareBarcode] = @BalanceTareBarcode, " +
                 "[BalancePriceUnit] = @BalancePriceUnit, [BalancePriceUnitValue] = @BalancePriceUnitValue, [CreatedUser] = @CreatedUser, [ProductPoolId] = ProductPoolId, [ProductType] = ProductType WHERE Id = @Id";
-            //var barcodeUpdateQuery = "UPDATE ProductBarcode Set Barcode = @Barcode, [Refund] = @Refund, [ProductId] = @ProductId, [ParentProductId] = @ParentProductId WHERE ProductId = @Id";
-            //var productStringUpdateQuery = "UPDATE ProductString Set Language = @Language, [ShortName] = @ShortName, [Description] = @Description, [ProductId] = @ProductId, " +
-            //    "LongName = @LongName WHERE ProductId = @Id";
             try
             {
                 _dbContext.BeginTransaction();
@@ -251,11 +266,8 @@ namespace CCProductService.Repositories
                     await InsertProductString(productDto, userClaim);
                     await InsertBarCode(productDto, userClaim);
                 }
-               
-                //await _dbContext.ExecuteAsync(barcodeUpdateQuery, pool.ProductBarcodes);
-                //await _dbContext.ExecuteAsync(productStringUpdateQuery, pool.ProductStrings);
                 _dbContext.CommitTransaction();
-                return false;
+                return true;
             }
             catch (Exception ex)
             {
@@ -263,8 +275,6 @@ namespace CCProductService.Repositories
 
                 throw;
             }
-
-            //return _dbContext.ExecuteAsync(query, param: pool);
         }
         private async Task<bool> InsertProductString(ProductBase productDto, UserClaim userClaim)
         {

@@ -15,9 +15,9 @@ namespace CCProductService.Interface
         Task<bool> UpdateProductAsync(Product productDto, UserClaim userClaim);
         Task<ProductBase> PatchProductAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim);
         Task <int>DeleteProductAsync(Guid id, UserClaim userClaim);
-        Task<IEnumerable<ProductCategoryDto>> GetCategoriesAsnyc(Guid id, UserClaim userClaim);
+        Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id, UserClaim userClaim);
         Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim);
-        Task<IEnumerable<ProductPriceDto>> GetProductPrices(Guid id, UserClaim userClaim);
+        Task<IEnumerable<ProductPrice>> GetProductPrices(Guid id, UserClaim userClaim);
 
     }
 }

@@ -15,6 +15,7 @@ namespace CCProductService.DTOs
         public Product() { }
 
         public Product (InternalProduct internalProduct) 
+            :base(internalProduct)
         { 
             Id= internalProduct.Id;
         }
@@ -75,9 +76,12 @@ namespace CCProductService.DTOs
 
         public void SetMultilanguageText(InternalProductString productString)
         {
-            ShortNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.ShortName });
-            LongNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.LongName });
-            Descriptions.Add(new MultilanguageText { Culture = productString.Language, Text = productString.Description });
+            if (productString != null)
+            {
+                ShortNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.ShortName });
+                LongNames.Add(new MultilanguageText { Culture = productString.Language, Text = productString.LongName });
+                Descriptions.Add(new MultilanguageText { Culture = productString.Language, Text = productString.Description });
+            }
         }
     }
 }

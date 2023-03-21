@@ -46,6 +46,19 @@ namespace CCProductPriceServiceTest
         }
 
         [Fact]
+        public async void Delete_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                HttpClient client = application.CreateClient();
+                CreateBasicClientWithAuth(client);
+                HttpResponseMessage response = await client.DeleteAsync("/api/v2/productpricepool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
         public async void GetByID_returns_404_If_given_Id_not_found()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -124,7 +137,7 @@ namespace CCProductPriceServiceTest
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
                     HttpResponseMessage response = await client.GetAsync("/api/v2/productpricepool/" + productPricePoolId);
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);   
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                     ProductPricePool productPricePool = JsonConvert.DeserializeObject<ProductPricePool>(await response.Content.ReadAsStringAsync());
                     Assert.Equal("TestPool", productPricePool.Name[0].Text);
                     Assert.Equal("TestPool Beschreibung", productPricePool.Description[0].Text);
@@ -299,6 +312,41 @@ namespace CCProductPriceServiceTest
         }
 
         [Fact]
+        public async void Put_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    ProductPricePool productPricePoolBase = new ProductPricePool
+                    {
+                        Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        Name = new List<CCApiLibrary.Models.MultilanguageText>
+                         {
+                             new CCApiLibrary.Models.MultilanguageText("de-DE", "Name geändert")
+                         },
+                        Description = new List<CCApiLibrary.Models.MultilanguageText>
+                         {
+                             new CCApiLibrary.Models.MultilanguageText("de-DE", "Beschreibung geändert")
+                         },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId,
+                        CurrencyId = new Guid("25950bf7-ecf9-4589-9f55-df9307f490fd")
+                    };
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPricePoolBase), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/productpricepool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11", httpContent);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    await ResetDatabaseAfterTesting(services);
+                }
+            }
+        }
+
+        [Fact]
         public async void Put_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -333,7 +381,7 @@ namespace CCProductPriceServiceTest
         }
 
         [Fact]
-        public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
+        public async void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
             using (IServiceScope services = application.Services.CreateScope())

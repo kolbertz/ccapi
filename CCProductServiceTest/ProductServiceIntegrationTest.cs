@@ -309,7 +309,7 @@ namespace CCProductServiceTest
         }
 
         [Fact]
-        public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
+        public async void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
             using (var services = application.Services.CreateScope())
@@ -451,6 +451,58 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                     }
                 }
+            }
+        }
+
+        [Fact]
+        public async void Put_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+                try
+                {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    Product product = new Product
+                    {
+                        Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        ProductType = CCProductService.DTOs.Enums.ProductType.MenuProduct,
+                        ShortNames = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE", "Name geändert")
+                        },
+                        LongNames = new List<MultilanguageText> {
+                            new MultilanguageText("de-DE", "langer Name")
+                        },
+                        Key = 2
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(product), Encoding.UTF8, "application/json");
+                    var response = await client.PutAsync("/api/v2/product/82a4252e-c58f-49d0-8476-b7e1a5fa4b11", httpContent);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public async void Delete_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    var response = await client.DeleteAsync("/api/v2/product/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
     }
