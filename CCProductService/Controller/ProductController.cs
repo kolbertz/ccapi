@@ -29,7 +29,7 @@ namespace CCProductService.Controller
         /// <param name="take"></param>
         /// <returns></returns>
         [HttpGet]
-        [SwaggerOperation("Get a list with Product items (using Dapper)")]
+        [SwaggerOperation("Get a list with Product items")]
         public async Task<IActionResult> Get(int? skip, int? take) 
         {
             UserClaim userClaim = null;
@@ -54,7 +54,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
-        [SwaggerOperation("Gets a Product by Id (using Dapper)")]
+        [SwaggerOperation("Gets a Product by Id")]
         public async Task<IActionResult> Get(Guid id) 
         {
             UserClaim userClaim = null;
@@ -78,7 +78,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [SwaggerOperation("Adds a new Product (using EF Core)")]
+        [SwaggerOperation("Adds a new Product")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Post(ProductBase productDto)
         {
@@ -105,7 +105,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPut]
         [Route("{id}")]
-        [SwaggerOperation("Updates a Product (using EF Core)")]
+        [SwaggerOperation("Updates a Product")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
         {
@@ -134,7 +134,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPatch]
         [Route("{id}")]
-        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 (using EF Core)")]
+        [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPatch)
         {
             ProductBase productBase;
@@ -166,7 +166,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
-        [SwaggerOperation("Delete a Product (using EF Core)")]
+        [SwaggerOperation("Delete a Product")]
         public async Task<IActionResult> Delete(Guid id)
         {
             UserClaim userClaim = null;
@@ -198,7 +198,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpGet]
         [Route("{id}/categories")]
-        [SwaggerOperation("Get a list of Categories for a product (using Dapper)")]
+        [SwaggerOperation("Get a list of Categories for a product")]
         public Task<IEnumerable<ProductCategory>> GetProductCategories(Guid id)
         {
             UserClaim userClaim = null;
@@ -216,7 +216,7 @@ namespace CCProductService.Controller
 
         [HttpGet]
         [Route("{id}/barcodes")]
-        [SwaggerOperation("Get a list of barcodes for the product (using dapper)")]
+        [SwaggerOperation("Get a list of barcodes for the product")]
         public async Task<IActionResult> GetProductBarcodes(Guid id)
         {
             UserClaim userClaim = null;
@@ -236,8 +236,9 @@ namespace CCProductService.Controller
         [HttpGet]
         [Route("{id}/pricings")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ProductPrice>))]
+        [ProducesResponseType(204)]
         [SwaggerOperation("Get a list of the current prices for the product")]
-        public async Task<IEnumerable<ProductPrice>> GetProductPricings(Guid id)
+        public async Task<IActionResult> GetProductPricings(Guid id)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -249,8 +250,42 @@ namespace CCProductService.Controller
             {
                 productRepository.Init(userClaim.TenantDatabase);
                 var pricings = await productRepository.GetProductPrices(id, userClaim);
-                return pricings;
+                return Ok(pricings);
             }
+        }
+
+        [HttpPost]
+        [Route("{id}/pricings")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(422)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Sets prices for the product")]
+        public async Task<IActionResult> SetProductPricings(Guid productId, List<ProductPriceBase> productPriceBase)
+        {
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("{id}/pricings")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Updates a ProductPrice via put request")]
+        public async Task<IActionResult> UpdateProductPrice(Guid productId, ProductPriceMain productPriceMain)
+        {
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("{id}/pricings")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation("Delete a ProductPrice")]
+        public async Task<IActionResult> DeleteProductPrice(Guid productId)
+        {
+            return Ok();
         }
 
         //[HttpGet]
@@ -294,5 +329,5 @@ namespace CCProductService.Controller
 
         //}).WithMetadata(new SwaggerOperationAttribute("Get product compilations (using Dapper)"));
 
-    }      
+    }
 }

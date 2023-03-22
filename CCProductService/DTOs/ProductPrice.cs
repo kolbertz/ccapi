@@ -3,15 +3,27 @@ using CCProductService.Data;
 
 namespace CCProductService.DTOs
 {
-    public class ProductPrice
+    public class ProductPriceBase
     {
         public Guid PricePoolId { get; set; }
-        public IEnumerable<MultilanguageText> PricePoolNames { get; set; }
-        public Guid PriceListId{ get; set; }
-        public List<MultilanguageText> PriceListNames { get; set; }
-        public Guid ProductPriceId { get; set; }
+
+        public Guid PriceListId { get; set; }
+
         public DateTimeOffset StartDate { get; set; }
+
         public decimal Price { get; set; }
+    }
+
+    public class ProductPriceMain : ProductPriceBase
+    {
+        public Guid ProductPriceId { get; set; }
+    }
+
+
+    public class ProductPrice : ProductPriceMain
+    {
+        public IEnumerable<MultilanguageText> PricePoolNames { get; set; }
+        public List<MultilanguageText> PriceListNames { get; set; }
         public string CurrencyValue { get; set; }
 
         public ProductPrice() { }
