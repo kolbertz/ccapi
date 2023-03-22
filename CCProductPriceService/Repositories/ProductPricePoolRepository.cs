@@ -27,27 +27,39 @@ namespace CCProductPriceService.Repositories
             _dbContext?.Dispose();
         }
 
+        //public Task<IEnumerable<ProductPricePool>> GetAllPricePools(UserClaim userClaim)
+        //{
+        //    (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
+
+        //    string query = $"SELECT Id, Name, Description, ParentProductPricePoolId, SystemSettingsId FROM ProductPricePool{sysIdQuery}";
+
+
+        //    return _dbContext.QueryAsync<InternalProductPricePool, Guid, ProductPricePool>(query, (internalProductPricePool, sysId) =>
+        //    {
+        //        return new ProductPricePool(internalProductPricePool, sysId);
+        //    }, splitOn: "[Name], SystemSettingsId");
+
+
+        //}
         public async Task<IEnumerable<ProductPricePool>> GetAllPricePools(UserClaim userClaim)
         {
             (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
 
-            string query = $"SELECT Id, Name, Description, ParentProductPricePoolId, SystemSettingsId FROM ProductPricePool{sysIdQuery}";
+            string query = $"SELECT Id, Name, Description,[CreatedDate], [CreatedUser],[LastUpdatedDate],[LastUpdatedUser], ParentProductPricePoolId,[CurrencyId], SystemSettingsId FROM ProductPricePool{sysIdQuery}";
             IEnumerable<InternalProductPricePool> pricePools = await _dbContext.QueryAsync<InternalProductPricePool>(query, paramObj).ConfigureAwait(false);
-            List<ProductPricePool> poolBases= new List<ProductPricePool>();
+            List<ProductPricePool> poolBases = new List<ProductPricePool>();
             foreach (var pricePool in pricePools)
             {
                 ProductPricePool pricePoolBase = new ProductPricePool(pricePool);
                 pricePoolBase.Id = pricePool.Id;
-                // TODO: Change when multilanguage for ProcePool is available
-                //pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
-                //if (!string.IsNullOrEmpty(pricePool.Description))
-                //{
-                //    pricePoolBase.Description.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Description });
-                //}
-                pricePoolBase.Name = pricePool.Name;
-                pricePoolBase.Description= pricePool.Description;
+                //TODO: Change when multilanguage for ProcePool is available
+                pricePoolBase.Name.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Name });
+                if (!string.IsNullOrEmpty(pricePool.Description))
+                {
+                    pricePoolBase.Description.Add(new MultilanguageText { Culture = "de-DE", Text = pricePool.Description });
+                }
                 pricePoolBase.ParentPoolId = pricePool.ParentProductPricePoolId;
-                pricePoolBase.SystemSettingsId= pricePool.SystemSettingsId;
+                pricePoolBase.SystemSettingsId = pricePool.SystemSettingsId;
                 poolBases.Add(pricePoolBase);
             }
             return poolBases;
@@ -56,20 +68,20 @@ namespace CCProductPriceService.Repositories
         public async Task<ProductPricePool> GetPricePoolById(Guid pricePoolId, UserClaim userClaim)
         {
             (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
-            string poolIdQuery = string.IsNullOrEmpty(sysIdQuery) ? " where" : " and" + " Id = @Id";
+            string poolIdQuery = (string.IsNullOrEmpty(sysIdQuery) ? " where" : " and") + " Id = @Id";
             string query = $"SELECT * FROM ProductPricePool{sysIdQuery}{poolIdQuery}";
             paramObj.TryAdd("Id", pricePoolId);
-            InternalProductPricePool internalPool = await _dbContext.QuerySingleAsync<InternalProductPricePool>(query, paramObj).ConfigureAwait(false);
+            InternalProductPricePool internalPool = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPricePool>(query, paramObj).ConfigureAwait(false);
             ProductPricePool pricePool = new ProductPricePool(internalPool);
             return pricePool;
         }
-               
-        public Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePoolBase, UserClaim userClaim) 
+
+        public Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePoolBase, UserClaim userClaim)
         {
             var query = "INSERT INTO ProductPricePool( [Name], Description, ParentProductPricePoolId, CurrencyId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES( @Name, @Description, @ParentProductPricePoolId,@CurrencyId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
-            InternalProductPricePool pricePool = new InternalProductPricePool();
+            InternalProductPricePool pricePool = new InternalProductPricePool(pricePoolBase);
             pricePool.CreatedDate = pricePool.LastUpdatedDate = DateTimeOffset.Now;
             pricePool.CreatedUser = pricePool.LastUpdatedUser = userClaim.UserId;
             return _dbContext.ExecuteScalarAsync<Guid>(query, pricePool);
@@ -82,19 +94,19 @@ namespace CCProductPriceService.Repositories
             return Update(pricePool);
         }
 
-        private Task<int> Update (InternalProductPricePool pricePool)
+        private Task<int> Update(InternalProductPricePool pricePool)
         {
-            var query = "UPDATE ProductPricePool Set  [Name] = @Name, Description = @Description, ParentProductPricePoolId = @ParentProductPricePoolId, CurrencyId = @CurrencyId " +
+            var query = "UPDATE ProductPricePool Set  [Name] = @Name, Description = @Description, ParentProductPricePoolId = @ParentProductPricePoolId, CurrencyId = @CurrencyId, " +
                 "SystemSettingsId = @SystemSettingsId, LastUpdatedDate = @LastUpdatedDate, LastUpdatedUser = @LastUpdatedUser WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: pricePool);
         }
 
-        public async Task<ProductPricePool> PatchPricePoolAsync(Guid id,JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
+        public async Task<ProductPricePool> PatchPricePoolAsync(Guid id, JsonPatchDocument jsonPatchDocument, UserClaim userClaim)
         {
             var query = "SELECT * FROM ProductPricePool WHERE Id = @ProductPricePoolId ";
             var p = new { ProductPricePoolId = id };
             InternalProductPricePool pricePool = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPricePool>(query, param: p);
-            if (pricePool == null) 
+            if (pricePool == null)
             {
                 ProductPricePool pricePoolBase = new ProductPricePool(pricePool);
                 jsonPatchDocument.ApplyTo(pricePoolBase);
@@ -112,7 +124,7 @@ namespace CCProductPriceService.Repositories
         public Task<int> DeletePricePool(Guid id)
         {
             var query = "DELETE FROM ProductPricePool WHERE Id = @Id";
-            return _dbContext.ExecuteAsync(query, param: new {Id = id });
+            return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
 
         private static (string sysId, ExpandoObject paramObj) GetClaimsQuery(UserClaim userClaim)
@@ -120,7 +132,7 @@ namespace CCProductPriceService.Repositories
             string sysIdQuery = string.Empty;
             var paramObj = new ExpandoObject();
 
-            if (userClaim != null)
+            if (userClaim != null && userClaim.SystemId != null)
             {
                 sysIdQuery = " where SystemSettingsId = @sysId";
                 paramObj.TryAdd("sysId", userClaim.SystemId);

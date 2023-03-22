@@ -12,7 +12,7 @@ namespace CCProductPriceService.Interfaces
 
         Task<ProductPricePool> GetPricePoolById(Guid pricePoolId, UserClaim userClaim);
 
-        Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePool, UserClaim userClaim);
+        Task<Guid> AddPricePoolAsync(ProductPricePoolBase pricePoolBase, UserClaim userClaim);
 
         Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim);
 

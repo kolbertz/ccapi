@@ -1,4 +1,5 @@
 ﻿using CCProductPriceService.DTOs;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.ComponentModel.DataAnnotations;
 
 namespace CCProductPriceService.InternalData
@@ -18,21 +19,44 @@ namespace CCProductPriceService.InternalData
         public Guid? CurrencyId { get; set; }
         public Guid SystemSettingsId { get; set; }
 
-        public InternalProductPricePool(ProductPricePool pricePool ) 
+        public InternalProductPricePool(ProductPricePoolBase pricePoolBase )
         {
-            MergeProductPricePool(pricePool);
+
+            if (pricePoolBase.Name != null && pricePoolBase.Name.Count > 0)
+            {
+                Name = pricePoolBase.Name.First().Text;
+            }
+            if (pricePoolBase.Description != null && pricePoolBase.Description.Count > 0)
+            {
+                Description = pricePoolBase.Description.First().Text;
+            }
+            ParentProductPricePoolId = pricePoolBase.ParentPoolId;
+            CurrencyId = pricePoolBase.CurrencyId;
+            SystemSettingsId = pricePoolBase.SystemSettingsId.Value;
         }
 
         public InternalProductPricePool() { }
 
+        public InternalProductPricePool(ProductPricePool pricePool) : base()
+        {
+            MergeProductPricePool(pricePool);
+        }
         public void MergeProductPricePool(ProductPricePool pricePool ) 
         {         
             Id= pricePool.Id;
-            Name = pricePool.Name;
-            Description = pricePool.Description;
+            if (pricePool.Name != null && pricePool.Name.Count > 0)
+            {
+                Name = pricePool.Name.First().Text;
+            }
+            if (pricePool.Description != null && pricePool.Description.Count > 0)
+            {
+                Description = pricePool.Description.First().Text;
+            }
             ParentProductPricePoolId = pricePool.ParentPoolId;
             CurrencyId = pricePool.CurrencyId;
-            SystemSettingsId= pricePool.SystemSettingsId;
+            SystemSettingsId= pricePool.SystemSettingsId.Value;
         }
+
+       
     }
 }

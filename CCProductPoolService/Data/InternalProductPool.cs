@@ -27,15 +27,23 @@ public partial class InternalProductPool
 
     public Guid SystemSettingsId { get; set; }
 
-    public InternalProductPool(ProductPoolBase productPoolDto)
+    public InternalProductPool(ProductPool productPoolDto)
     {
         MergeProductPool(productPoolDto);
     }
 
-    public InternalProductPool() { }
+    public InternalProductPool(ProductPoolBase productPool) 
+    {        
+        ProductPoolKey = productPool.Key.Value;
+        Name = productPool.Name;
+        Description = productPool.Description;
+        ParentProductPoolId = productPool.ParentProductPool;
+        SystemSettingsId = productPool.SystemSettingsId.Value;
+    }
 
-    public void MergeProductPool(ProductPoolBase productPoolDto)
+    public void MergeProductPool(ProductPool productPoolDto)
     {
+        Id = productPoolDto.Id;
         ProductPoolKey = productPoolDto.Key.Value;
         Name = productPoolDto.Name;
         Description = productPoolDto.Description;

@@ -26,10 +26,10 @@ namespace CCProductPriceService.InternalData
             if (priceList.Name != null && priceList.Name.Count > 0)
             {
                 Name = priceList.Name.First().Text;
-            }            
-            Key = priceList.Key;
+            }
+            Key = priceList.Key.Value;
             Priority = priceList.Priority;
-            SystemSettingsId= priceList.SystemSettingsId;
+            SystemSettingsId = priceList.SystemSettingsId.Value;
         }
 
         public InternalProductPriceList(ProductPriceList productPriceList):base() 
@@ -44,9 +44,13 @@ namespace CCProductPriceService.InternalData
             {
                 Name = priceList.Name.First().Text;
             }
-            Key = priceList.Key;
+            Key = priceList.Key.Value;
             Priority = priceList.Priority;
-            SystemSettingsId = priceList.SystemSettingsId;
+            SystemSettingsId = priceList.SystemSettingsId.Value;
+        }
+        public InternalProductPriceList() 
+        {
+           
         }
     }
 }

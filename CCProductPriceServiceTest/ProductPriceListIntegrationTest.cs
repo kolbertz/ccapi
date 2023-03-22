@@ -223,7 +223,7 @@ namespace CCProductPriceServiceTest
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    ProductPriceListBase productPrice = new ProductPriceListBase
+                    ProductPriceList productPrice = new ProductPriceList
                     {
                         Name = new List<CCApiLibrary.Models.MultilanguageText> {
                             new CCApiLibrary.Models.MultilanguageText("de-DE", "Gästeliste")
@@ -277,7 +277,7 @@ namespace CCProductPriceServiceTest
                     // if PUT return successful status code, proove it by sending a corresponding GET request
                     if (response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        HttpResponseMessage getResponse = await client.GetAsync("/api/v2/productpricelist/" + productPriceList);
+                        HttpResponseMessage getResponse = await client.GetAsync("/api/v2/productpricelist/" + productPriceListId);
                         ProductPriceList productPrice = JsonConvert.DeserializeObject<ProductPriceList>(await getResponse.Content.ReadAsStringAsync());
                         Assert.Equal(99, productPrice.Key);
                         Assert.Equal(5, productPrice.Priority);
@@ -311,7 +311,7 @@ namespace CCProductPriceServiceTest
                     ProductPriceList productPriceList = new ProductPriceList
                     {
                         Id = productPriceListId,
-                        Key = 99,
+                        
                         Name = new List<CCApiLibrary.Models.MultilanguageText>
                            {
                                new CCApiLibrary.Models.MultilanguageText("de-DE", "Gästeliste")

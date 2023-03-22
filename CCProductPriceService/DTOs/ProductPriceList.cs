@@ -7,13 +7,12 @@ namespace CCProductPriceService.DTOs
     {
         public Guid Id { get; set; }
 
-<<<<<<< HEAD
-        public ProductPriceList(InternalProductPriceList internalProductPriceList) :base (internalProductPriceList)
-=======
-        public ProductPriceList() { }
 
-        public ProductPriceList(InternalProductPriceList internalProductPriceList) 
->>>>>>> a3fe5e1716346170568099e984b56a0146f06c0d
+        //public ProductPriceList(InternalProductPriceList internalProductPriceList) :base(internalProductPriceList) { }
+
+        //public ProductPriceList() { }
+
+        public ProductPriceList(InternalProductPriceList internalProductPriceList)
 
         {
             if (internalProductPriceList != null)
@@ -39,9 +38,12 @@ namespace CCProductPriceService.DTOs
             }
         }
 
-        public ProductPriceList() : base() { }
-        
-           
-                    
+        public ProductPriceList() : base() 
+        {
+            
+        }
+
+
+
     }
 }

@@ -53,7 +53,7 @@ namespace CCProductPriceServiceTest
             {
                 HttpClient client = application.CreateClient();
                 CreateBasicClientWithAuth(client);
-                var response = await client.GetAsync("/api/v2/productpricepool/" + "fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
+                var response = await client.GetAsync("/api/v2/productpricepool/fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }

@@ -71,7 +71,9 @@ namespace CCProductPriceService.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [SwaggerOperation("Adds a new ProductPriceList")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Post(ProductPriceListBase priceList)
         {
             try
@@ -101,6 +103,10 @@ namespace CCProductPriceService.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Updates a ProductPriceList")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] ProductPriceList productDto)
