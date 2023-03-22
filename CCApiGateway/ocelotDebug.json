@@ -3,6 +3,7 @@
     "BaseUrl": "https://localhost:7137"
   },
   "Routes": [
+    // Product region
     {
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "Get" ],
@@ -121,6 +122,46 @@
       "SwaggerKey": "product"
     },
     {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    // ProductPool region
+    {
       "UpstreamPathTemplate": "/productpool",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/productpool",
@@ -198,18 +239,321 @@
       ],
       "SwaggerKey": "productpool"
     },
+    // CategoryPool
     {
-      "UpstreamPathTemplate": "/productpool/{id}/categories",
+      "UpstreamPathTemplate": "/categorypool",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/productpool/{id}/categories",
+      "DownstreamPathTemplate": "/api/v2/categorypool",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7085
+          "Port": 7199
         }
       ],
-      "SwaggerKey": "productpool"
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    // Category
+    {
+      "UpstreamPathTemplate": "/category",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/category",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/category",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7199
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    // ProductPriceList
+    {
+      "UpstreamPathTemplate": "/productpricelist",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    // ProductPricePool
+    {
+      "UpstreamPathTemplate": "/productpricepool",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7116
+        }
+      ],
+      "SwaggerKey": "productpricepool"
     }
   ],
   "SwaggerEndPoints": [
@@ -230,6 +574,46 @@
           "Name": "CCProductPoolService",
           "Version": "v2",
           "Url": "https://localhost:7085/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "categoryPool",
+      "Config": [
+        {
+          "Name": "CCCategoryPoolService",
+          "Version": "v2",
+          "Url": "https://localhost:7199/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "category",
+      "Config": [
+        {
+          "Name": "CCCategoryService",
+          "Version": "v2",
+          "Url": "https://localhost:7199/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "productpricelist",
+      "Config": [
+        {
+          "Name": "CCProductPriceListService",
+          "Version": "v2",
+          "Url": "https://localhost:7116/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "productpricepool",
+      "Config": [
+        {
+          "Name": "CCProductPricePoolService",
+          "Version": "v2",
+          "Url": "https://localhost:7116/swagger/v2/swagger.json"
         }
       ]
     }

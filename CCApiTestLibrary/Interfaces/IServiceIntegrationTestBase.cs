@@ -18,20 +18,24 @@ namespace CCApiTestLibrary.Interfaces
 
         void Get_By_Id_returns_200_And_Item_if_successful();
 
+        void GetByID_returns_404_If_given_Id_not_found();
+
         void Post_returns_201_if_successful();
 
+        void Post_Returns_422_if_required_prop_is_missing();
+
         void Put_Returns_204_if_successful();
+
+        void Put_Returns_422_if_required_prop_is_missing();
+
+        void Put_Returns_404_If_given_Id_not_found();
+
+        void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different();
 
         void Patch_Returns_204_And_Item_if_successful();
 
         void Delete_Returns_204_if_successful();
 
-        void Post_Returns_422_if_required_prop_is_missing();
-
-        void Put_Returns_422_if_required_prop_is_missing();
-
-        void GetByID_returns_404_If_given_Id_not_found();
-
-        void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different();
+        void Delete_Returns_404_If_given_Id_not_found();
     }
 }

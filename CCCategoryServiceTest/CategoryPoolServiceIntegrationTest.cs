@@ -43,6 +43,20 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
+        public async void Delete_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpResponseMessage response = await client.DeleteAsync("/api/v2/categorypool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                    var message = response.Content.ReadAsStringAsync();
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
         public async void GetByID_returns_404_If_given_Id_not_found()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -295,6 +309,41 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
+        public async void Put_Returns_404_If_given_Id_not_found()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (var services = application.Services.CreateScope())
+            {
+                try
+                {
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    CategoryPool categoryPoolBase = new CategoryPool()
+                    {
+                        Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        Type = 99,
+                        Names = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Allergene")
+                            },
+                        Descriptions = new List<MultilanguageText>
+                            {
+                                new MultilanguageText("de-DE", "Unverträglichkeiten")
+                            },
+                        SystemSettingsId = StaticTestGuids.SystemSettingsId
+                    };
+                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(categoryPoolBase), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("/api/v2/categorypool/82a4252e-c58f-49d0-8476-b7e1a5fa4b11", httpContent);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    await ResetDatabaseAfterTesting(services);
+                }
+            }
+        }
+
+        [Fact]
         public async void Put_Returns_422_if_required_prop_is_missing()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -325,7 +374,7 @@ namespace CCCategoryServiceTest
         }
 
         [Fact]
-        public async void Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
+        public async void Put_Returns_BadRequestErrorMessageResult_when_route_Id_and_Model_Id_are_different()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
             using (var services = application.Services.CreateScope())

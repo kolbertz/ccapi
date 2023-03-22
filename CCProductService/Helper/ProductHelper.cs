@@ -8,32 +8,6 @@ namespace CCProductService.Helper
 {
     public class ProductHelper
     {
-        public static void ParseProductToDto(InternalProduct product, ProductBase productDto)
-        {
-            if (product != null)
-            {
-                if (productDto == null)
-                {
-                    productDto = new ProductBase();
-                }
-                
-                productDto.ProductPoolId = product.ProductPoolId;
-                productDto.Key = product.ProductKey;
-                productDto.Barcodes = product.ProductBarcodes?.Select(x => x.Barcode).ToList();
-                productDto.ShortNames = product.ProductStrings?.Select(x => new MultilanguageText { Culture = x.Language, Text = x.ShortName }).ToList();
-                productDto.LongNames = product.ProductStrings?.Select(x => new MultilanguageText { Culture = x.Language, Text = x.LongName }).ToList();
-                productDto.Descriptions = product.ProductStrings?.Select(x => new MultilanguageText { Culture = x.Language, Text = x.Description }).ToList();
-                productDto.Balance = product.Balance ? new Balance
-                {
-                    PriceUnit = product.BalancePriceUnit,
-                    PriceUnitValue = product.BalancePriceUnitValue,
-                    Tare = product.BalanceTare
-                } : null;
-                productDto.IsBlocked = product.IsBlocked;
-            }
-
-        }
-
         public static void ParseDtoToProduct(ProductBase productDto, InternalProduct product)
         {
             if (productDto != null)
