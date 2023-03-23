@@ -26,13 +26,21 @@ namespace CCProductPriceService.Repositories
             _dbContext?.Dispose();
         }
 
-        public Task<IEnumerable<ProductPriceBase>> GetAllProductPricesAsync()
+        public Task<IEnumerable<ProductPriceBase>> GetAllProductPricesAsync(UserClaim userClaim)
         {
-            var query = "SELECT Id, ProductId, ProductPricePoolId, ProductPriceListId, ManualPrice FROM ProductPrice";
+            string sysIdQuery = string.Empty;
+            var paramObj = new ExpandoObject();
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " WHERE ProductPricePool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
+            var query = $"SELECT Id, ProductId, ProductPricePoolId, ProductPriceListId, ManualPrice FROM ProductPrice{sysIdQuery}";
             return _dbContext.QueryAsync<ProductPriceBase>(query);
         }
 
-        public Task<ProductPriceBase> GetProductPriceByIdAsync(Guid id)
+        public Task<ProductPriceBase> GetProductPriceByIdAsync(Guid id, UserClaim userClaim)
         {
             var query = "SELECT Id, ProductId, ProductPricePoolId, ProductPriceListId, ManualPrice FROM ProductPrice " +
                 "WHERE Id = @ProductPriceId";

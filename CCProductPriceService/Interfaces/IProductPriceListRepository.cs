@@ -8,9 +8,9 @@ namespace CCProductPriceService.Interfaces
     {
         void Init(string database);
 
-        Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists();
+        Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists(UserClaim userClaim);
 
-        Task<ProductPriceList> GetProductPriceListById(Guid productPriceListId);
+        Task<ProductPriceList> GetProductPriceListById(Guid productPriceListId, UserClaim userClaim);
 
         Task<Guid> AddProductPriceListAsync(ProductPriceListBase priceListBase, UserClaim userClaim);
                 

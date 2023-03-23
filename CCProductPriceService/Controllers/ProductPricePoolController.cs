@@ -58,7 +58,7 @@ namespace CCProductPriceService.Controllers
                 using (IProductPricePoolRepository repo = _serviceProvider.GetService<IProductPricePoolRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    ProductPricePool productPricePool = (await repo.GetPricePoolById(id, userClaim).ConfigureAwait(false));
+                    ProductPricePool productPricePool = await repo.GetPricePoolById(id, userClaim).ConfigureAwait(false);
                     if (productPricePool != null)
                     {
                         return Ok(productPricePool);
@@ -128,8 +128,12 @@ namespace CCProductPriceService.Controllers
             using (IProductPricePoolRepository productPricePoolRepository = _serviceProvider.GetService<IProductPricePoolRepository>())
             {
                 productPricePoolRepository.Init(userClaim.TenantDatabase);
-                await productPricePoolRepository.UpdatePricePool(pricePool, userClaim).ConfigureAwait(false);
-                return NoContent();
+                if (await productPricePoolRepository.UpdatePricePool(pricePool, userClaim).ConfigureAwait(false) > 0) 
+                {
+                    return NoContent();
+                }
+                return NotFound();
+                
             }
         }
 

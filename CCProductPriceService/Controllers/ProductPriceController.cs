@@ -32,7 +32,7 @@ namespace CCProductPriceService.Controllers
                 using (IProductPriceRepository repo = _serviceProvider.GetService<IProductPriceRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    return Ok(await repo.GetAllProductPricesAsync().ConfigureAwait(false));
+                    return Ok(await repo.GetAllProductPricesAsync(userClaim).ConfigureAwait(false));
                 }
             }
             catch (Exception)
@@ -52,7 +52,7 @@ namespace CCProductPriceService.Controllers
                 using (IProductPriceRepository repo = _serviceProvider.GetService<IProductPriceRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    return Ok(await repo.GetProductPriceByIdAsync(id).ConfigureAwait(false));
+                    return Ok(await repo.GetProductPriceByIdAsync(id, userClaim).ConfigureAwait(false));
                 }
             }
             catch (Exception)

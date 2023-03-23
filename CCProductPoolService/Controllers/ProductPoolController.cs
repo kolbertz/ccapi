@@ -38,7 +38,7 @@ namespace CCProductPoolService.Controllers
                 using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
                 {
                     productPoolRepository.Init(userClaim.TenantDatabase);
-                    return Ok(await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync());
+                    return Ok(await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolsAsync(userClaim));
                 }
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace CCProductPoolService.Controllers
                 using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
                 {
                     productPoolRepository.Init(userClaim.TenantDatabase);
-                    ProductPool productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id);
+                    ProductPool productPoolDto = await _serviceProvider.GetService<IProductPoolRepository>().GetProductPoolByIdAsync(id, userClaim);
                     if (productPoolDto == null)
                     {
                         return NotFound();
@@ -136,8 +136,10 @@ namespace CCProductPoolService.Controllers
                 using (IProductPoolRepository productPoolRepository = _serviceProvider.GetService<IProductPoolRepository>())
                 {
                     productPoolRepository.Init(userClaim.TenantDatabase);
-                    await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim);
-                    return NoContent();
+                    if (await _serviceProvider.GetService<IProductPoolRepository>().UpdateProductPoolAsync(productPoolDto, userClaim).ConfigureAwait(false) > 0)
+                    { return NoContent(); }
+                    return NotFound();
+                   
                 }
             }
             catch (Exception ex)

@@ -157,7 +157,7 @@ namespace CCProductService.Repositories
             }
         }
 
-        public Task<bool> UpdateProductAsync(Product productDto, UserClaim userClaim)
+        public Task<int> UpdateProductAsync(Product productDto, UserClaim userClaim)
         {
             InternalProduct product = new InternalProduct(productDto);
             ProductHelper.ParseDtoToProduct(productDto, product);
@@ -176,7 +176,7 @@ namespace CCProductService.Repositories
                 ProductBase productDto = new ProductBase(product);
                 product.LastUpdatedDate = DateTimeOffset.Now;
                 product.LastUpdatedUser = userClaim.UserId;
-                if (await Update(product, productDto, userClaim).ConfigureAwait(false))
+                if (await Update(product, productDto, userClaim).ConfigureAwait(false) >0)
                 {
                     return productDto;
                 }
@@ -250,7 +250,7 @@ namespace CCProductService.Repositories
                 splitOn: "ProductPriceListId, ProductPriceId", param: paramObj);
         }
 
-        public async Task<bool> Update(InternalProduct product,ProductBase productDto, UserClaim userClaim)
+        public async Task<int> Update(InternalProduct product,ProductBase productDto, UserClaim userClaim)
         {
             var productUpdateQuery = "UPDATE Product Set ProductKey = @ProductKey, [IsBlocked] = @IsBlocked, [Balance] = @Balance, [BalanceTareBarcode] = @BalanceTareBarcode, " +
                 "[BalancePriceUnit] = @BalancePriceUnit, [BalancePriceUnitValue] = @BalancePriceUnitValue, [CreatedUser] = @CreatedUser, [ProductPoolId] = ProductPoolId, [ProductType] = ProductType WHERE Id = @Id";
@@ -267,7 +267,7 @@ namespace CCProductService.Repositories
                     await InsertBarCode(productDto, userClaim);
                 }
                 _dbContext.CommitTransaction();
-                return true;
+                return await _dbContext.ExecuteAsync(productUpdateQuery, param: product);
             }
             catch (Exception ex)
             {

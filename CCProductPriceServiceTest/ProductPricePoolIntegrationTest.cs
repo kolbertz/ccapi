@@ -406,7 +406,7 @@ namespace CCProductPriceServiceTest
                     CreateBasicClientWithAuth(client);
                     HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPricePoolBase), Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PutAsync("/api/v2/productpricepool/25950bf7-ecf9-1111-1111-df9307f490fd", httpContent);
-                    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
                 }
                 finally

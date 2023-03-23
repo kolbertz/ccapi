@@ -34,7 +34,7 @@ namespace CCProductPriceService.Controllers
                 using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    return Ok(await repo.GetAllProductPriceLists().ConfigureAwait(false));
+                    return Ok(await repo.GetAllProductPriceLists(userClaim).ConfigureAwait(false));
 
                 }
             }
@@ -54,7 +54,7 @@ namespace CCProductPriceService.Controllers
             using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
             {
                 repo.Init(userClaim.TenantDatabase);
-                 ProductPriceList productPriceList = await repo.GetProductPriceListById(id).ConfigureAwait(false);
+                 ProductPriceList productPriceList = await repo.GetProductPriceListById(id, userClaim).ConfigureAwait(false);
                 if (productPriceList != null)
                 {
                     return Ok(productPriceList);
@@ -124,8 +124,11 @@ namespace CCProductPriceService.Controllers
             using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
             {
                 productPriceListRepository.Init(userClaim.TenantDatabase);
-                await productPriceListRepository.UpdateProductPriceListAsync(productDto, userClaim).ConfigureAwait(false);
-                return NoContent();
+                if (await productPriceListRepository.UpdateProductPriceListAsync(productDto, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                return NotFound();
             }
         }
 

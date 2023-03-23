@@ -4,6 +4,7 @@ using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
 using CCProductPriceService.InternalData;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Dynamic;
 using System.Reflection.Metadata.Ecma335;
 
 namespace CCProductPriceService.Repositories
@@ -28,10 +29,18 @@ namespace CCProductPriceService.Repositories
         }
 
         
-        public Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists()
-        {
-            var query = "SELECT Id, [Key], Priority,[Name], SystemSettingsId FROM ProductPriceList";
+        public Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists(UserClaim userClaim)
+        {            
+            string sysIdQuery = string.Empty;
+            var paramObj = new ExpandoObject();
 
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " WHERE ProductPriceList.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
+            var query = $"SELECT Id, [Key], Priority,[Name], SystemSettingsId FROM ProductPriceList{sysIdQuery}";       
+            
             return _dbContext.QueryAsync<InternalProductPriceList, Guid, ProductPriceList>(query, (internalProductPriceList, sysId) =>
             { 
                 return new ProductPriceList(internalProductPriceList, sysId);
@@ -39,10 +48,19 @@ namespace CCProductPriceService.Repositories
 
         }
 
-        public  async Task<ProductPriceList> GetProductPriceListById(Guid id)
+        public  async Task<ProductPriceList> GetProductPriceListById(Guid id, UserClaim userClaim)
         {
+            var paramObj = new ExpandoObject();
+            string sysIdQuery = string.Empty;
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " AND SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
             var query = "SELECT Id, [Name], [Key], Priority, SystemSettingsId FROM ProductPriceList " +
-                "WHERE Id = @ProductPriceListId";
+                $"WHERE Id = @ProductPriceListId{sysIdQuery}";
+
             InternalProductPriceList productPriceList = await _dbContext.QueryFirstOrDefaultAsync<InternalProductPriceList>(query, param: new { ProductPriceListId = id });
             if (productPriceList != null)
             {

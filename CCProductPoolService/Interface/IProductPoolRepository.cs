@@ -8,9 +8,9 @@ namespace CCProductPoolService.Interface
     public interface IProductPoolRepository : IDisposable
     {
         void Init(string database);
-        Task<IEnumerable<ProductPool>> GetProductPoolsAsync();
+        Task<IEnumerable<ProductPool>> GetProductPoolsAsync(UserClaim userClaim);
 
-        Task<ProductPool> GetProductPoolByIdAsync(Guid id);
+        Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim);
 
         Task<Guid> AddProductPoolAsync(ProductPoolBase productPool, UserClaim userClaim);
 

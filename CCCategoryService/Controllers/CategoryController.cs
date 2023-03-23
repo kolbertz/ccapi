@@ -121,7 +121,7 @@ namespace CCCategoryService.Controllers
             using (ICategoryRepository categoryRepository = _serviceProvider.GetService<ICategoryRepository>())
             {
                 categoryRepository.Init(userClaim.TenantDatabase);
-                if (await categoryRepository.UpdateCategoryAsync(categoryDto, userClaim).ConfigureAwait(false))
+                if (await categoryRepository.UpdateCategoryAsync(categoryDto, userClaim).ConfigureAwait(false) > 0)
                 {
                     return NoContent();
                 }
