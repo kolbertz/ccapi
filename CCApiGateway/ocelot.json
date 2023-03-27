@@ -1,17 +1,22 @@
 {
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7137"
+    "ServiceDiscoveryProvider": {
+      //"BaseUrl": "http://20.76.221.72:80",
+      //"Namespace": "default",
+      "Type": "KubernetesServiceDiscoveryProvider"
+    }
   },
   "Routes": [
+    // Product region
     {
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -20,11 +25,11 @@
       "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -33,11 +38,11 @@
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "Post" ],
       "DownstreamPathTemplate": "/api/v2/product",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -46,11 +51,11 @@
       "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -59,11 +64,11 @@
       "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Patch" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -72,11 +77,11 @@
       "UpstreamPathTemplate": "/product/{id}",
       "UpstreamHttpMethod": [ "Delete" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -85,11 +90,11 @@
       "UpstreamPathTemplate": "/product/{id}/categories",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -98,11 +103,11 @@
       "UpstreamPathTemplate": "/product/{id}/barcodes",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}/barcodes",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
@@ -111,24 +116,64 @@
       "UpstreamPathTemplate": "/product/{id}/pricings",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "product"
     },
     {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/pricings",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    // ProductPool region
+    {
       "UpstreamPathTemplate": "/productpool",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/productpool",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
@@ -137,11 +182,11 @@
       "UpstreamPathTemplate": "/productpool/{id}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/productpool/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
@@ -150,11 +195,11 @@
       "UpstreamPathTemplate": "/productpool",
       "UpstreamHttpMethod": [ "Post" ],
       "DownstreamPathTemplate": "/api/v2/productpool",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
@@ -163,11 +208,11 @@
       "UpstreamPathTemplate": "/productpool/{id}",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/v2/productpool/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
@@ -176,11 +221,11 @@
       "UpstreamPathTemplate": "/productpool/{id}",
       "UpstreamHttpMethod": [ "Patch" ],
       "DownstreamPathTemplate": "/api/v2/productpool/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
@@ -189,27 +234,353 @@
       "UpstreamPathTemplate": "/productpool/{id}",
       "UpstreamHttpMethod": [ "Delete" ],
       "DownstreamPathTemplate": "/api/v2/productpool/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "ccproductpoolservice-service",
+          "Port": 80
         }
       ],
       "SwaggerKey": "productpool"
     },
+    // CategoryPool
     {
-      "UpstreamPathTemplate": "/productpool/{id}/categories",
+      "UpstreamPathTemplate": "/categorypool",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/v2/productpool/{id}/categories",
-      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/v2/categorypool",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ccproductpoolservice.azurewebsites.net",
-          "Port": 443
+          "Host": "cccategoryservice-service",
+          "Port": 80
         }
       ],
-      "SwaggerKey": "productpool"
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    {
+      "UpstreamPathTemplate": "/categorypool/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/categorypool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "categoryPool"
+    },
+    // Category
+    {
+      "UpstreamPathTemplate": "/category",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/category",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/category",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    {
+      "UpstreamPathTemplate": "/category/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/category/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cccategoryservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "category"
+    },
+    // ProductPriceList
+    {
+      "UpstreamPathTemplate": "/productpricelist",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricelist/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/productpricelist/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricelist"
+    },
+    // ProductPricePool
+    {
+      "UpstreamPathTemplate": "/productpricepool",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Patch" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    {
+      "UpstreamPathTemplate": "/productpricepool/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/api/v2/productpricepool/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccproductpriceservice-service",
+          "Port": 80
+        }
+      ],
+      "SwaggerKey": "productpricepool"
+    },
+    // AuthServer
+    {
+      "UpstreamPathTemplate": "/authorize",
+      "DownstreamPathTemplate": "/home/authorize",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccauthserver-service",
+          "Port": 80
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/token",
+      "DownstreamPathTemplate": "/home/token",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccauthserver-service",
+          "Port": 80
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [
@@ -219,7 +590,7 @@
         {
           "Name": "CCProductService",
           "Version": "v2",
-          "Url": "https://ccproductservice.azurewebsites.net/swagger/v2/swagger.json"
+          "Url": "http://ccproductservice-service:80/swagger/v2/swagger.json"
         }
       ]
     },
@@ -229,7 +600,47 @@
         {
           "Name": "CCProductPoolService",
           "Version": "v2",
-          "Url": "https://ccproductpoolservice.azurewebsites.net/swagger/v2/swagger.json"
+          "Url": "http://ccproductpoolservice-service:80/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "categoryPool",
+      "Config": [
+        {
+          "Name": "CCCategoryPoolService",
+          "Version": "v2",
+          "Url": "http://cccategoryservice-service:80/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "category",
+      "Config": [
+        {
+          "Name": "CCCategoryService",
+          "Version": "v2",
+          "Url": "http://cccategoryservice-service:80/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "productpricelist",
+      "Config": [
+        {
+          "Name": "CCProductPriceListService",
+          "Version": "v2",
+          "Url": "http://ccproductpriceservice-service:80/swagger/v2/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "productpricepool",
+      "Config": [
+        {
+          "Name": "CCProductPricePoolService",
+          "Version": "v2",
+          "Url": "http://ccproductpriceservice-service:80/swagger/v2/swagger.json"
         }
       ]
     }
