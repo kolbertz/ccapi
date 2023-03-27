@@ -6,6 +6,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Kubernetes;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace CCApiGateway
@@ -164,7 +165,8 @@ namespace CCApiGateway
 #else
             builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 #endif
-            builder.Services.AddOcelot(builder.Configuration);
+            builder.Services.AddOcelot(builder.Configuration)
+                .AddKubernetes();
             builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
             builder.Services.AddAuthorization();
@@ -175,14 +177,14 @@ namespace CCApiGateway
                 opt.PathToSwaggerGenerator = "/swagger/docs";
             });
             // Configure the HTTP request pipeline.
-            app.UseSwagger();
-            app.UseSwaggerUI(opt =>
-            {
-                opt.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
-                opt.OAuthClientId(configuration["Authentication:ClientId"]);
-                opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
-                opt.OAuthUsePkce();
-            });
+            //app.UseSwagger();
+            //app.UseSwaggerUI(opt =>
+            //{
+            //    opt.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+            //    opt.OAuthClientId(configuration["Authentication:ClientId"]);
+            //    opt.OAuthClientSecret(configuration["Authentication:ClientSecret"]);
+            //    opt.OAuthUsePkce();
+            //});
 
             app.UseHttpsRedirection();
 
