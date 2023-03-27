@@ -66,7 +66,7 @@ namespace CCProductPriceServiceTest
             {
                 HttpClient client = application.CreateClient();
                 CreateBasicClientWithAuth(client);
-                var response = await client.GetAsync("/api/v2/productpricepool/" + "fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
+                var response = await client.GetAsync("/api/v2/productpricepool/fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
@@ -406,7 +406,7 @@ namespace CCProductPriceServiceTest
                     CreateBasicClientWithAuth(client);
                     HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPricePoolBase), Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PutAsync("/api/v2/productpricepool/25950bf7-ecf9-1111-1111-df9307f490fd", httpContent);
-                    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
                 }
                 finally

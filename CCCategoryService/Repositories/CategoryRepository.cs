@@ -40,7 +40,14 @@ namespace CCCategoryService.Repositories
         {
             string query;
             string categoryPoolQuery = string.Empty;
+            string sysIdQuery = string.Empty;
             var paramObj = new ExpandoObject();
+
+            if (userClaim.SystemId.HasValue) 
+            {
+                sysIdQuery = " WHERE CategoryPool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
 
             if (userClaim.CategoryPoolIds != null && userClaim.CategoryPoolIds.Count() > 0)
             {
@@ -51,7 +58,7 @@ namespace CCCategoryService.Repositories
             if (take.HasValue && skip.HasValue)
             {
                 query = $"Select t.Id, t.CategoryPoolId, t.CategoryKey,  CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description " +
-                    $"				FROM (Select Id, CategoryKey, CategoryPoolId	From Category{categoryPoolQuery}	" +
+                    $"				FROM (Select Id, CategoryKey, CategoryPoolId	From Category{sysIdQuery}{categoryPoolQuery}	" +
                     $"				ORDER BY CategoryKey      " +
                     $"              OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY) as t 		" +
                     $"			    LEFT JOIN CategoryString on t.Id = CategoryString.CategoryId";
@@ -63,7 +70,7 @@ namespace CCCategoryService.Repositories
             {
                 query = "SELECT Category.Id, Category.CategoryKey, Category.CategoryPoolId, CategoryString.Id AS CategoryStringID, CategoryString.CategoryId, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description" +
                     $" from Category " +
-                    $"JOIN CategoryString on Category.Id = CategoryString.CategoryId{categoryPoolQuery}" +
+                    $"JOIN CategoryString on Category.Id = CategoryString.CategoryId{sysIdQuery}{categoryPoolQuery}" +
                     $" ORDER BY CategoryKey";
             }
 
@@ -93,6 +100,13 @@ namespace CCCategoryService.Repositories
             Category dto = null;
             var paramObj = new ExpandoObject();
             string categoryPoolQuery = string.Empty;
+            string sysIdQuery = string.Empty;
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " AND CategoryPool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
 
             if (userClaim.CategoryPoolIds != null && userClaim.CategoryPoolIds.Count() > 0)
             {
@@ -102,7 +116,7 @@ namespace CCCategoryService.Repositories
 
             string query = $"SELECT Category.Id, CategoryKey, CategoryPoolId, CategoryString.CategoryId,CategoryString.Id AS CategoryStringID, CategoryString.Culture, CategoryString.CategoryName, CategoryString.Comment, CategoryString.Description " +
                  $"from Category JOIN CategoryString on Category.Id = CategoryString.CategoryId " +
-                 $"WHERE Category.Id = @CategoryId{categoryPoolQuery}";
+                 $"WHERE Category.Id = @CategoryId{sysIdQuery}{categoryPoolQuery}";
 
             paramObj.TryAdd("CategoryId", id);
 
@@ -147,7 +161,7 @@ namespace CCCategoryService.Repositories
             }
         }
 
-        public Task<bool> UpdateCategoryAsync(Category categoryDto, UserClaim userClaim)
+        public Task<int> UpdateCategoryAsync(Category categoryDto, UserClaim userClaim)
         {
 
             InternalCategory category = new InternalCategory(categoryDto);
@@ -166,7 +180,7 @@ namespace CCCategoryService.Repositories
                 CategoryBase categoryDto = new CategoryBase();
                 category.LastUpdatedDate = DateTimeOffset.Now;
                 category.LastUpdatedUser = userClaim.UserId;
-                if (await Update(category, categoryDto, userClaim).ConfigureAwait(false))
+                if (await Update(category, categoryDto, userClaim).ConfigureAwait(false) > 0)
                 {
                     return categoryDto;
                 }
@@ -189,20 +203,20 @@ namespace CCCategoryService.Repositories
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
 
-        public async Task<bool> Update(InternalCategory category, CategoryBase categoryBase, UserClaim userClaim)
+        public async Task<int> Update(InternalCategory category, CategoryBase categoryBase, UserClaim userClaim)
         {
             var categoryUpdateQuery = "Update Category Set CategoryKey = @CategoryKey, CreatedUser = @CreatedUser, CategoryPoolId = @CategoryPoolId WHERE Id = @Id ";
             try
             {
                 _dbContext.BeginTransaction();
-                if (await _dbContext.ExecuteAsync(categoryUpdateQuery, category) > 0)
+                if (await _dbContext.ExecuteAsync(categoryUpdateQuery, category) >0 )
                 {
                     await DeleteCategoryStringAsync(category.Id, userClaim);
                     await InsertCategoryString(category, userClaim);
                 }
-
                 _dbContext.CommitTransaction();
-                return true;
+                return await _dbContext.ExecuteAsync(categoryUpdateQuery, param: category);
+                   
             }
             catch (Exception)
             {

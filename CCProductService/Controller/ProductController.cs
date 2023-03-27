@@ -122,8 +122,15 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                await productRepository.UpdateProductAsync(productDto, userClaim).ConfigureAwait(false);
-                return NoContent();
+                if (await productRepository.UpdateProductAsync(productDto, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+                
             }
         }
 

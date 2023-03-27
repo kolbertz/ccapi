@@ -56,9 +56,7 @@ namespace CCCategoryService.Controllers
             }
 
             using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
-            {
-                //Fehler beim Aufruf der Methode GetById
-                //Baustelle
+            {                
                 categoryPoolRepository.Init(userClaim.TenantDatabase);
                 CategoryPoolBase categoryPoolDto = await categoryPoolRepository.GetCategoryPoolByIdAsync(id, userClaim).ConfigureAwait(false);
                 if (categoryPoolDto != null)

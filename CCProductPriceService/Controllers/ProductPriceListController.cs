@@ -1,10 +1,13 @@
-﻿using CCApiLibrary.Models;
+﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Models;
 using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
+using CCProductPriceService.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CCProductPriceService.Controllers
 {
@@ -22,6 +25,7 @@ namespace CCProductPriceService.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ProductPriceList))]
+        [SwaggerOperation("Get a list with ProductPriceList items (using Dapper)")]
         public async Task<IActionResult> Get()
         {
             try
@@ -30,8 +34,8 @@ namespace CCProductPriceService.Controllers
                 using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
                 {
                     repo.Init(userClaim.TenantDatabase);
-                    return Ok(await repo.GetAllProductPriceLists().ConfigureAwait(false));
-                    
+                    return Ok(await repo.GetAllProductPriceLists(userClaim).ConfigureAwait(false));
+
                 }
             }
             catch (Exception ex)
@@ -43,27 +47,34 @@ namespace CCProductPriceService.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [SwaggerOperation("Gets a ProductPriceList by Id (using Dapper)")]
         public async Task<IActionResult> Get(Guid id)
         {
-            try
+            UserClaim userClaim = GetUserClaim();
+            using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
             {
-                UserClaim userClaim = GetUserClaim();
-                using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
+                repo.Init(userClaim.TenantDatabase);
+                 ProductPriceList productPriceList = await repo.GetProductPriceListById(id, userClaim).ConfigureAwait(false);
+                if (productPriceList != null)
                 {
-                    repo.Init(userClaim.TenantDatabase);
-                    return Ok(await repo.GetProductPriceListById(id).ConfigureAwait(false));
+                    return Ok(productPriceList);
+                }
+                else
+                {
+                    return NotFound();
                 }
             }
-            catch (Exception)
-            {
+            
 
-                throw;
-            }
+
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Post(ProductPriceList priceListBase)
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [SwaggerOperation("Adds a new ProductPriceList")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        public async Task<IActionResult> Post(ProductPriceListBase priceList)
         {
             try
             {
@@ -74,8 +85,13 @@ namespace CCProductPriceService.Controllers
                 {
                     userClaim = new UserClaim(HttpContext.User.Claims);
                 }
-                listId = await _serviceProvider.GetService<IProductPriceListRepository>().AddProductPriceListAsync(priceListBase, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{listId}"), null);
+                using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
+                {
+                    productPriceListRepository.Init(userClaim.TenantDatabase);
+                    listId = await _serviceProvider.GetService<IProductPriceListRepository>().AddProductPriceListAsync(priceList, userClaim);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{listId}"), null);
+                }
+                
             }
             catch (Exception)
             {
@@ -85,9 +101,40 @@ namespace CCProductPriceService.Controllers
 
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerOperation("Updates a ProductPriceList")]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        public async Task<IActionResult> Put(Guid id, [ModelBinder] ProductPriceList productDto)
+        {
+            if (id != productDto.Id)
+            {
+                return BadRequest("The id inside the body do not match the query parameter");
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
+            {
+                productPriceListRepository.Init(userClaim.TenantDatabase);
+                if (await productPriceListRepository.UpdateProductPriceListAsync(productDto, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                return NotFound();
+            }
+        }
 
         [HttpPatch]
         [Route("{id}")]
+        [SwaggerOperation("Patch a ProductPriceList")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
         {
             ProductPriceList dto;
@@ -97,34 +144,42 @@ namespace CCProductPriceService.Controllers
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
-            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>()) 
+            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
             {
                 productPriceListRepository.Init(userClaim.TenantDatabase);
                 dto = await productPriceListRepository.PatchProductPriceList(id, jsonPatch, userClaim).ConfigureAwait(false);
-                return Ok(dto);
-            }           
+                if (dto != null)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
         }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("{id}")]
+        [SwaggerOperation("Delete a ProductPriceList")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
+
+            UserClaim userClaim = GetUserClaim();
+            using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
             {
-                UserClaim userClaim = GetUserClaim();
-                using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
+                repo.Init(userClaim.TenantDatabase);
+                if (await _serviceProvider.GetService<IProductPriceListRepository>().DeletePriceListAsync(id).ConfigureAwait(false) > 0)
                 {
-                    repo.Init(userClaim.TenantDatabase);
-                    return Ok(await _serviceProvider.GetService<IProductPriceListRepository>().DeletePriceListAsync(id).ConfigureAwait(false));
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
                 }
             }
-            catch (Exception)
-            {
-
-                return StatusCode(500);
-            }
-
         }
     }
 }

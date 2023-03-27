@@ -6,5 +6,9 @@
         public DateTimeOffset StartDate { get; set; }
         public decimal Value { get; set; }
         public string CurrencySymbol { get; set; }
+
+
+        //public InternalProductPrice(List<ProductPriceBase> productPriceBases)
+        //{ }
     }
 }

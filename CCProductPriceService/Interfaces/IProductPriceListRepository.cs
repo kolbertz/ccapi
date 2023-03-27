@@ -8,14 +8,13 @@ namespace CCProductPriceService.Interfaces
     {
         void Init(string database);
 
-        Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists();
+        Task<IEnumerable<ProductPriceList>> GetAllProductPriceLists(UserClaim userClaim);
 
-        Task<ProductPriceList> GetProductPriceListById(Guid productPriceListId);
+        Task<ProductPriceList> GetProductPriceListById(Guid productPriceListId, UserClaim userClaim);
 
-        Task<Guid> AddProductPriceListAsync(ProductPriceList priceList, UserClaim userClaim);
-
-        //Baustelle
-        //Task<int> UpdatePricePool(ProductPricePool pricePool, UserClaim userClaim);
+        Task<Guid> AddProductPriceListAsync(ProductPriceListBase priceListBase, UserClaim userClaim);
+                
+        Task<int> UpdateProductPriceListAsync(ProductPriceList priceList, UserClaim userClaim);
 
         Task<ProductPriceList> PatchProductPriceList(Guid id, JsonPatchDocument pricePool, UserClaim userClaim);
 

@@ -4,6 +4,7 @@ using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using CCProductPoolService.Interface;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Dynamic;
 
 namespace CCProductPoolService.Repositories
 {
@@ -27,18 +28,28 @@ namespace CCProductPoolService.Repositories
             _dbContext.Init(database);
         }
 
-        public Task<IEnumerable<ProductPool>> GetProductPoolsAsync()
+        public Task<IEnumerable<ProductPool>> GetProductPoolsAsync(UserClaim userClaim)
         {
 
             var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool";
             return _dbContext.QueryAsync<ProductPool>(query);
         }
 
-        public Task<ProductPool> GetProductPoolByIdAsync(Guid id)
+        //public Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim)
+        //{
+        //    var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool " +
+        //        "WHERE Id = @ProductPoolId";
+        //    return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, param: new { ProductPoolId = id });
+        //}
+
+        public Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim)
         {
-            var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool " +
-                "WHERE Id = @ProductPoolId";
-            return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, param: new { ProductPoolId = id });
+            (string sysIdQuery, ExpandoObject paramObj) = GetClaimsQuery(userClaim);
+            string poolIdQuery = (string.IsNullOrEmpty(sysIdQuery) ? " where" : " and") + " Id = @Id";
+            var query = $"SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool{sysIdQuery}{poolIdQuery}";
+            paramObj.TryAdd("Id", id);
+
+            return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, paramObj);
         }
 
         public Task<Guid> AddProductPoolAsync(ProductPoolBase productPoolDto, UserClaim userClaim)
@@ -92,6 +103,18 @@ namespace CCProductPoolService.Repositories
             var query = "DELETE FROM ProductPool WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
-               
+
+        private static (string sysId, ExpandoObject paramObj) GetClaimsQuery(UserClaim userClaim)
+        {
+            string sysIdQuery = string.Empty;
+            var paramObj = new ExpandoObject();
+
+            if (userClaim != null && userClaim.SystemId != null)
+            {
+                sysIdQuery = " where SystemSettingsId = @sysId";
+                paramObj.TryAdd("sysId", userClaim.SystemId);
+            }
+            return (sysIdQuery, paramObj);
+        }
     }
 }

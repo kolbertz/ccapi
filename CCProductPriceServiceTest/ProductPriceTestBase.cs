@@ -18,7 +18,7 @@ namespace CCProductPriceServiceTest
             {
                 builder.ConfigureTestServices(services =>
                 {
-                    services.AddSingleton<IProductPriceRepository, ProductPriceRepository>();
+                    
                     services.AddSingleton<IProductPricePoolRepository, ProductPricePoolRepository>();
                     services.AddSingleton<IProductPriceListRepository, ProductPriceListRepository>();
                     PrepareServiceCollectionForTest(services);
