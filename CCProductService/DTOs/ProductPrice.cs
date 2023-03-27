@@ -5,6 +5,8 @@ namespace CCProductService.DTOs
 {
     public class ProductPriceBase
     {
+        public Guid ProductId { get; set; }
+
         public Guid PricePoolId { get; set; }
 
         public Guid PriceListId { get; set; }
@@ -14,14 +16,16 @@ namespace CCProductService.DTOs
         public decimal Price { get; set; }
     }
 
-    public class ProductPriceMain : ProductPriceBase
+    public class ProductPriceDate
     {
-        public Guid ProductPriceId { get; set; }
+        public Guid PriceId { get; set; }
+        public decimal Value { get; set; }
+        public DateTimeOffset Date { get; set; }
     }
 
-
-    public class ProductPrice : ProductPriceMain
+    public class ProductPrice : ProductPriceBase
     {
+
         public IEnumerable<MultilanguageText> PricePoolNames { get; set; }
         public List<MultilanguageText> PriceListNames { get; set; }
         public string CurrencyValue { get; set; }
@@ -30,6 +34,7 @@ namespace CCProductService.DTOs
 
         public ProductPrice(InternalProductPricePool internalPricePool, InternalProductPriceList internalProductPriceList, InternalProductPrice internalProductPrice)
         {
+            ProductId = internalProductPrice.ProductId;
             PricePoolId = internalPricePool.ProductPricePoolId;
             PricePoolNames = new List<MultilanguageText>
             {
@@ -40,7 +45,6 @@ namespace CCProductService.DTOs
             {
                 new MultilanguageText("de-DE", internalProductPriceList.PriceListName)
             };
-            ProductPriceId = internalProductPrice.ProductPriceId;
             StartDate = internalProductPrice.StartDate;
             Price = internalProductPrice.Value;
             CurrencyValue = internalProductPrice.CurrencySymbol;

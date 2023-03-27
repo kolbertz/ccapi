@@ -18,7 +18,9 @@ namespace CCProductService.Interface
         Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id, UserClaim userClaim);
         Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim);
         Task<IEnumerable<ProductPrice>> GetProductPrices(Guid id, UserClaim userClaim);
-
+        Task<Guid> AddProductPrices(Guid id, List<ProductPriceBase> productPriceBases, UserClaim userClaim);
+        Task<int> UpdateProductPrice(Guid id, ProductPriceBase productPriceBase, UserClaim userClaim);
+        Task<int> DeleteProductPrice(Guid id);
     }
 }
  
