@@ -250,6 +250,37 @@ namespace CCProductService.Repositories
                 splitOn: "ProductPriceListId, ProductPriceId", param: paramObj);
         }
 
+        //public async Task<Guid> AddProductPrices1(Guid guid, List<ProductPriceBase> productPriceBases, UserClaim userClaim)
+        //{
+        //    ExpandoObject paramObj = new ExpandoObject();
+
+        //    InternalProductPrice internalProdPrice = new InternalProductPrice(productPriceBases);
+        //    var query1 = "INSERT INTO ProductPrice( ProductId,ProductPricePoolId, ProductPriceListId, ManualPrice) " +
+        //        "OUTPUT Inserted.Id " +
+        //        "VALUES( @ProductId, @ProductPricePoolId, @ProductPriceListId, @ManualPrice);";
+
+        //    var query2 = "INSERT INTO ProductPriceDate( ProductPriceId,StartDate, Value) " +
+        //        "OUTPUT Inserted.Id " +
+        //        "VALUES( @ProductPriceId, @StartDate, @Value);";
+
+        //    var query3 = "INSERT INTO ProductPriceList( [Name] ,[Key] , Priority, SystemSettingsId) " +
+        //       "OUTPUT Inserted.Id " +
+        //       "VALUES(@Name, @Key, @Priority, @SystemSettingsId);";
+
+        //    var query4 = "INSERT INTO ProductPricePool( [Name], Description, ParentProductPricePoolId, CurrencyId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +
+        //        "OUTPUT Inserted.Id " +
+        //        "VALUES( @Name, @Description, @ParentProductPricePoolId,@CurrencyId, @SystemSettingsId, @CreatedDate, @CreatedUser, @LastUpdatedDate, @LastUpdatedUser);";
+
+        //    _dbContext.BeginTransaction();
+        //    Guid id = await _dbContext.ExecuteScalarAsync<Guid>(query1, internalProdPrice);
+        //    await _dbContext.ExecuteScalarAsync<Guid>(query2, internalProdPrice);
+        //    await _dbContext.ExecuteScalarAsync<Guid>(query3, internalProdPrice);
+        //    await _dbContext.ExecuteScalarAsync<Guid>(query4, internalProdPrice);
+
+        //    _dbContext.CommitTransaction();
+        //    return id;
+        //}
+
         public async Task<int> Update(InternalProduct product,ProductBase productDto, UserClaim userClaim)
         {
             var productUpdateQuery = "UPDATE Product Set ProductKey = @ProductKey, [IsBlocked] = @IsBlocked, [Balance] = @Balance, [BalanceTareBarcode] = @BalanceTareBarcode, " +

@@ -100,7 +100,7 @@ public class Program
         builder.Services.AddScoped<IApplicationDbConnection, ApplicationDbConnection>();
         builder.Services.AddScoped<IProductPricePoolRepository, ProductPricePoolRepository>();
         builder.Services.AddScoped<IProductPriceListRepository, ProductPriceListRepository>();
-        builder.Services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
+        //builder.Services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
         builder.Services.AddScoped<ValidateModelAttribute>();
         builder.Services.Configure<ApiBehaviorOptions>(Options => Options.SuppressModelStateInvalidFilter = true);
 
