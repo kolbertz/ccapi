@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Linq.Expressions;
 using JsonPatchDocument = Microsoft.AspNetCore.JsonPatch.JsonPatchDocument;
 
 namespace CCProductService.Controller
@@ -13,7 +14,7 @@ namespace CCProductService.Controller
     [Route("api/v2/[controller]")]
     [ApiController]
     [Authorize]
-    public class ProductController : ControllerBase 
+    public class ProductController : ControllerBase
     {
         private IServiceProvider _serviceProvider;
 
@@ -30,7 +31,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpGet]
         [SwaggerOperation("Get a list with Product items")]
-        public async Task<IActionResult> Get(int? skip, int? take) 
+        public async Task<IActionResult> Get(int? skip, int? take)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -55,7 +56,7 @@ namespace CCProductService.Controller
         [HttpGet]
         [Route("{id}")]
         [SwaggerOperation("Gets a Product by Id")]
-        public async Task<IActionResult> Get(Guid id) 
+        public async Task<IActionResult> Get(Guid id)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -130,7 +131,7 @@ namespace CCProductService.Controller
                 {
                     return NotFound();
                 }
-                
+
             }
         }
 
@@ -154,7 +155,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                productBase = await productRepository.PatchProductAsync(id,productPatch, userClaim).ConfigureAwait(false);
+                productBase = await productRepository.PatchProductAsync(id, productPatch, userClaim).ConfigureAwait(false);
                 if (productBase != null)
                 {
                     return NoContent();
@@ -269,7 +270,18 @@ namespace CCProductService.Controller
         [SwaggerOperation("Sets prices for the product")]
         public async Task<IActionResult> SetProductPricings(Guid productId, List<ProductPriceBase> productPriceBase)
         {
-            return Ok();
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                var pricings = await productRepository.AddProductPrices(productId, productPriceBase, userClaim);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{pricings}"), null);
+            }
         }
 
         [HttpPut]
@@ -279,10 +291,24 @@ namespace CCProductService.Controller
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
-        [SwaggerOperation("Updates a ProductPrice via put request")]
-        public async Task<IActionResult> UpdateProductPrice(Guid productId, ProductPriceMain productPriceMain)
+        [SwaggerOperation("PutMethod: Updates a ProductPrice via put request")]
+        public async Task<IActionResult> Put(Guid productId, ProductPriceBase productPriceBase)
         {
-            return Ok();
+            if (productId != productPriceBase.ProductId)
+            {
+                return BadRequest("The id inside the body do not match the query parameter");
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                await productRepository.UpdateProductPrice(productId, productPriceBase, userClaim).ConfigureAwait(false);
+                return NoContent();
+            }
         }
 
         [HttpDelete]
@@ -292,49 +318,98 @@ namespace CCProductService.Controller
         [SwaggerOperation("Delete a ProductPrice")]
         public async Task<IActionResult> DeleteProductPrice(Guid productId)
         {
-            return Ok();
+            try
+            {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    if (await productRepository.DeleteProductPrice(productId).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+
+
+
+            //[HttpGet]
+            //[Route("{id}/compilations")]
+            //public async Task<IActionResult> GetProductCompilations(Guid id)
+            //{
+            //    return Ok();
+            //}
+
+            //[HttpGet]
+            //[Route("{id}/categories")]
+            //public async Task<IActionResult> GetProductPools()
+            //{
+            //    return Ok();
+            //}
+
+            //[HttpGet]
+            //[Route("{id}/categories")]
+            //public async Task<IActionResult> GetCategories(Guid id)
+            //{
+            //    return Ok();
+            //}
+
+            //app.MapDelete("/products/{id}", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
+
+            //}).WithMetadata(new SwaggerOperationAttribute("Delet a product (using EF Core)"));
+
+            //app.MapGet("products/{id}/categories", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
+
+            //}).WithMetadata(new SwaggerOperationAttribute("Get a list of categories for this product (using Dapper)"));
+
+            //app.MapGet("products/{id}/barcodes", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
+
+            //}).WithMetadata(new SwaggerOperationAttribute("Get a list of barcodes for this product (using Dapper)"));
+
+            //app.MapGet("products/{id}/pricings", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
+
+            //}).WithMetadata(new SwaggerOperationAttribute("Get price definitions (using Dapper)"));
+
+            //app.MapGet("products/{id}/compilations", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
+
+            //}).WithMetadata(new SwaggerOperationAttribute("Get product compilations (using Dapper)"));
+
         }
 
-        //[HttpGet]
-        //[Route("{id}/compilations")]
-        //public async Task<IActionResult> GetProductCompilations(Guid id)
-        //{
-        //    return Ok();
-        //}
+        [HttpPost]
+        [Route("{id}/pricings")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(422)]
+        [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Sets Category By ProductID")]
+        public async Task<IActionResult> SetCategoryByProductId(Guid productId, List<ProductPriceBase> productPriceBase)
+        {
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
 
-        //[HttpGet]
-        //[Route("{id}/categories")]
-        //public async Task<IActionResult> GetProductPools()
-        //{
-        //    return Ok();
-        //}
-
-        //[HttpGet]
-        //[Route("{id}/categories")]
-        //public async Task<IActionResult> GetCategories(Guid id)
-        //{
-        //    return Ok();
-        //}
-
-        //app.MapDelete("/products/{id}", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
-
-        //}).WithMetadata(new SwaggerOperationAttribute("Delet a product (using EF Core)"));
-
-        //app.MapGet("products/{id}/categories", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
-
-        //}).WithMetadata(new SwaggerOperationAttribute("Get a list of categories for this product (using Dapper)"));
-
-        //app.MapGet("products/{id}/barcodes", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
-
-        //}).WithMetadata(new SwaggerOperationAttribute("Get a list of barcodes for this product (using Dapper)"));
-
-        //app.MapGet("products/{id}/pricings", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
-
-        //}).WithMetadata(new SwaggerOperationAttribute("Get price definitions (using Dapper)"));
-
-        //app.MapGet("products/{id}/compilations", [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async (Guid id, HttpContext context) => {
-
-        //}).WithMetadata(new SwaggerOperationAttribute("Get product compilations (using Dapper)"));
-
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                var pricings = await productRepository.AddProductPrices(productId, productPriceBase, userClaim);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{pricings}"), null);
+            }
+        }
     }
 }
