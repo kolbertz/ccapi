@@ -73,8 +73,8 @@ public class Program
                 {
                     AuthorizationCode = new OpenApiOAuthFlow
                     {
-                        TokenUrl = new Uri(@"https://localhost:7092/Home/token"),
-                        AuthorizationUrl = new Uri(@"https://localhost:7092/Home/Authorize"),
+                        TokenUrl = new Uri(@"http://20.103.171.17:80/token"),
+                        AuthorizationUrl = new Uri(@"http://20.103.171.17:80/Authorize"),
                     }
                 },
                 Scheme = "gloabalAuth",

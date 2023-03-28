@@ -74,8 +74,8 @@ public class Program
                 {
                     AuthorizationCode = new OpenApiOAuthFlow
                     {
-                        TokenUrl = new Uri(@"https://localhost:7092/Home/token"),
-                        AuthorizationUrl = new Uri(@"https://localhost:7092/Home/Authorize"),
+                        TokenUrl = new Uri(@"http://20.103.171.17:80/token"),
+                        AuthorizationUrl = new Uri(@"http://20.103.171.17:80/Authorize"),
                     }
                 },
                 Scheme = "gloabalAuth",
@@ -132,11 +132,11 @@ public class Program
             {
                 options.Audience = "all";
                 options.ClaimsIssuer = "localhost";
-                options.Authority = "https://localhost:7092";
+                options.Authority = "http://20.103.171.17:80";
                 options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
                 {
                 //AuthorizationEndpoint = @"https://localhost:7092/Home/Authorize\",
-                            TokenEndpoint = @"https://localhost:7092/Home/Token",
+                            TokenEndpoint = @"http://20.103.171.17:80/Token",
                         };
                         options.RequireHttpsMetadata = false;
                         SecurityKey signingKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["TokenAuthentication:SecretKey"]));

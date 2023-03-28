@@ -50,12 +50,12 @@ namespace CCAuthServer.Services
                 return response;
             }
 
-            if (!authorizationRequest.redirect_uri.IsRedirectUriStartWithHttps() && !httpContextAccessor.HttpContext.Request.IsHttps)
-            {
-                response.Error = ErrorTypeEnum.InvalidRequest.GetEnumDescription();
-                response.ErrorDescription = "redirect_url is not secure, MUST be TLS";
-                return response;
-            }
+            //if (!authorizationRequest.redirect_uri.IsRedirectUriStartWithHttps() && !httpContextAccessor.HttpContext.Request.IsHttps)
+            //{
+            //    response.Error = ErrorTypeEnum.InvalidRequest.GetEnumDescription();
+            //    response.ErrorDescription = "redirect_url is not secure, MUST be TLS";
+            //    return response;
+            //}
 
 
             // check the return url is match the one that in the client store

@@ -68,7 +68,7 @@
                             var username = $('input[name="UserName"]').val();
                             $.ajax({
                                 type: "GET",
-                                url: "/Home/GetSystems",
+                                url: "/systems",
                                 data: {username : username},
                                 success: function(data) {
                                     $('#nextBtn').hide();

@@ -3,7 +3,6 @@ using CCAuthServer.Services.CodeService;
 using CCAuthServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using CCAuthServer.Context;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Web.Helpers;
 
 namespace CCAuthServer.Controllers
