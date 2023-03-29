@@ -62,4 +62,5 @@ namespace CCCategoryService.Dtos
 
         public CategoryPoolBase() { }
     }
+       
 }

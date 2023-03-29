@@ -12,6 +12,8 @@ namespace CCCategoryService.Interface
 
         Task<CategoryPool> GetCategoryPoolByIdAsync(Guid id, UserClaim userClaim);
 
+        Task<CategoryPoolWithCategoryList> GetCategoryPoolAsyncMoreInfo(Guid id, UserClaim userClaim);
+
         Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPool, UserClaim userClaim);
 
         Task<int> UpdateCategoryPoolAsync(CategoryPool categoryPool, UserClaim userClaim);
