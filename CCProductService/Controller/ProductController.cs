@@ -391,12 +391,12 @@ namespace CCProductService.Controller
         }
 
         [HttpPost]
-        [Route("{id}/pricings")]
+        [Route("{id}/categories")]
         [ProducesResponseType(201)]
         [ProducesResponseType(422)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         [SwaggerOperation("Sets Category By ProductID")]
-        public async Task<IActionResult> SetCategoryByProductId(Guid productId, List<ProductPriceBase> productPriceBase)
+        public async Task<IActionResult> SetCategoryByProductId(Guid productId, ProductCategory productCategory)
         {
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -407,9 +407,39 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                var pricings = await productRepository.AddProductPrices(productId, productPriceBase, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{pricings}"), null);
+                var temp = await productRepository.SetCategoryByProductId(productId, productCategory, userClaim);
+                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{temp}"), null);
             }
+        }
+
+        [HttpPut]
+        [SwaggerOperation("Updates Category By ProductID")]
+        public async Task<IActionResult> UpdateCategoryByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
+        {
+            if ( id != productCategory.ProductId)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                if ( await productRepository.UpdateCategoryByProductId(id,productCategory, userClaim).ConfigureAwait(false) >0 )
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+                
+            }
+
         }
     }
 }

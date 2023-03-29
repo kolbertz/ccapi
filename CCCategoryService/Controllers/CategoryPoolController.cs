@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CCCategoryService.Controllers
 {
@@ -23,6 +24,7 @@ namespace CCCategoryService.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation("Get a list with CategoryPool items (using Dapper)")]
         public async Task<IActionResult> Get()
         {
             try
@@ -46,6 +48,7 @@ namespace CCCategoryService.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [SwaggerOperation("Gets a CategoryPool by Id (using Dapper)")]
         public async Task<IActionResult> Get(Guid id)
         {
             UserClaim userClaim = null;
@@ -70,10 +73,38 @@ namespace CCCategoryService.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{id}/moreInfo")]
+        [SwaggerOperation("Gets a CategoryPool by Id with more Info")]
+        public async Task<IActionResult> GetMore(Guid id)
+        {
+            UserClaim userClaim = null;
+
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (ICategoryPoolRepository categoryPoolRepository = _serviceProvider.GetService<ICategoryPoolRepository>())
+            {
+                categoryPoolRepository.Init(userClaim.TenantDatabase);
+                CategoryPoolWithCategoryList categoryPoolDto = await categoryPoolRepository.GetCategoryPoolAsyncMoreInfo(id, userClaim).ConfigureAwait(false);
+                if (categoryPoolDto != null)
+                {
+                    return Ok(categoryPoolDto);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ServiceFilter(typeof(ValidateModelAttribute))]
+        [SwaggerOperation("Adds a new CategoryPool ")]
         public async Task<IActionResult> Post(CategoryPoolBase categoryPoolDto)
         {
             try
@@ -102,6 +133,7 @@ namespace CCCategoryService.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerOperation("Updates a CategoryPool)")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, CategoryPool categoryPoolDto)
         {
@@ -135,6 +167,8 @@ namespace CCCategoryService.Controllers
 
         [HttpPatch]
         [Route("{id}")]
+        [SwaggerOperation("Patch a CategoryPool not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0 ")]
+
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument categoryPoolPatch)
         {
             try
@@ -164,6 +198,7 @@ namespace CCCategoryService.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("{id}")]
+        [SwaggerOperation("Deletes a CategoryPool ")]
         public async Task<IActionResult> Delete(Guid id)
         {
             try

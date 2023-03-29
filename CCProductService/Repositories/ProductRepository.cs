@@ -7,6 +7,7 @@ using CCProductService.Interface;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Diagnostics;
 using System.Dynamic;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CCProductService.Repositories
 {
@@ -258,8 +259,8 @@ namespace CCProductService.Repositories
                 "VALUES( @ProductId, @ProductPricePoolId, @ProductPriceListId, @ManualPrice);";
             InternalProductPrice internalProductPrice = new InternalProductPrice(productPriceBases);
             return _dbContext.ExecuteScalarAsync<Guid>(query, internalProductPrice);
-            
-        }               
+
+        }
 
 
         public Task<int> UpdateProductPrice(Guid id, ProductPriceBase productPriceBase, UserClaim userClaim)
@@ -378,5 +379,37 @@ namespace CCProductService.Repositories
             return (sysIdQuery, paramObj);
         }
 
+        public Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
+        {
+            var query = "INSERT INTO ProductCategory( ProductId, CategoryId) " +
+                //"OUTPUT Inserted.Id " +
+                "VALUES( @ProductId, @CategoryId);";
+           // InternalProductPrice internalProductPrice = new InternalProductPrice(productCategory);
+            return _dbContext.ExecuteScalarAsync<Guid>(query, productCategory);            
+
+        }
+
+        public async Task<int> UpdateCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
+        {
+            string categoryByQuery = string.Empty;
+            var paramObj = new ExpandoObject();
+
+            if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
+            {
+                categoryByQuery = " AND Product.ProductPoolId IN @poolIds";
+                paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
+            }
+
+            string updateQuery = " UPDATE ProductCategory SET CategoryId = @CategoryId " +
+                "SELECT * From Category  LEFT JOIN ProductCategory on ProductCategory.CategoryId = Category.Id  " +
+                "LEFT JOIN Product  on Product.Id = ProductCategory.ProductId " +
+                $"WHERE ProductId = @ProductId AND CategoryPoolId = @CategoryPoolId{categoryByQuery}";
+
+            paramObj.TryAdd("ProductId", id);
+            paramObj.TryAdd("CategoryPoolId", id);
+
+            return await _dbContext.ExecuteAsync(updateQuery, param: productCategory);
+        }
     }
+
 }

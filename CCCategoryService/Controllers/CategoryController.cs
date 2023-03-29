@@ -103,6 +103,8 @@ namespace CCCategoryService.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Updates a Category (using EF Core)")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Category categoryDto)
@@ -154,6 +156,7 @@ namespace CCCategoryService.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("{id}")]
         [SwaggerOperation("Deletes a Category ")]
         public async Task<IActionResult> Delete(Guid id)

@@ -50,6 +50,21 @@ namespace CCCategoryService.Repositories
             return null;
         }
 
+        public async Task<CategoryPoolWithCategoryList> GetCategoryPoolAsyncMoreInfo(Guid id, UserClaim userClaim)
+        {
+            var query = "SELECT  CategoryPoolId, Name AS CategoryPoolName,CategoryId,CategoryName AS CategoryNames FROM [CategoryString]  " +
+                "LEFT JOIN Category ON CategoryString.CategoryId = Category.Id " +
+                "LEFT JOIN CategoryPool ON Category.CategoryPoolId = CategoryPool.Id " +
+                " WHERE CategoryPool.Id= @CategoryPoolId";
+            //InternalCategoryPool internalCategoryPool = await _dbContext.QueryFirstOrDefaultAsync<InternalCategoryPool>(query, param:new {CategoryPoolId = id }).ConfigureAwait(false); 
+            //if (internalCategoryPool != null)
+            //{ 
+            //    return new CategoryPoolWithCategoryList();
+            //}
+            CategoryPoolWithCategoryList withCategoryList = await _dbContext.QueryFirstOrDefaultAsync<CategoryPoolWithCategoryList>(query, param: new { CategoryPoolId = id }).ConfigureAwait(false);
+            return withCategoryList;
+        }
+
         public Task<Guid> AddCategoryPoolAsync(CategoryPoolBase categoryPoolDto, UserClaim userClaim)
         {
             var query = "INSERT INTO CategoryPool( [Name], Description, ParentCategoryPoolId, SystemSettingsId, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser) " +

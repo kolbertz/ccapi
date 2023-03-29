@@ -21,6 +21,8 @@ namespace CCProductService.Interface
         Task<Guid> AddProductPrices(Guid id, List<ProductPriceBase> productPriceBases, UserClaim userClaim);
         Task<int> UpdateProductPrice(Guid id, ProductPriceBase productPriceBase, UserClaim userClaim);
         Task<int> DeleteProductPrice(Guid id);
+        Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim);
+        Task<int> UpdateCategoryByProductId(Guid id,ProductCategory proCategory, UserClaim userClaim);
     }
 }
  
