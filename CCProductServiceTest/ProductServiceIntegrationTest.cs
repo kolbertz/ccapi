@@ -501,8 +501,46 @@ namespace CCProductServiceTest
             {
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    var response = await client.DeleteAsync("/api/v2/product/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
+                    HttpResponseMessage response = await client.DeleteAsync("/api/v2/product/82a4252e-c58f-49d0-8476-b7e1a5fa4b11");
                     Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async void ProductId_Get_Barcodes_return_200_And_Barcode_List()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await dbConnection.ExecuteAsync(ProductQueries.SetPriductBarcode(productId, "Barcode" + i));
+                        }
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpResponseMessage response = await client.GetAsync($"/api/v2/product/{productId}/barcodes");
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    List<string> barcodes = JsonConvert.DeserializeObject<List<string>>(await  response.Content.ReadAsStringAsync());
+                    Assert.Equal(3, barcodes.Count);
+                    Assert.Equal("Barcode1", barcodes[1]);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductBarcode());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                    }
+                }
             }
         }
     }

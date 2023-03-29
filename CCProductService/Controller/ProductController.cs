@@ -224,6 +224,8 @@ namespace CCProductService.Controller
 
         [HttpGet]
         [Route("{id}/barcodes")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        [ProducesResponseType(404)]
         [SwaggerOperation("Get a list of barcodes for the product")]
         public async Task<IActionResult> GetProductBarcodes(Guid id)
         {
@@ -237,7 +239,11 @@ namespace CCProductService.Controller
             {
                 productRepository.Init(userClaim.TenantDatabase);
                 IEnumerable<string> barcodes = await productRepository.GetBarcodesAsync(id, userClaim);
-                return Ok(barcodes);
+                if (barcodes != null && barcodes.Count() > 0)
+                {
+                    return Ok(barcodes);
+                }
+                return NotFound();
             }
         }
 
@@ -245,6 +251,7 @@ namespace CCProductService.Controller
         [Route("{id}/pricings")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ProductPrice>))]
         [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [SwaggerOperation("Get a list of the current prices for the product")]
         public async Task<IActionResult> GetProductPricings(Guid id)
         {
@@ -257,8 +264,12 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                var pricings = await productRepository.GetProductPrices(id, userClaim);
-                return Ok(pricings);
+                IEnumerable<ProductPrice> pricings = await productRepository.GetProductPrices(id, userClaim);
+                if (pricings != null && pricings.Count() > 0)
+                {
+                    return Ok(pricings);
+                }
+                return NotFound();
             }
         }
 
