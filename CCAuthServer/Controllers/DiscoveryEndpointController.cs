@@ -11,9 +11,9 @@ namespace CCAuthServer.Controllers
         {
             var response = new DiscoveryResponse
             {
-                issuer = "https://localhost:7092",
-                authorization_endpoint = "https://localhost:7092/Home/Authorize",
-                token_endpoint = "https://localhost:7092/Home/Token",
+                issuer = "http://20.103.171.17:80",
+                authorization_endpoint = "http://20.103.171.17:80/Authorize",
+                token_endpoint = "http://20.103.171.17:80/Home/Token",
                 token_endpoint_auth_methods_supported = new string[] { "client_secret_basic", "private_key_jwt" },
                 token_endpoint_auth_signing_alg_values_supported = new string[] { "RS256", "ES256" },
 
@@ -34,7 +34,7 @@ namespace CCAuthServer.Controllers
                     "family_name", "nickname", "profile", "picture", "website", "email", "email_verified",
                     "locale", "zoneinfo" },
                 claims_parameter_supported = true,
-                service_documentation = "https://localhost:7092/connect/service_documentation.html",
+                service_documentation = "http://20.103.171.17:80/connect/service_documentation.html",
                 ui_locales_supported = new string[] { "en-US", "en-GB", "en-CA", "fr-FR", "fr-CA" }
 
             };

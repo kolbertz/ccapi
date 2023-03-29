@@ -581,6 +581,41 @@
           "Port": 80
         }
       ]
+    },
+    {
+      "UpstreamPathTemplate": "/systems",
+      "DownstreamPathTemplate": "/home/GetSystems",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccauthserver-service",
+          "Port": 80
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/home/login",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/home/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccauthserver-service",
+          "Port": 80
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/home/login",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/home/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ccauthserver-service",
+          "Port": 80
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [
