@@ -357,7 +357,7 @@ namespace CCProductServiceTest
                 HttpClient client = application.CreateClient();
                 CreateBasicClientWithAuth(client);
                 var response = await client.GetAsync("/api/v2/product/fab8c985-6147-4eba-b2c7-5f7012c4aeeb");
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
 
@@ -538,6 +538,86 @@ namespace CCProductServiceTest
                     {
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductBarcode());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public async void ProductId_Get_Barcodes_return_404_if_product_exists_but_no_barcodes()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpResponseMessage response = await client.GetAsync($"/api/v2/product/{productId}/barcodes");
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductBarcode());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public async void ProductId_Get_Pricings_return_200_And_PriceList()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId, productPricePoolId, productPriceListOne, productPriceListTwo, productPriceOne, productPriceTwo;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        productPricePoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPricePool("TestPool", "Beschreibung"));
+                        productPriceListOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPriceList("TestList1", 1, 1));
+                        productPriceListTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPriceList("TestList2", 2, 2));
+                        productPriceOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateProductPrice(productId, productPricePoolId, productPriceListOne));
+                        productPriceTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateProductPrice(productId, productPricePoolId, productPriceListTwo));
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.PopulateProductPriceDate(), param: new { priceId = productPriceOne, startDate = new DateTimeOffset(2023, 01, 01, 0, 0, 0, TimeSpan.FromMinutes(60)), value = 4.50m });
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.PopulateProductPriceDate(), param: new { priceId = productPriceOne, startDate = new DateTimeOffset(2099, 01, 01, 0, 0, 0, TimeSpan.FromMinutes(60)), value = 3.50m });
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.PopulateProductPriceDate(), param: new { priceId = productPriceTwo, startDate = new DateTimeOffset(2023, 02, 08, 0, 0, 0, TimeSpan.FromMinutes(60)), value = 1.00m });
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.PopulateProductPriceDate(), param: new { priceId = productPriceTwo, startDate = new DateTimeOffset(2099, 01, 01, 0, 0, 0, TimeSpan.FromMinutes(60)), value = 2.75m });
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    HttpResponseMessage response = await client.GetAsync($"/api/v2/product/{productId}/pricings");
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    List<ProductPrice> productPrices = JsonConvert.DeserializeObject<List<ProductPrice>>(await response.Content.ReadAsStringAsync());
+                    Assert.Equal(2, productPrices.Count());
+                    Assert.Equal(4.50m, productPrices[0].Price);
+                    Assert.Equal(new DateTimeOffset(2023, 01, 01, 0, 0, 0, TimeSpan.FromMinutes(60)), productPrices[0].StartDate);
+                    Assert.Equal(1.00m, productPrices[1].Price);
+                    Assert.Equal(new DateTimeOffset(2023, 02, 08, 0, 0, 0, TimeSpan.FromMinutes(60)), productPrices[1].StartDate);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPriceDates());
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPrices());
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPriceLists());
+                        await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPricePools());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                     }
                 }
