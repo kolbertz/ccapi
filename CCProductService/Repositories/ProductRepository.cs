@@ -49,20 +49,32 @@ namespace CCProductService.Repositories
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
             }
 
-            if (take.HasValue && skip.HasValue)
+            if (skip.HasValue ||take.HasValue)
             {
+                string takeQuery = string.Empty;
+                if (take.HasValue)
+                {
+                    paramObj.TryAdd("fetch", take.Value);
+                    takeQuery = " Fetch next @fetch Rows only";
+                    if (!skip.HasValue)
+                    {
+                        skip = 0;
+                    }
+                }
+
+                string skipQuery = " OFFSET @offset Rows";
+                paramObj.TryAdd("offset", skip.Value);
+
                 query = $"SELECT temp.Id, ProductPoolId, ProductKey, IsBlocked, Balance, BalanceTare, BalancePriceUnit, BalancePriceUnitValue, [Value] AS Standardprice," +
                     $" ProductString.ProductId, ProductString.Language, ProductString.ShortName, ProductString.LongName, ProductString.Description " +
                     $"FROM (SELECT prod.Id, prod.ProductPoolId, prod.ProductKey, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, ProductPriceDate.Value, " +
                     $"ROW_NUMBER() OVER (Partition by prod.Id order by StartDate desc) as row " +
                     $"FROM (SELECT Product.Id, Product.ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue " +
-                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery} order by Product.ProductKey OFFSET @offset Rows Fetch next @fetch Rows only) as prod " +
+                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery} order by Product.ProductKey{skipQuery}{takeQuery}) as prod " +
                     $"LEFT JOIN ProductPrice ON prod.Id = ProductPrice.ProductId LEFT JOIN ProductPricePoolToPriceList ON ProductPricePoolToPriceList.ProductPricePoolId = ProductPrice.ProductPricePoolId " +
                     $"LEFT JOIN ProductPriceDate ON ProductPriceDate.ProductPriceId = ProductPrice.Id WHERE ProductPricePoolToPriceList.IsDefault = 1 OR ProductPricePoolToPriceList.IsDefault IS NULL) as temp " +
                     $"LEFT JOIN ProductString on ProductString.ProductId = temp.Id where temp.row = 1";
 
-                paramObj.TryAdd("offset", skip.Value);
-                paramObj.TryAdd("fetch", take.Value);
             }
             else
             {
@@ -245,7 +257,7 @@ namespace CCProductService.Repositories
                       $"WHERE ProductPrice.ProductId = @productId AND ProductPriceDate.StartDate <= Convert(date, @currentDate) {productPoolQuery}) " +
                       "SELECT cte.ProductPricePoolId, ProductPricePool.Name as PricePoolName, cte.ProductPriceListId, ProductPriceList.Name as PriceListName, cte.ProductId, cte.StartDate, cte.Value, Currency.SymbolShort as CurrencySymbol " +
                       "FROM cte JOIN ProductPricePool ON ProductPricePool.Id = cte.ProductPricePoolId JOIN ProductPriceList ON ProductPriceList.Id = cte.ProductPriceListId " +
-                      "JOIN Currency ON Currency.Id = ProductPricePool.CurrencyId " +
+                      "LEFT JOIN Currency ON Currency.Id = ProductPricePool.CurrencyId " +
                       $"WHERE cte.row = 1{sysIdQuery}";
 
             paramObj.TryAdd("productId", id);

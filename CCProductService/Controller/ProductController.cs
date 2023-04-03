@@ -30,21 +30,30 @@ namespace CCProductService.Controller
         /// <param name="take"></param>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(ProductStandardPrice))]
+        [ProducesResponseType(204)]
         [SwaggerOperation("Get a list with Product items")]
         public async Task<IActionResult> Get(int? skip, int? take)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    IEnumerable<ProductStandardPrice> productsList = null;
+                    productRepository.Init(userClaim.TenantDatabase);
+                    productsList = await productRepository.GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
+                    return Ok(productsList);
+                }
+            }
+            catch (Exception)
             {
-                IEnumerable<ProductStandardPrice> productsList = null;
-                productRepository.Init(userClaim.TenantDatabase);
-                productsList = await productRepository.GetAllProducts(take, skip, userClaim).ConfigureAwait(false);
-                return Ok(productsList);
+                return StatusCode(500);
             }
         }
 
@@ -55,20 +64,33 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(200, Type = typeof(ProductBase))]
+        [ProducesResponseType(404)]
         [SwaggerOperation("Gets a Product by Id")]
         public async Task<IActionResult> Get(Guid id)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    ProductBase product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
+                    if (product != null)
+                    {
+                        return Ok(product);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                ProductBase product = await productRepository.GetProductById(id, userClaim).ConfigureAwait(false);
-                return Ok(product);
+                return StatusCode(500);
             }
         }
 
@@ -79,15 +101,13 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [SwaggerOperation("Adds a new Product")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Post(ProductBase productDto)
         {
             try
             {
-
-
                 UserClaim userClaim = null;
                 Guid? newProductId = null;
                 if (HttpContext.User.Claims != null)
@@ -104,7 +124,6 @@ namespace CCProductService.Controller
             }
             catch (Exception)
             {
-
                 return StatusCode(500);
             }
         }
@@ -117,6 +136,10 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPut]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Updates a Product")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] Product productDto)
@@ -153,6 +176,8 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPatch]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPatch)
         {
@@ -193,6 +218,7 @@ namespace CCProductService.Controller
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation("Delete a Product")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -224,39 +250,66 @@ namespace CCProductService.Controller
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductCategory>))]
+        [ProducesResponseType(404)]
         [Route("{id}/categories")]
         [SwaggerOperation("Get a list of Categories for a product")]
-        public Task<IEnumerable<ProductCategory>> GetProductCategories(Guid id)
+        public async Task<IActionResult> GetProductCategories(Guid id)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id, userClaim).ConfigureAwait(false);
+                    if (productCategories != null && productCategories.Count() > 0)
+                    {
+                        return Ok(productCategories);
+                    }
+                    return NotFound(); 
+                }
+            }
+            catch (Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                return productRepository.GetCategoriesAsnyc(id, userClaim);
+                return StatusCode(500);
             }
         }
 
         [HttpGet]
         [Route("{id}/barcodes")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        [ProducesResponseType(404)]
         [SwaggerOperation("Get a list of barcodes for the product")]
         public async Task<IActionResult> GetProductBarcodes(Guid id)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<string> barcodes = await productRepository.GetBarcodesAsync(id, userClaim);
+                    if (barcodes != null && barcodes.Count() > 0)
+                    {
+                        return Ok(barcodes);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                IEnumerable<string> barcodes = await productRepository.GetBarcodesAsync(id, userClaim);
-                return Ok(barcodes);
+                return StatusCode(500);
             }
         }
 
@@ -264,6 +317,7 @@ namespace CCProductService.Controller
         [Route("{id}/pricings")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ProductPrice>))]
         [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [SwaggerOperation("Get a list of the current prices for the product")]
         public async Task<IActionResult> GetProductPricings(Guid id,string Datestring)
         {            
@@ -316,17 +370,24 @@ namespace CCProductService.Controller
         [SwaggerOperation("Sets prices for the product")]
         public async Task<IActionResult> SetProductPricings(Guid productId, List<ProductPriceBase> productPriceBase)
         {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    var pricings = await productRepository.AddProductPrices(productId, productPriceBase, userClaim);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{pricings}"), null);
+                }
+            }
+            catch (Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                var pricings = await productRepository.AddProductPrices(productId, productPriceBase, userClaim);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{pricings}"), null);
+                return StatusCode(500);
             }
         }
 
@@ -340,20 +401,30 @@ namespace CCProductService.Controller
         [SwaggerOperation("PutMethod: Updates a ProductPrice via put request")]
         public async Task<IActionResult> Put(Guid productId, ProductPriceBase productPriceBase)
         {
-            if (productId != productPriceBase.ProductId)
+            try
             {
-                return BadRequest("The id inside the body do not match the query parameter");
+                if (productId != productPriceBase.ProductId)
+                {
+                    return BadRequest("The id inside the body do not match the query parameter");
+                }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    if (await productRepository.UpdateProductPrice(productId, productPriceBase, userClaim).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    return NotFound();
+                }
             }
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            catch (Exception)
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
-            {
-                productRepository.Init(userClaim.TenantDatabase);
-                await productRepository.UpdateProductPrice(productId, productPriceBase, userClaim).ConfigureAwait(false);
-                return NoContent();
+                return StatusCode(500);
             }
         }
 

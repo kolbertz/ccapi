@@ -13,7 +13,7 @@ namespace CCAuthServer.Controllers
             {
                 issuer = "http://20.103.171.17:80",
                 authorization_endpoint = "http://20.103.171.17:80/Authorize",
-                token_endpoint = "http://20.103.171.17:80/Home/Token",
+                token_endpoint = "http://20.103.171.17:80/Token",
                 token_endpoint_auth_methods_supported = new string[] { "client_secret_basic", "private_key_jwt" },
                 token_endpoint_auth_signing_alg_values_supported = new string[] { "RS256", "ES256" },
 

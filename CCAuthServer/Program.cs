@@ -24,6 +24,7 @@ internal class Program
         var app = builder.Build();
         app.UseStaticFiles();
         app.UseRouting();
+
         app.UseCors(builder => builder
             .AllowAnyOrigin()
             .AllowAnyMethod()
@@ -32,7 +33,7 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseEndpoints(endpoints =>
+        _ = app.UseEndpoints(endpoints =>
         {
             _ = endpoints.MapDefaultControllerRoute();
         });

@@ -26,5 +26,28 @@ namespace CCApiTestLibrary.PopulateQueries
         {
             return "DELETE FROM ProductPricePool";
         }
+
+        public static string PopulateProductPrice(Guid productId, Guid poolId, Guid listId)
+        {
+            return $"INSERT INTO ProductPrice(ProductId, ProductPricePoolId, ProductPriceListId, ManualPrice) " +
+                $"OUTPUT INSERTED.Id " +
+                $"VALUES('{productId}', '{poolId}', '{listId}', 0)";
+        }
+
+        public static string DeleteProductPrices()
+        {
+            return "DELETE FROM ProductPrice";
+        }
+
+        public static string PopulateProductPriceDate()
+        {
+            return $"INSERT INTO ProductPriceDate(ProductPriceId, StartDate, [Value]) " +
+                $"VALUES(@priceId, @startDate, @value)";
+        }
+
+        public static string DeleteProductPriceDates()
+        {
+            return "DELETE FROM ProductPriceDate";
+        }
     }
 }
