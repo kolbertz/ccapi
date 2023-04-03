@@ -1,4 +1,6 @@
-﻿namespace CCCategoryService.Dtos.Enums
+﻿using System.Runtime.CompilerServices;
+
+namespace CCCategoryService.Dtos.Enums
 {
     /// <summary>
         /// The types used for category pools
@@ -18,5 +20,11 @@
                                          /// The pool type menu plan (menu plan selections)
                                          /// </summary>
         PoolTypeMenuPlan = 4,
-    }
+
+        
+        
+    }   
+    
+    
+
 }

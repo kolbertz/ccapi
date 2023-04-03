@@ -114,6 +114,7 @@ namespace CCProductService.Repositories
 
             string query = $"SELECT Product.Id, ProductKey, ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, " +
                 $"ProductString.LongName, ProductString.Description FROM Product JOIN ProductString on Product.Id = ProductString.ProductId " +
+                $"JOIN ProductPool ON Product.ProductPoolId = ProductPool.Id" +
                 $"WHERE Product.Id = @ProductId{sysIdQuery}{productPoolQuery}";
 
             paramObj.TryAdd("ProductId", id);
@@ -215,12 +216,13 @@ namespace CCProductService.Repositories
             return _dbContext.QueryAsync<string>(query, param: new { ProductId = id });
         }
 
-        public Task<IEnumerable<ProductPrice>> GetProductPrices(Guid id, UserClaim userClaim)
+        public Task<IEnumerable<ProductPrice>> GetProductPrices(Guid id, DateTimeOffset currentDate, UserClaim userClaim)
         {
             ExpandoObject paramObj = new ExpandoObject();
             string sysIdQuery = string.Empty;
             string productPoolQuery = string.Empty;
-
+            string currentDateQuery = string.Empty;
+                
             if (userClaim.SystemId.HasValue)
             {
                 sysIdQuery = " AND ProductPricePool.SystemSettingsId = @SysId";
@@ -233,11 +235,14 @@ namespace CCProductService.Repositories
                 paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
             }
 
+            
+            paramObj.TryAdd("currentDate",currentDate);
+
             var query = "with cte as " +
                       "(Select ProductPrice.ProductId, ProductPriceDate.StartDate, ProductPriceDate.Value, ProductPrice.ProductPricePoolId, ProductPrice.ProductPriceListId, " +
                       "ROW_NUMBER() OVER (PARTITION BY ProductPrice.Id ORDER BY ProductPriceDate.StartDate desc) as row " +
                       "FROM ProductPrice JOIN ProductPriceDate ON ProductPrice.Id = ProductPriceDate.ProductPriceId JOIN Product ON Product.Id = ProductPrice.ProductId " +
-                      $"WHERE ProductPrice.ProductId = @productId AND ProductPriceDate.StartDate <= Convert(date, GetDate()){productPoolQuery}) " +
+                      $"WHERE ProductPrice.ProductId = @productId AND ProductPriceDate.StartDate <= Convert(date, @currentDate) {productPoolQuery}) " +
                       "SELECT cte.ProductPricePoolId, ProductPricePool.Name as PricePoolName, cte.ProductPriceListId, ProductPriceList.Name as PriceListName, cte.ProductId, cte.StartDate, cte.Value, Currency.SymbolShort as CurrencySymbol " +
                       "FROM cte JOIN ProductPricePool ON ProductPricePool.Id = cte.ProductPricePoolId JOIN ProductPriceList ON ProductPriceList.Id = cte.ProductPriceListId " +
                       "JOIN Currency ON Currency.Id = ProductPricePool.CurrencyId " +
@@ -250,6 +255,59 @@ namespace CCProductService.Repositories
                 return new ProductPrice(pool, list, productPrice);
             },
                 splitOn: "ProductPriceListId, ProductId", param: paramObj);
+        }
+
+        public Task<IEnumerable<ProductPrice>> GetPricingHistory(Guid id, string start, string end, UserClaim userClaim)
+        {
+            ExpandoObject paramObj = new ExpandoObject();
+            string sysIdQuery = string.Empty;
+            string productPoolQuery = string.Empty;
+            string startDateQuery = string.Empty;
+            string endDateQuery = string.Empty;
+
+            if (userClaim.SystemId.HasValue)
+            {
+                sysIdQuery = " AND ProductPricePool.SystemSettingsId = @SysId";
+                paramObj.TryAdd("SysId", userClaim.SystemId);
+            }
+
+            if (userClaim.ProductPoolIds != null && userClaim.ProductPoolIds.Count() > 0)
+            {
+                productPoolQuery = " AND Product.ProductPoolId IN @poolIds";
+                paramObj.TryAdd("poolIds", userClaim.ProductPoolIds.ToArray());
+            }
+            if (DateTimeOffset.TryParse( start, out DateTimeOffset startDate))
+            {
+                startDateQuery = " AND ProductPriceDate.StartDate >= CONVERT(date,@startDate)";
+                paramObj.TryAdd("startDate", startDate);
+            }
+            if (DateTimeOffset.TryParse(end, out DateTimeOffset endDate)) 
+            {
+                endDateQuery = " AND ProductPriceDate.StartDate <= CONVERT(date,@endDate )";
+                paramObj.TryAdd("endDate", endDate);
+            }
+
+            
+
+            var query = "with cte as " +
+                      "(Select ProductPrice.ProductId, ProductPriceDate.StartDate, ProductPriceDate.Value, ProductPrice.ProductPricePoolId, ProductPrice.ProductPriceListId, " +
+                      "ROW_NUMBER() OVER (PARTITION BY ProductPrice.Id ORDER BY ProductPriceDate.StartDate desc) as row " +
+                      "FROM ProductPrice JOIN ProductPriceDate ON ProductPrice.Id = ProductPriceDate.ProductPriceId JOIN Product ON Product.Id = ProductPrice.ProductId " +
+                      $"WHERE ProductPrice.ProductId = @productId{startDateQuery}{endDateQuery}" +                     
+                      $"{productPoolQuery}) " +
+                      "SELECT cte.ProductPricePoolId, ProductPricePool.Name as PricePoolName, cte.ProductPriceListId, ProductPriceList.Name as PriceListName, cte.ProductId, cte.StartDate, cte.Value, Currency.SymbolShort as CurrencySymbol " +
+                      "FROM cte JOIN ProductPricePool ON ProductPricePool.Id = cte.ProductPricePoolId JOIN ProductPriceList ON ProductPriceList.Id = cte.ProductPriceListId " +
+                      "JOIN Currency ON Currency.Id = ProductPricePool.CurrencyId " +
+                      $"WHERE cte.row = 1{sysIdQuery}";
+
+            paramObj.TryAdd("productId", id);
+
+            return _dbContext.QueryAsync<InternalProductPricePool, InternalProductPriceList, InternalProductPrice, ProductPrice>(query, (pool, list, productPrice) =>
+            {
+                return new ProductPrice(pool, list, productPrice);
+            },
+                splitOn: "ProductPriceListId, ProductId", param: paramObj);
+
         }
 
         public Task<Guid> AddProductPrices(Guid id, List<ProductPriceBase> productPriceBases, UserClaim userClaim)
@@ -382,7 +440,7 @@ namespace CCProductService.Repositories
         public Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
         {
             var query = "INSERT INTO ProductCategory( ProductId, CategoryId) " +
-                //"OUTPUT Inserted.Id " +
+               // "OUTPUT Inserted.Id " +
                 "VALUES( @ProductId, @CategoryId);";
            // InternalProductPrice internalProductPrice = new InternalProductPrice(productCategory);
             return _dbContext.ExecuteScalarAsync<Guid>(query, productCategory);            

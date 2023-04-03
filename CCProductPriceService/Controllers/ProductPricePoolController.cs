@@ -155,7 +155,14 @@ namespace CCProductPriceService.Controllers
             {
                 productPricePoolRepository.Init(userClaim.TenantDatabase);
                 dto = await productPricePoolRepository.PatchPricePoolAsync(id, jsonPatch, userClaim).ConfigureAwait(false);
-                return Ok(dto);
+                if(dto != null)
+                {
+                    return Ok(dto);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
         }
 
@@ -182,7 +189,7 @@ namespace CCProductPriceService.Controllers
                     }
                 }
             }
-            catch (Exception ex) { return StatusCode(500); }
+            catch (Exception) { return StatusCode(500); }
 
 
         }

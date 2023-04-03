@@ -79,22 +79,33 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Adds a new Product")]
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Post(ProductBase productDto)
         {
-            UserClaim userClaim = null;
-            Guid? newProductId = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+
+                UserClaim userClaim = null;
+                Guid? newProductId = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    newProductId = await productRepository.AddProductAsync(productDto, userClaim).ConfigureAwait(false);
+                    return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newProductId}"), null);
+                }
+            }
+            catch (Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                newProductId = await productRepository.AddProductAsync(productDto, userClaim).ConfigureAwait(false);
-                return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{newProductId}"), null);
+
+                return StatusCode(500);
             }
         }
 
@@ -145,25 +156,32 @@ namespace CCProductService.Controller
         [SwaggerOperation("Patch a Product not using Microsoft.AspNetCore.JsonPatch. See https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument productPatch)
         {
-            ProductBase productBase;
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+            try
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                ProductBase productBase;
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    productBase = await productRepository.PatchProductAsync(id, productPatch, userClaim).ConfigureAwait(false);
+                    if (productBase != null)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch(Exception)
             {
-                productRepository.Init(userClaim.TenantDatabase);
-                productBase = await productRepository.PatchProductAsync(id, productPatch, userClaim).ConfigureAwait(false);
-                if (productBase != null)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return StatusCode(500);
             }
         }
 
@@ -174,6 +192,7 @@ namespace CCProductService.Controller
         /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [SwaggerOperation("Delete a Product")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -246,20 +265,47 @@ namespace CCProductService.Controller
         [ProducesResponseType(200, Type = typeof(IEnumerable<ProductPrice>))]
         [ProducesResponseType(204)]
         [SwaggerOperation("Get a list of the current prices for the product")]
-        public async Task<IActionResult> GetProductPricings(Guid id)
-        {
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
+        public async Task<IActionResult> GetProductPricings(Guid id,string Datestring)
+        {            
+            if (DateTimeOffset.TryParse(Datestring, out DateTimeOffset currentDate))
             {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
 
-            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
-            {
-                productRepository.Init(userClaim.TenantDatabase);
-                var pricings = await productRepository.GetProductPrices(id, userClaim);
-                return Ok(pricings);
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    var pricings = await productRepository.GetProductPrices(id, currentDate, userClaim);
+                    return Ok(pricings);
+                }
+
             }
+            else
+            {
+                return BadRequest("The given DateString is not a valid Datetime");
+            }
+           
+        }
+
+        [HttpGet]
+        [Route("{id}/history")]
+        [SwaggerOperation("Get a history of prices for the product")]
+        public async Task<IActionResult> GetPricingHistory(Guid id, string startDate, string endDate)
+        {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    var pricingsHistory = await productRepository.GetPricingHistory(id, startDate, endDate, userClaim);
+                    return Ok(pricingsHistory);
+                }
         }
 
         [HttpPost]
@@ -416,7 +462,7 @@ namespace CCProductService.Controller
         [SwaggerOperation("Updates Category By ProductID")]
         public async Task<IActionResult> UpdateCategoryByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
         {
-            if ( id != productCategory.ProductId)
+            if (id != productCategory.ProductId)
             {
                 return BadRequest();
             }
@@ -429,7 +475,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                if ( await productRepository.UpdateCategoryByProductId(id,productCategory, userClaim).ConfigureAwait(false) >0 )
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, userClaim).ConfigureAwait(false) > 0)
                 {
                     return NoContent();
                 }
@@ -437,9 +483,10 @@ namespace CCProductService.Controller
                 {
                     return NotFound();
                 }
-                
+
             }
 
         }
+      
     }
 }
