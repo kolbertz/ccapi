@@ -1,4 +1,5 @@
-﻿using CCApiLibrary.Interfaces;
+﻿using CCApiLibrary.Enums;
+using CCApiLibrary.Interfaces;
 using CCApiLibrary.Models;
 using CCProductService.Data;
 using CCProductService.DTOs;
@@ -206,11 +207,38 @@ namespace CCProductService.Repositories
 
         }
 
-        public async Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id, UserClaim userClaim)
+        public async Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id,CategoryPoolType categoryPoolType, UserClaim userClaim)
         {
-            var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
-                "WHERE ProductCategory.ProductId = @ProductId";
-            IEnumerable<InternalCategoryString> categoryStrings = await _dbContext.QueryAsync<InternalCategoryString>(query, param: new { ProductId = id }).ConfigureAwait(false);
+
+            int poolType = new int();
+            if (categoryPoolType == CategoryPoolType.PoolTypeCategory)
+            {
+                /* Category Type 1 (Warengruppe)*/
+                poolType = (int)CategoryPoolType.PoolTypeCategory;                
+            }
+            else if (categoryPoolType == CategoryPoolType.PoolTypeTags)
+            {
+                /* Category Type 2 (Rabatte)*/
+                poolType = (int)CategoryPoolType.PoolTypeTags;
+            }
+            else if (categoryPoolType == CategoryPoolType.PoolTypeTax)
+            {
+                /* Category Type 3 (Steuerkennzeichen)*/
+                poolType = (int)CategoryPoolType.PoolTypeTax;
+            }
+                /* Category Type 4 (Allergene/Zusatzstoffe)*/
+            else if (categoryPoolType == CategoryPoolType.PoolTypeMenuPlan)
+            {
+                poolType = (int)CategoryPoolType.PoolTypeMenuPlan;
+            }
+
+            var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory " +
+                "JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
+                "JOIN Category ON CategoryString.CategoryId = Category.Id " +
+                "JOIN CategoryPool ON Category.CategoryPoolId = CategoryPool.Id " +
+                $"WHERE ProductCategory.ProductId = @ProductId AND CategoryPool.PoolType={poolType}";
+            
+            IEnumerable<InternalCategoryString> categoryStrings = await _dbContext.QueryAsync<InternalCategoryString>(query, param: new { PoolType = poolType, ProductId = id }).ConfigureAwait(false);
             return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategory
             {
                 CategoryId = c.Key,
@@ -220,6 +248,7 @@ namespace CCProductService.Repositories
                     Text = x.CategoryName
                 })
             });
+
         }
 
         public Task<IEnumerable<string>> GetBarcodesAsync(Guid id, UserClaim userClaim)
@@ -451,16 +480,39 @@ namespace CCProductService.Repositories
 
         public Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
         {
+           
             var query = "INSERT INTO ProductCategory( ProductId, CategoryId) " +
-               // "OUTPUT Inserted.Id " +
+                "OUTPUT Inserted.Id " +
                 "VALUES( @ProductId, @CategoryId);";
            // InternalProductPrice internalProductPrice = new InternalProductPrice(productCategory);
-            return _dbContext.ExecuteScalarAsync<Guid>(query, productCategory);            
+            return _dbContext.ExecuteScalarAsync<Guid>(query,  productCategory );
+
 
         }
 
-        public async Task<int> UpdateCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
+        public async Task<int> UpdateCategoryByProductId(Guid id, ProductCategory productCategory, CategoryPoolType categoryPoolType, UserClaim userClaim)
         {
+            int poolType = new int();
+            if (categoryPoolType == CategoryPoolType.PoolTypeCategory)
+            {
+                /* Category Type 1 (Warengruppe)*/
+                poolType = (int)CategoryPoolType.PoolTypeCategory;
+            }
+            else if (categoryPoolType == CategoryPoolType.PoolTypeTags)
+            {
+                /* Category Type 2 (Rabatte)*/
+                poolType = (int)CategoryPoolType.PoolTypeTags;
+            }
+            else if (categoryPoolType == CategoryPoolType.PoolTypeTax)
+            {
+                /* Category Type 3 (Steuerkennzeichen)*/
+                poolType = (int)CategoryPoolType.PoolTypeTax;
+            }
+            /* Category Type 4 (Allergene/Zusatzstoffe)*/
+            else if (categoryPoolType == CategoryPoolType.PoolTypeMenuPlan)
+            {
+                poolType = (int)CategoryPoolType.PoolTypeMenuPlan;
+            }
             string categoryByQuery = string.Empty;
             var paramObj = new ExpandoObject();
 
@@ -472,8 +524,9 @@ namespace CCProductService.Repositories
 
             string updateQuery = " UPDATE ProductCategory SET CategoryId = @CategoryId " +
                 "SELECT * From Category  LEFT JOIN ProductCategory on ProductCategory.CategoryId = Category.Id  " +
+                "LEFT JOIN CategoryPool on Category.CategoryPoolId = CategoryPool.Id "+
                 "LEFT JOIN Product  on Product.Id = ProductCategory.ProductId " +
-                $"WHERE ProductId = @ProductId AND CategoryPoolId = @CategoryPoolId{categoryByQuery}";
+                $"WHERE ProductId = @ProductId AND CategoryPoolId = @CategoryPoolId{categoryByQuery} AND CategoryPool.PoolType={poolType}";
 
             paramObj.TryAdd("ProductId", id);
             paramObj.TryAdd("CategoryPoolId", id);

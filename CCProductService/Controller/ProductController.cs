@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.CustomAttributes;
+using CCApiLibrary.Enums;
 using CCApiLibrary.Models;
 using CCProductService.DTOs;
 using CCProductService.Interface;
@@ -267,7 +268,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeCategory, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
@@ -333,7 +334,11 @@ namespace CCProductService.Controller
                 {
                     productRepository.Init(userClaim.TenantDatabase);
                     var pricings = await productRepository.GetProductPrices(id, currentDate, userClaim);
-                    return Ok(pricings);
+                    if (pricings != null)
+                    {
+                        return Ok(pricings);
+                    }
+                    return NotFound();
                 }
 
             }
@@ -546,7 +551,7 @@ namespace CCProductService.Controller
             using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
             {
                 productRepository.Init(userClaim.TenantDatabase);
-                if (await productRepository.UpdateCategoryByProductId(id, productCategory, userClaim).ConfigureAwait(false) > 0)
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, CategoryPoolType.PoolTypeCategory, userClaim).ConfigureAwait(false) > 0)
                 {
                     return NoContent();
                 }
@@ -558,6 +563,352 @@ namespace CCProductService.Controller
             }
 
         }
-      
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductCategory>))]
+        [ProducesResponseType(404)]
+        [Route("{id}/taxes")]
+        [SwaggerOperation("Get a list of taxes for a product")]
+        public async Task<IActionResult> GetProductTaxes(Guid id,CategoryPoolType categoryPoolType)
+        {
+            try
+            {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeTax, userClaim).ConfigureAwait(false);
+                    if (productCategories != null && productCategories.Count() > 0)
+                    {
+                        return Ok(productCategories);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductCategory>))]
+        [ProducesResponseType(404)]
+        [Route("{id}/tags")]
+        [SwaggerOperation("Get a list of tags for a product")]
+        public async Task<IActionResult> GetProductTags(Guid id)
+        {
+            try
+            {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeTags, userClaim).ConfigureAwait(false);
+                    if (productCategories != null && productCategories.Count() > 0)
+                    {
+                        return Ok(productCategories);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductCategory>))]
+        [ProducesResponseType(404)]
+        [Route("{id}/additives")]
+        [SwaggerOperation("Get a list of additives for a product")]
+        public async Task<IActionResult> GetProductAdditives(Guid id)
+        {
+            try
+            {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
+                    if (productCategories != null && productCategories.Count() > 0)
+                    {
+                        return Ok(productCategories);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ProductCategory>))]
+        [ProducesResponseType(404)]
+        [Route("{id}/allergens")]
+        [SwaggerOperation("Get a list of allergens for a product")]
+        public async Task<IActionResult> GetProductAllergens(Guid id)
+        {
+            try
+            {
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+                {
+                    productRepository.Init(userClaim.TenantDatabase);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
+                    if (productCategories != null && productCategories.Count() > 0)
+                    {
+                        return Ok(productCategories);
+                    }
+                    return NotFound();
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        //[HttpPost]
+        //[Route("{id}/taxes")]
+        //[ProducesResponseType(201)]
+        //[ProducesResponseType(422)]
+        //[ServiceFilter(typeof(ValidateModelAttribute))]
+        //[SwaggerOperation("Sets Taxes By ProductID")]
+        //public async Task<IActionResult> SetTaxesByProductId(Guid productId, ProductCategory productCategory)
+        //{
+        //    UserClaim userClaim = null;
+        //    if (HttpContext.User.Claims != null)
+        //    {
+        //        userClaim = new UserClaim(HttpContext.User.Claims);
+        //    }
+
+        //    using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+        //    {
+        //        productRepository.Init(userClaim.TenantDatabase);
+        //        var temp = await productRepository.SetCategoryByProductId(productId, productCategory,CategoryPoolType.PoolTypeTax, userClaim);
+        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{temp}"), null);
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("{id}/tags")]
+        //[ProducesResponseType(201)]
+        //[ProducesResponseType(422)]
+        //[ServiceFilter(typeof(ValidateModelAttribute))]
+        //[SwaggerOperation("Sets Tags By ProductID")]
+        //public async Task<IActionResult> SetTagsByProductId(Guid productId, ProductCategory productCategory)
+        //{
+        //    UserClaim userClaim = null;
+        //    if (HttpContext.User.Claims != null)
+        //    {
+        //        userClaim = new UserClaim(HttpContext.User.Claims);
+        //    }
+
+        //    using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+        //    {
+        //        productRepository.Init(userClaim.TenantDatabase);
+        //        var temp = await productRepository.SetCategoryByProductId(productId, productCategory,CategoryPoolType.PoolTypeTags, userClaim);
+        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{temp}"), null);
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("{id}/additives")]
+        //[ProducesResponseType(201)]
+        //[ProducesResponseType(422)]
+        //[ServiceFilter(typeof(ValidateModelAttribute))]
+        //[SwaggerOperation("Sets Additives By ProductID")]
+        //public async Task<IActionResult> SetAdditivesByProductId(Guid productId, ProductCategory productCategory)
+        //{
+        //    UserClaim userClaim = null;
+        //    if (HttpContext.User.Claims != null)
+        //    {
+        //        userClaim = new UserClaim(HttpContext.User.Claims);
+        //    }
+
+        //    using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+        //    {
+        //        productRepository.Init(userClaim.TenantDatabase);
+        //        var temp = await productRepository.SetCategoryByProductId(productId, productCategory, CategoryPoolType.PoolTypeMenuPlan, userClaim);
+        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{temp}"), null);
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("{id}/allergens")]
+        //[ProducesResponseType(201)]
+        //[ProducesResponseType(422)]
+        //[ServiceFilter(typeof(ValidateModelAttribute))]
+        //[SwaggerOperation("Sets Allergens By ProductID")]
+        //public async Task<IActionResult> SetAllergensByProductId(Guid productId, ProductCategory productCategory)
+        //{
+        //    UserClaim userClaim = null;
+        //    if (HttpContext.User.Claims != null)
+        //    {
+        //        userClaim = new UserClaim(HttpContext.User.Claims);
+        //    }
+
+        //    using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+        //    {
+        //        productRepository.Init(userClaim.TenantDatabase);
+        //        var temp = await productRepository.SetCategoryByProductId(productId, productCategory, CategoryPoolType.PoolTypeMenuPlan, userClaim);
+        //        return Created(new Uri($"{HttpContext.Request.GetEncodedUrl()}/{temp}"), null);
+        //    }
+        //}
+
+        [HttpPut]
+        [Route("{id}/tags")]
+        [SwaggerOperation("Updates Tags By ProductID")]
+        public async Task<IActionResult> UpdateTagsByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
+        {
+            if (id != productCategory.ProductId)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, CategoryPoolType.PoolTypeTags, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+
+        }
+
+        [HttpPut]
+        [Route("{id}/taxes")]
+        [SwaggerOperation("Updates Taxes By ProductID")]
+        public async Task<IActionResult> UpdateTaxesByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
+        {
+            if (id != productCategory.ProductId)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, CategoryPoolType.PoolTypeTax, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+
+        }
+
+        [HttpPut]
+        [Route("{id}/additives")]
+        [SwaggerOperation("Updates Additives By ProductID")]
+        public async Task<IActionResult> UpdateAdditivesByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
+        {
+            if (id != productCategory.ProductId)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+
+        }
+
+        [HttpPut]
+        [Route("{id}/allergens")]
+        [SwaggerOperation("Updates Allergens By ProductID")]
+        public async Task<IActionResult> UpdateAllergensByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
+        {
+            if (id != productCategory.ProductId)
+            {
+                return BadRequest();
+            }
+            UserClaim userClaim = null;
+            if (HttpContext.User.Claims != null)
+            {
+                userClaim = new UserClaim(HttpContext.User.Claims);
+            }
+
+            using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
+            {
+                productRepository.Init(userClaim.TenantDatabase);
+                if (await productRepository.UpdateCategoryByProductId(id, productCategory, CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false) > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+
+        }
+
+
+
+
+
     }
+
 }

@@ -25,4 +25,8 @@
     <ProjectReference Include="..\CCApiLibrary\CCApiLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Enums\" />
+  </ItemGroup>
+
 </Project>
