@@ -157,14 +157,14 @@ namespace CCAuthServer.Services
             request.GrantType = httpContextAccessor.HttpContext.Request.Form["grant_type"];
             request.RedirectUri = httpContextAccessor.HttpContext.Request.Form["redirect_uri"];
 
-            var checkClientResult = this.VerifyClientById(request.ClientId, true, request.ClientSecret);
+            CheckClientResult checkClientResult = this.VerifyClientById(request.ClientId, true, request.ClientSecret);
             if (!checkClientResult.IsSuccess)
             {
                 return new TokenResponse { Error = checkClientResult.Error, ErrorDescription = checkClientResult.ErrorDescription };
             }
 
             // check code from the Concurrent Dictionary
-            var clientCodeChecker = _codeStoreService.GetClientDataByCode(request.Code);
+            AuthorizationCode clientCodeChecker = _codeStoreService.GetClientDataByCode(request.Code);
             if (clientCodeChecker == null)
                 return new TokenResponse { Error = ErrorTypeEnum.InvalidGrant.GetEnumDescription() };
 
@@ -213,11 +213,7 @@ namespace CCAuthServer.Services
             var key_at = new SymmetricSecurityKey(Convert.FromBase64String(keyAlg));
             var credentials_at = new SigningCredentials(key_at, SecurityAlgorithms.HmacSha256);
 
-            var claims_at = clientCodeChecker.Subject.Claims.ToList();
-            claims_at.Add(new Claim("SystemId", "f2a46b64-ab2e-47b1-84fe-8cc91b241165"));
-            claims_at.Add(new Claim("UserId", "e5ae5497-c6d6-4f16-8292-50fd6bf64f7c"));
-            claims_at.Add(new Claim("UserGroupId", "05e652ff-c4b6-4966-8da4-08cb9d102081"));
-
+            List<Claim> claims_at = clientCodeChecker.Subject.Claims.ToList();
 
             var access_token = new JwtSecurityToken("localhost", "all", claims_at, signingCredentials: credentials_at,
                 expires: DateTime.UtcNow.AddMinutes(

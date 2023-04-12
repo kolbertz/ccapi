@@ -15,7 +15,7 @@ namespace CCApiLibrary.Models
 
         public UserClaim(IEnumerable<Claim> claims)
         {
-            string tenant = claims.Where(x => x.Type == "Tenant").Select(x => x.Value).FirstOrDefault();
+            string tenant = claims.Where(x => x.Type == "TenantId").Select(x => x.Value).FirstOrDefault();
             if (!string.IsNullOrEmpty(tenant))
             {
                 TenantId = new Guid(tenant);

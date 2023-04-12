@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Dapper;
 using System.Data;
 using System.Data.SqlClient;
+using static Dapper.SqlMapper;
 
 namespace CCApiLibrary.DbConnection
 {
@@ -42,6 +43,7 @@ namespace CCApiLibrary.DbConnection
 
         public void Init(string database)
         {
+            var conString = _configuration.GetConnectionString(database);
             _connection = new SqlConnection(_configuration.GetConnectionString(database));
             _connection.Open();
         }
@@ -109,7 +111,7 @@ namespace CCApiLibrary.DbConnection
             return _connection.QuerySingleAsync<T>(sql, param, _transaction);
         }
 
-        public Task QueryMultipleAsync(string sql, object param = null)
+        public Task<GridReader> QueryMultipleAsync(string sql, object param = null)
         {
             return _connection.QueryMultipleAsync(sql, param, _transaction);
         }

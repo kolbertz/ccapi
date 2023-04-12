@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace CCApiLibrary.Interfaces
 {
@@ -18,7 +19,7 @@ namespace CCApiLibrary.Interfaces
         Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, object param = null, string splitOn = null);
         Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, CancellationToken cancellationToken = default);
         Task<T> QuerySingleAsync<T>(string sql, object param = null, CancellationToken cancellationToken = default);
-        Task QueryMultipleAsync(string sql, object param = null);
+        Task<GridReader> QueryMultipleAsync(string sql, object param = null);
         
     }
 }

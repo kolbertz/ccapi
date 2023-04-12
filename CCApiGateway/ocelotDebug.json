@@ -577,6 +577,41 @@
           "Port": 7092
         }
       ]
+    },
+    {
+      "UpstreamPathTemplate": "/systems",
+      "DownstreamPathTemplate": "/home/GetSystems",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/home/login",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/home/login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/home/login",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/home/login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [
