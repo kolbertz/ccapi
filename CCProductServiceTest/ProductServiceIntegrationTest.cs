@@ -619,7 +619,7 @@ namespace CCProductServiceTest
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    HttpResponseMessage response = await client.GetAsync($"/api/v2/product/{productId}/pricings");
+                    HttpResponseMessage response = await client.GetAsync($"/api/v2/product/{productId}/pricings?Datestring=" + DateTime.UtcNow.Date.ToLongDateString());
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                     List<ProductPrice> productPrices = JsonConvert.DeserializeObject<List<ProductPrice>>(await response.Content.ReadAsStringAsync());
                     Assert.Equal(2, productPrices.Count());
