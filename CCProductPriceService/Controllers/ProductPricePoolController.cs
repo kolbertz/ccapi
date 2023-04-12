@@ -3,6 +3,7 @@ using CCApiLibrary.Models;
 using CCProductPriceService.DTOs;
 using CCProductPriceService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;

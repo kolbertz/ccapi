@@ -68,12 +68,12 @@ namespace CCAuthServer.Services.CodeService
         {
             //loginRequest.Code, loginRequest.RequestedScopes,
             //        loginRequest.UserName, nonce: loginRequest.Nonce, systemSettingsId: loginRequest.SystemSettingId
-            var oldValue = GetClientDataByCode(loginRequest.Code);
+            AuthorizationCode oldValue = GetClientDataByCode(loginRequest.Code);
 
             if (oldValue != null)
             {
                 // check the requested scopes with the one that are stored in the Client Store 
-                var client = _clientStore.Clients.Where(x => x.ClientId == oldValue.ClientId).FirstOrDefault();
+                Client client = _clientStore.Clients.Where(x => x.ClientId == oldValue.ClientId).FirstOrDefault();
 
                 if (client != null)
                 {

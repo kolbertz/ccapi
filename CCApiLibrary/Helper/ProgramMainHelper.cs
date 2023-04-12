@@ -174,12 +174,22 @@ namespace CCApiLibrary.Helper
             });
         }
 
+        public static void AddCors(IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllHeaders",
+                    builder => {
+                        builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                    });
+            });
+        }
+
         public static void UseCors(WebApplication app)
         {
-            app.UseCors(builder => builder
-             .AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader());
+            app.UseCors("AllowAllHeaders");
         }
     }
 }

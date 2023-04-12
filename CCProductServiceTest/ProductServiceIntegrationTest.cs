@@ -68,8 +68,9 @@ namespace CCProductServiceTest
                     {
                         dbConnection.Init(databaseKey);
                         // Populate DB
-                        Guid productOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
-                        Guid productTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(2));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        Guid productOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        Guid productTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(2, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productOne, "Produkt 1"));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productTwo, "Produkt 2"));
                     }
@@ -90,6 +91,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -108,6 +110,7 @@ namespace CCProductServiceTest
                     ProductBase productBase = new ProductBase
                     {
                         Key = 1,
+                        ProductPoolId = default(Guid),
                         ProductType = CCProductService.DTOs.Enums.ProductType.DefaultProduct,
                         ShortNames = new List<MultilanguageText>
                          {
@@ -146,11 +149,12 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId;
+                    Guid productId, productPoolId;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
                     HttpClient client = application.CreateClient();
@@ -169,6 +173,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -186,7 +191,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Put Test"));
                     }
                     HttpClient client = application.CreateClient();
@@ -194,6 +200,7 @@ namespace CCProductServiceTest
                     Product product = new Product
                     {
                         Id = productId,
+                        ProductPoolId = default(Guid),
                         ProductType = CCProductService.DTOs.Enums.ProductType.MenuProduct,
                         ShortNames = new List<MultilanguageText>
                         {
@@ -215,6 +222,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -232,7 +240,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Patch Test"));
                     }
                     HttpClient client = application.CreateClient();
@@ -271,6 +280,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -288,7 +298,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Patch Test"));
                     }
                     HttpClient client = application.CreateClient();
@@ -303,6 +314,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -319,6 +331,7 @@ namespace CCProductServiceTest
                     Product product = new Product
                     {
                         Id = new Guid("6bbd2f72-94a9-453b-aa28-cff702e8fa4a"),
+                        ProductPoolId = default(Guid),
                         ProductType = CCProductService.DTOs.Enums.ProductType.MenuProduct,
                         ShortNames = new List<MultilanguageText>
                         {
@@ -467,6 +480,7 @@ namespace CCProductServiceTest
                     Product product = new Product
                     {
                         Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
+                        ProductPoolId = default(Guid),
                         ProductType = CCProductService.DTOs.Enums.ProductType.MenuProduct,
                         ShortNames = new List<MultilanguageText>
                         {
@@ -518,7 +532,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         for (int i = 0; i < 3; i++)
                         {
                             await dbConnection.ExecuteAsync(ProductQueries.SetPriductBarcode(productId, "Barcode" + i));
@@ -539,6 +554,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductBarcode());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -556,7 +572,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
@@ -570,6 +587,7 @@ namespace CCProductServiceTest
                         dbConnection.Init(databaseKey);
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductBarcode());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }
@@ -587,7 +605,8 @@ namespace CCProductServiceTest
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1));
+                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         productPricePoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPricePool("TestPool", "Beschreibung"));
                         productPriceListOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPriceList("TestList1", 1, 1));
                         productPriceListTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductPriceQueries.PopulateSingleProductPriceList("TestList2", 2, 2));
@@ -619,6 +638,7 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPriceLists());
                         await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPricePools());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }
                 }
             }

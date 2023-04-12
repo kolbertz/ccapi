@@ -4,6 +4,7 @@ using CCApiLibrary.Models;
 using CCProductService.DTOs;
 using CCProductService.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -89,7 +90,7 @@ namespace CCProductService.Controller
                     return NotFound();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(500);
             }
@@ -320,7 +321,7 @@ namespace CCProductService.Controller
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [SwaggerOperation("Get a list of the current prices for the product")]
-        public async Task<IActionResult> GetProductPricings(Guid id,string Datestring)
+        public async Task<IActionResult> GetProductPricings(Guid id, string Datestring)
         {            
             if (DateTimeOffset.TryParse(Datestring, out DateTimeOffset currentDate))
             {

@@ -4,6 +4,7 @@ using CCApiLibrary.Models;
 using CCCategoryService.Dtos;
 using CCCategoryService.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;

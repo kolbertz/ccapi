@@ -6,6 +6,7 @@ using CCAuthServer.Context;
 using System.Web.Helpers;
 using System.Net;
 using CCAuthServer.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace CCAuthServer.Controllers
 {
@@ -54,7 +55,9 @@ namespace CCAuthServer.Controllers
             string pwdValue = loginRequest.Password + (userData.OldSaltKey ?? "mb3XdW5fN0ztctuJKbUv7XhD16") + "ePK2kOIZTDMePvPY0Yxb" + userData.Id.ToString();
             string encodePwd = string.IsNullOrEmpty(loginRequest.Password) ? string.Empty : Crypto.SHA256(pwdValue);
 
-            if (!string.IsNullOrEmpty(userData.Password) && string.CompareOrdinal(userData.Password.ToUpper(), encodePwd.ToUpper()) == 0)
+            int compared = string.CompareOrdinal(userData.Password.ToUpper(), encodePwd.ToUpper());
+
+            if (!string.IsNullOrEmpty(userData.Password) && compared == 0)
             {
                 AuthorizationCode result = await _codeStoreService.UpdatedClientDataByCode(loginRequest, userData).ConfigureAwait(false);
                 if (result != null)
@@ -64,7 +67,7 @@ namespace CCAuthServer.Controllers
                     return Redirect(loginRequest.RedirectUri);
                 }
             }
-            return RedirectToAction("Error", new { error = $"invalid_request: pwdValue: {pwdValue} - encodePwd: {encodePwd} - userData.Password: {userData.Password}" });
+            return RedirectToAction("Error", new { error = $"invalid_request: pwdValue: {pwdValue} - encodePwd: {encodePwd} - userData.Password: {userData.Password} - COMPARED: {compared} - CODE: {loginRequest.Code}" });
         }
 
         public IActionResult Authorize(AuthorizationRequest authorizationRequest)
