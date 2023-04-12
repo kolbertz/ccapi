@@ -51,7 +51,7 @@ namespace CCCategoryService.Repositories
 
             if (userClaim.CategoryPoolIds != null && userClaim.CategoryPoolIds.Count() > 0)
             {
-                categoryPoolQuery = " where Category.CategoryPoolId in @poolIds";
+                categoryPoolQuery = " AND Category.CategoryPoolId in @poolIds";
                 paramObj.TryAdd("poolIds", userClaim.CategoryPoolIds.ToArray());
             }
 

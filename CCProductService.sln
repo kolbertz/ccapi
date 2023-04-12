@@ -24,15 +24,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCProductPriceService", "CC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCCategoryService", "CCCategoryService\CCCategoryService.csproj", "{62F662EC-2754-440F-ACA4-5145407E8567}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCApiTestLibrary", "CCApiTestLibrary\CCApiTestLibrary.csproj", "{843EF91C-353F-4307-9DBF-49D09107B7E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCApiTestLibrary", "CCApiTestLibrary\CCApiTestLibrary.csproj", "{843EF91C-353F-4307-9DBF-49D09107B7E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCProductServiceTest", "CCProductServiceTest\CCProductServiceTest.csproj", "{D060709C-C055-416B-AD1E-CAAEC977249B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCProductServiceTest", "CCProductServiceTest\CCProductServiceTest.csproj", "{D060709C-C055-416B-AD1E-CAAEC977249B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCProductPoolServiceTest", "CCProductPoolServiceTest\CCProductPoolServiceTest.csproj", "{EC8F7394-450A-4527-A8C6-BE0550AC3706}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCProductPoolServiceTest", "CCProductPoolServiceTest\CCProductPoolServiceTest.csproj", "{EC8F7394-450A-4527-A8C6-BE0550AC3706}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCCategoryServiceTest", "CCCategoryServiceTest\CCCategoryServiceTest.csproj", "{87D549CE-FBB2-43B1-8F72-C0D4185B4B64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCCategoryServiceTest", "CCCategoryServiceTest\CCCategoryServiceTest.csproj", "{87D549CE-FBB2-43B1-8F72-C0D4185B4B64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCProductPriceServiceTest", "CCProductPriceServiceTest\CCProductPriceServiceTest.csproj", "{C84C9155-0666-49AF-A156-228610FCF76E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCProductPriceServiceTest", "CCProductPriceServiceTest\CCProductPriceServiceTest.csproj", "{C84C9155-0666-49AF-A156-228610FCF76E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

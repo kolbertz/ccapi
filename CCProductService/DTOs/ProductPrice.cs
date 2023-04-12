@@ -1,5 +1,7 @@
 ﻿using CCApiLibrary.Models;
 using CCProductService.Data;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace CCProductService.DTOs
 {
@@ -10,10 +12,11 @@ namespace CCProductService.DTOs
         public Guid PricePoolId { get; set; }
 
         public Guid PriceListId { get; set; }
-
-        public DateTimeOffset StartDate { get; set; }
+        
+        public DateTimeOffset? StartDate { get; set; }
 
         public decimal Price { get; set; }
+       
     }
 
     public class ProductPriceDate
@@ -44,7 +47,8 @@ namespace CCProductService.DTOs
             PriceListNames = new List<MultilanguageText>
             {
                 new MultilanguageText("de-DE", internalProductPriceList.PriceListName)
-            };
+            };          
+            
             StartDate = internalProductPrice.StartDate;
             Price = internalProductPrice.Value;
             CurrencyValue = internalProductPrice.CurrencySymbol;

@@ -1,9 +1,11 @@
-﻿namespace CCCategoryService.Dtos.Enums
+﻿using System.Runtime.CompilerServices;
+
+namespace CCApiLibrary.Enums
 {
     /// <summary>
         /// The types used for category pools
         /// </summary>
-    public enum CategoryPoolType
+    public enum  CategoryPoolType
     {
         /// <summary>
                 /// The pool type category (single select, e.g. Warengruppen)
@@ -18,5 +20,11 @@
                                          /// The pool type menu plan (menu plan selections)
                                          /// </summary>
         PoolTypeMenuPlan = 4,
+
+
+
     }
+
+
+
 }

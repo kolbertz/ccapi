@@ -38,7 +38,7 @@ namespace CCProductPriceService.Controllers
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return StatusCode(500);
@@ -111,24 +111,31 @@ namespace CCProductPriceService.Controllers
         [ServiceFilter(typeof(ValidateModelAttribute))]
         public async Task<IActionResult> Put(Guid id, [ModelBinder] ProductPriceList productDto)
         {
-            if (id != productDto.Id)
+            try
             {
-                return BadRequest("The id inside the body do not match the query parameter");
-            }
-            UserClaim userClaim = null;
-            if (HttpContext.User.Claims != null)
-            {
-                userClaim = new UserClaim(HttpContext.User.Claims);
-            }
-
-            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
-            {
-                productPriceListRepository.Init(userClaim.TenantDatabase);
-                if (await productPriceListRepository.UpdateProductPriceListAsync(productDto, userClaim).ConfigureAwait(false) > 0)
+                if (id != productDto.Id)
                 {
-                    return NoContent();
+                    return BadRequest("The id inside the body do not match the query parameter");
                 }
-                return NotFound();
+                UserClaim userClaim = null;
+                if (HttpContext.User.Claims != null)
+                {
+                    userClaim = new UserClaim(HttpContext.User.Claims);
+                }
+
+                using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
+                {
+                    productPriceListRepository.Init(userClaim.TenantDatabase);
+                    if (await productPriceListRepository.UpdateProductPriceListAsync(productDto, userClaim).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    return NotFound();
+                }
+            }
+            catch(Exception) 
+            {
+                return StatusCode(500);
             }
         }
 
@@ -137,6 +144,8 @@ namespace CCProductPriceService.Controllers
         [SwaggerOperation("Patch a ProductPriceList")]
         public async Task<IActionResult> Patch(Guid id, JsonPatchDocument jsonPatch)
         {
+            try 
+            { 
             ProductPriceList dto;
             UserClaim userClaim = null;
             if (HttpContext.User.Claims != null)
@@ -144,20 +153,21 @@ namespace CCProductPriceService.Controllers
                 userClaim = new UserClaim(HttpContext.User.Claims);
             }
 
-            using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
-            {
-                productPriceListRepository.Init(userClaim.TenantDatabase);
-                dto = await productPriceListRepository.PatchProductPriceList(id, jsonPatch, userClaim).ConfigureAwait(false);
-                if (dto != null)
+                using (IProductPriceListRepository productPriceListRepository = _serviceProvider.GetService<IProductPriceListRepository>())
                 {
-                    return NoContent();
+                    productPriceListRepository.Init(userClaim.TenantDatabase);
+                    dto = await productPriceListRepository.PatchProductPriceList(id, jsonPatch, userClaim).ConfigureAwait(false);
+                    if (dto != null)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
-                else
-                {
-                    return NotFound();
-                }
-
             }
+            catch (Exception) { return StatusCode(500); }
         }
 
         [HttpDelete]
@@ -166,19 +176,25 @@ namespace CCProductPriceService.Controllers
         [SwaggerOperation("Delete a ProductPriceList")]
         public async Task<IActionResult> Delete(Guid id)
         {
-
-            UserClaim userClaim = GetUserClaim();
-            using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
+            try
             {
-                repo.Init(userClaim.TenantDatabase);
-                if (await _serviceProvider.GetService<IProductPriceListRepository>().DeletePriceListAsync(id).ConfigureAwait(false) > 0)
+                UserClaim userClaim = GetUserClaim();
+                using (IProductPriceListRepository repo = _serviceProvider.GetService<IProductPriceListRepository>())
                 {
-                    return NoContent();
+                    repo.Init(userClaim.TenantDatabase);
+                    if (await _serviceProvider.GetService<IProductPriceListRepository>().DeletePriceListAsync(id).ConfigureAwait(false) > 0)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
-                else
-                {
-                    return NotFound();
-                }
+            }
+            catch (Exception) 
+            { 
+                return StatusCode(500);
             }
         }
     }

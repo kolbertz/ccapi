@@ -56,11 +56,7 @@ namespace CCCategoryService.Repositories
                 "LEFT JOIN Category ON CategoryString.CategoryId = Category.Id " +
                 "LEFT JOIN CategoryPool ON Category.CategoryPoolId = CategoryPool.Id " +
                 " WHERE CategoryPool.Id= @CategoryPoolId";
-            //InternalCategoryPool internalCategoryPool = await _dbContext.QueryFirstOrDefaultAsync<InternalCategoryPool>(query, param:new {CategoryPoolId = id }).ConfigureAwait(false); 
-            //if (internalCategoryPool != null)
-            //{ 
-            //    return new CategoryPoolWithCategoryList();
-            //}
+            
             CategoryPoolWithCategoryList withCategoryList = await _dbContext.QueryFirstOrDefaultAsync<CategoryPoolWithCategoryList>(query, param: new { CategoryPoolId = id }).ConfigureAwait(false);
             return withCategoryList;
         }
@@ -116,6 +112,10 @@ namespace CCCategoryService.Repositories
             var query = "DELETE FROM CategoryPool WHERE Id = @Id";
             return _dbContext.ExecuteAsync(query, param: new { Id = id });
         }
+        private static void ConvertCategoryPoolTypes() 
+        { 
 
+        
+        }
     }
 }
