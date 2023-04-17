@@ -232,7 +232,7 @@ namespace CCProductService.Repositories
                 poolType = (int)CategoryPoolType.PoolTypeMenuPlan;
             }
 
-            var query = "SELECT CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory " +
+            var query = "SELECT Category.CategoryPoolId, CategoryString.CategoryId, CategoryName, Culture FROM ProductCategory " +
                 "JOIN CategoryString ON ProductCategory.CategoryId = CategoryString.CategoryId " +
                 "JOIN Category ON CategoryString.CategoryId = Category.Id " +
                 "JOIN CategoryPool ON Category.CategoryPoolId = CategoryPool.Id " +
@@ -242,6 +242,7 @@ namespace CCProductService.Repositories
             return categoryStrings.GroupBy(cs => cs.CategoryId).Select(c => new ProductCategory
             {
                 CategoryId = c.Key,
+                CategoryPoolId = c.FirstOrDefault().CategoryPoolId,
                 CategoryNames = c.Select(x => new MultilanguageText
                 {
                     Culture = x.Culture,
@@ -478,7 +479,7 @@ namespace CCProductService.Repositories
             return (sysIdQuery, paramObj);
         }
 
-        public Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory, UserClaim userClaim)
+        public Task<Guid> SetCategoryByProductId(Guid id, ProductCategory productCategory,CategoryPoolType categoryPoolType, UserClaim userClaim)
         {
            
             var query = "INSERT INTO ProductCategory( ProductId, CategoryId) " +
