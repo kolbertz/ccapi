@@ -207,7 +207,7 @@ namespace CCProductService.Repositories
 
         }
 
-        public async Task<IEnumerable<ProductCategory>> GetCategoriesAsnyc(Guid id,CategoryPoolType categoryPoolType, UserClaim userClaim)
+        public async Task<IEnumerable<ProductCategory>> GetCategoriesAsync(Guid id,CategoryPoolType categoryPoolType, UserClaim userClaim)
         {
 
             int poolType = new int();
@@ -485,7 +485,7 @@ namespace CCProductService.Repositories
             var query = "INSERT INTO ProductCategory( ProductId, CategoryId) " +
                 "OUTPUT Inserted.Id " +
                 "VALUES( @ProductId, @CategoryId);";
-           // InternalProductPrice internalProductPrice = new InternalProductPrice(productCategory);
+            // InternalProductPrice internalProductPrice = new InternalProductPrice(productCategory);
             return _dbContext.ExecuteScalarAsync<Guid>(query,  productCategory );
 
 

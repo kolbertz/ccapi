@@ -1,4 +1,5 @@
 ﻿using CCApiLibrary.Interfaces;
+using CCApiLibrary.Models;
 using CCApiTestLibrary.BaseClasses;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -111,8 +112,14 @@ namespace CCProductPoolServiceTest
                     CreateBasicClientWithAuth(client);
                     ProductPool productPool = new ProductPool
                     {
-                        Description = "ApiController Test Pool",
-                        Name = "ApiController Test Pool",
+                        Descriptions = new List<MultilanguageText>
+                        { 
+                            new MultilanguageText("de-DE","ApiController Test Pool")
+                        },
+                        Names = new List<MultilanguageText>
+                        { 
+                            new MultilanguageText("de-DE","ApiController Test Pool")
+                        },
                         Key = 1,
                         SystemSettingsId = StaticTestGuids.SystemSettingsId
                     };
@@ -193,8 +200,14 @@ namespace CCProductPoolServiceTest
                     ProductPool productPool = new ProductPool
                     {
                         Id = productPoolId,
-                        Description = "ApiController Put Test Pool",
-                        Name = "ApiController Put Test Pool",
+                        Descriptions = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
+                        Names = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
                         Key = 2,
                         SystemSettingsId = StaticTestGuids.SystemSettingsId
                     };
@@ -327,8 +340,14 @@ namespace CCProductPoolServiceTest
                     ProductPool productPool = new ProductPool
                     {
                         Id = new Guid("6bbd2f72-94a9-453b-aa28-cff702e8fa4a"),
-                        Description = "ApiController Put Test Pool",
-                        Name = "ApiController Put Test Pool",
+                        Descriptions = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
+                        Names = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
                         Key = 2,
                         SystemSettingsId = StaticTestGuids.SystemSettingsId
                     };
@@ -406,7 +425,7 @@ namespace CCProductPoolServiceTest
             {
                 ProductPool productPool = new ProductPool
                 {
-                    Name = "ApiController Test Pool",
+                    Names = new List<MultilanguageText> { new MultilanguageText("de-DE", "ApiController Test Pool") },
                     SystemSettingsId = StaticTestGuids.SystemSettingsId
                 };
                 HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(productPool), Encoding.UTF8, "application/json");
@@ -433,8 +452,14 @@ namespace CCProductPoolServiceTest
                     ProductPool productPool = new ProductPool
                     {
                         Id = new Guid("82a4252e-c58f-49d0-8476-b7e1a5fa4b11"),
-                        Description = "ApiController Put Test Pool",
-                        Name = "ApiController Put Test Pool",
+                        Descriptions = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
+                        Names = new List<MultilanguageText>
+                        {
+                            new MultilanguageText("de-DE","ApiController Put Test Pool")
+                        },
                         Key = 2,
                         SystemSettingsId = StaticTestGuids.SystemSettingsId
                     };

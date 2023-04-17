@@ -269,7 +269,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeCategory, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsync(id,CategoryPoolType.PoolTypeCategory, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
@@ -583,7 +583,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeTax, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsync(id,CategoryPoolType.PoolTypeTax, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
@@ -616,7 +616,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeTags, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsync(id,CategoryPoolType.PoolTypeTags, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
@@ -648,7 +648,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsync(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
@@ -680,7 +680,7 @@ namespace CCProductService.Controller
                 using (IProductRepository productRepository = _serviceProvider.GetService<IProductRepository>())
                 {
                     productRepository.Init(userClaim.TenantDatabase);
-                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsnyc(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
+                    IEnumerable<ProductCategory> productCategories = await productRepository.GetCategoriesAsync(id,CategoryPoolType.PoolTypeMenuPlan, userClaim).ConfigureAwait(false);
                     if (productCategories != null && productCategories.Count() > 0)
                     {
                         return Ok(productCategories);
