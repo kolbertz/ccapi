@@ -8,11 +8,11 @@ namespace CCApiTestLibrary.PopulateQueries
 {
     public static class ProductQueries
     {
-        public static string PopulateSingleProduct(int key)
+        public static string PopulateSingleProduct(int key, Guid poolId)
         {
             return "INSERT INTO Product(ProductKey, IsBlocked, Balance, CreatedDate, CreatedUser, LastUpdatedDate, LastUpdatedUser, ProductPoolId, ProductType) " +
                 "OUTPUT Inserted.Id " +
-                $"VALUES({key}, 0, 0, GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', 'fab8c985-6147-4eba-b2c7-5f7012c4aeeb', 0)";
+                $"VALUES({key}, 0, 0, GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', GetDate(), '1f11e600-4b51-4ae5-9feb-d372d096acb4', '{poolId}', 0)";
         }
 
         public static string PopulateProductStringsForSingleProduct(Guid productId, string text)

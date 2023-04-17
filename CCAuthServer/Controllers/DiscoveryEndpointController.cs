@@ -1,4 +1,5 @@
 ﻿using CCAuthServer.Endpoints;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CCAuthServer.Controllers

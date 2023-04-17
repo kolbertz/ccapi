@@ -1,4 +1,5 @@
-﻿using CCAuthServer.Models;
+﻿using CCAuthServer.Context;
+using CCAuthServer.Models;
 using CCAuthServer.OauthRequest;
 
 namespace CCAuthServer.Services.CodeService
@@ -8,7 +9,7 @@ namespace CCAuthServer.Services.CodeService
         string GenerateAuthorizationCode(Client client, IList<string> requestedScope);
         AuthorizationCode GetClientDataByCode(string key);
         AuthorizationCode RemoveClientDataByCode(string key);
-        AuthorizationCode UpdatedClientDataByCode(OpenIdConnectLoginRequest loginRequest);
+        Task<AuthorizationCode> UpdatedClientDataByCode(OpenIdConnectLoginRequest loginRequest, UserData userData);
 
     }
 }

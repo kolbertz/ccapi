@@ -71,7 +71,7 @@ namespace CCProductService.Repositories
                     $"FROM (SELECT prod.Id, prod.ProductPoolId, prod.ProductKey, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, ProductPriceDate.Value, " +
                     $"ROW_NUMBER() OVER (Partition by prod.Id order by StartDate desc) as row " +
                     $"FROM (SELECT Product.Id, Product.ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue " +
-                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery} order by Product.ProductKey{skipQuery}{takeQuery}) as prod " +
+                    $"FROM Product JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery} order by Product.ProductKey{skipQuery}{takeQuery}) as prod " +
                     $"LEFT JOIN ProductPrice ON prod.Id = ProductPrice.ProductId LEFT JOIN ProductPricePoolToPriceList ON ProductPricePoolToPriceList.ProductPricePoolId = ProductPrice.ProductPricePoolId " +
                     $"LEFT JOIN ProductPriceDate ON ProductPriceDate.ProductPriceId = ProductPrice.Id WHERE ProductPricePoolToPriceList.IsDefault = 1 OR ProductPricePoolToPriceList.IsDefault IS NULL) as temp " +
                     $"LEFT JOIN ProductString on ProductString.ProductId = temp.Id where temp.row = 1";
@@ -84,7 +84,7 @@ namespace CCProductService.Repositories
                     $"FROM (SELECT prod.Id, prod.ProductPoolId, prod.ProductKey, prod.IsBlocked, prod.Balance, prod.BalanceTare, prod.BalancePriceUnit, prod.BalancePriceUnitValue, ProductPriceDate.Value, " +
                     $"ROW_NUMBER() OVER (Partition by prod.Id order by StartDate desc) as row " +
                     $"FROM (SELECT Product.Id, Product.ProductKey, Product.ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue " +
-                    $"FROM Product LEFT JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery}) as prod " +
+                    $"FROM Product JOIN ProductPool ON ProductPool.Id = Product.ProductPoolId{sysIdQuery}{productPoolQuery}) as prod " +
                     $"LEFT JOIN ProductPrice ON prod.Id = ProductPrice.ProductId LEFT JOIN ProductPricePoolToPriceList ON ProductPricePoolToPriceList.ProductPricePoolId = ProductPrice.ProductPricePoolId " +
                     $"LEFT JOIN ProductPriceDate ON ProductPriceDate.ProductPriceId = ProductPrice.Id WHERE ProductPricePoolToPriceList.IsDefault = 1 OR ProductPricePoolToPriceList.IsDefault IS NULL) as temp " +
                     $"LEFT JOIN ProductString on ProductString.ProductId = temp.Id where temp.row = 1";
@@ -128,7 +128,7 @@ namespace CCProductService.Repositories
             string query = $"SELECT Product.Id, ProductKey, ProductPoolId, Product.IsBlocked, Product.Balance, Product.BalanceTare, Product.BalancePriceUnit, Product.BalancePriceUnitValue, ProductString.ProductId, ProductString.Language, ProductString.ShortName, " +
                 $"ProductString.LongName, ProductString.Description FROM Product JOIN ProductString on Product.Id = ProductString.ProductId " +
                 $"JOIN ProductPool ON Product.ProductPoolId = ProductPool.Id" +
-                $"WHERE Product.Id = @ProductId{sysIdQuery}{productPoolQuery}";
+                $" WHERE Product.Id = @ProductId{sysIdQuery}{productPoolQuery}";
 
             paramObj.TryAdd("ProductId", id);
 

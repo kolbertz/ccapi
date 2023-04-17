@@ -41,13 +41,15 @@ namespace CCApiGateway
             builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
             builder.Services.AddAuthorization();
+            ProgramMainHelper.AddCors(builder.Services);
 
             var app = builder.Build();
             app.UseSwaggerForOcelotUI(opt =>
             {
                 opt.PathToSwaggerGenerator = "/swagger/docs";
             });
-
+            ProgramMainHelper.UseCors(app);
+            app.UsePreflightRequestHandler();
             app.UseHttpsRedirection();
 
             app.UseOcelot().Wait();

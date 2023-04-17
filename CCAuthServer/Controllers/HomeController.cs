@@ -4,6 +4,9 @@ using CCAuthServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using CCAuthServer.Context;
 using System.Web.Helpers;
+using System.Net;
+using CCAuthServer.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace CCAuthServer.Controllers
 {
@@ -48,13 +51,15 @@ namespace CCAuthServer.Controllers
             // here I have to check if the username and passowrd is correct
             // and I will show you how to integrate the ASP.NET Core Identity
             // With our framework
-            UserData userData = await _userRepository.GetUserData(loginRequest.UserName, loginRequest.Password);
+            UserData userData = await _userRepository.GetUserData(loginRequest.UserName, loginRequest.SystemSettingId);
             string pwdValue = loginRequest.Password + (userData.OldSaltKey ?? "mb3XdW5fN0ztctuJKbUv7XhD16") + "ePK2kOIZTDMePvPY0Yxb" + userData.Id.ToString();
             string encodePwd = string.IsNullOrEmpty(loginRequest.Password) ? string.Empty : Crypto.SHA256(pwdValue);
 
-            if (string.CompareOrdinal(userData.Password, encodePwd) == 0)
+            int compared = string.CompareOrdinal(userData.Password.ToUpper(), encodePwd.ToUpper());
+
+            if (!string.IsNullOrEmpty(userData.Password) && compared == 0)
             {
-                var result = _codeStoreService.UpdatedClientDataByCode(loginRequest);
+                AuthorizationCode result = await _codeStoreService.UpdatedClientDataByCode(loginRequest, userData).ConfigureAwait(false);
                 if (result != null)
                 {
 
@@ -62,7 +67,7 @@ namespace CCAuthServer.Controllers
                     return Redirect(loginRequest.RedirectUri);
                 }
             }
-            return RedirectToAction("Error", new { error = "invalid_request" });
+            return RedirectToAction("Error", new { error = $"invalid_request: pwdValue: {pwdValue} - encodePwd: {encodePwd} - userData.Password: {userData.Password} - COMPARED: {compared} - CODE: {loginRequest.Code}" });
         }
 
         public IActionResult Authorize(AuthorizationRequest authorizationRequest)

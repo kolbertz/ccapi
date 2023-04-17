@@ -70,7 +70,7 @@ namespace CCApiLibrary.Helper
                             AuthorizationUrl = new Uri(@"http://20.103.171.17:80/Authorize"),
                         }
                     },
-                    Scheme = "gloabalAuth",
+                    Scheme = "globalAuth",
                     In = ParameterLocation.Header,
                     Description = "JSON Web Token based security"
                 });
@@ -102,8 +102,8 @@ namespace CCApiLibrary.Helper
             .AddJwtBearer("monolithAuth", options =>
             {
                 options.Audience = "all";
-                options.ClaimsIssuer = "localhost";
-                options.Authority = "http://localhost:7298";
+                options.ClaimsIssuer = "cashcontrol";
+                options.Authority = "ccapi";
                 options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
                 {
                     AuthorizationEndpoint = @"https://staging-signin.cashcontrol.com/OAuth/Authorize\",
@@ -119,11 +119,11 @@ namespace CCApiLibrary.Helper
                     ValidAudience = configuration["TokenAuthentication:Audience"],
                     IssuerSigningKey = signingKey
                 };
-            }).AddJwtBearer("gloabalAuth", options =>
+            }).AddJwtBearer("globalAuth", options =>
             {
                 options.Audience = "all";
-                options.ClaimsIssuer = "localhost";
-                options.Authority = "http://20.103.171.17:80";
+                options.ClaimsIssuer = "cashcontrol";
+                options.Authority = "ccapi";
                 options.Configuration = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration
                 {
                     //AuthorizationEndpoint = @"https://localhost:7092/Home/Authorize\",
@@ -157,7 +157,7 @@ namespace CCApiLibrary.Helper
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes("monolithAuth", "gloabalAuth")
+                    .AddAuthenticationSchemes("monolithAuth", "globalAuth")
                     .Build();
             });
         }
@@ -174,12 +174,22 @@ namespace CCApiLibrary.Helper
             });
         }
 
+        public static void AddCors(IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllHeaders",
+                    builder => {
+                        builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                    });
+            });
+        }
+
         public static void UseCors(WebApplication app)
         {
-            app.UseCors(builder => builder
-             .AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader());
+            app.UseCors("AllowAllHeaders");
         }
     }
 }

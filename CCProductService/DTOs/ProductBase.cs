@@ -22,8 +22,8 @@ namespace CCProductService.DTOs
 
     }
     public class ProductBase 
-    {      
-
+    {
+        [Required]
         public Guid? ProductPoolId { get; set; }
 
         [Required]

@@ -41,8 +41,6 @@ public class Program
         // Configure the HTTP request pipeline.
         ProgramMainHelper.AddSwaggerUi(app, configuration);
 
-        ProgramMainHelper.UseCors(app);
-
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

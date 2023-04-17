@@ -1,4 +1,5 @@
-﻿using CCAuthServer.Models;
+﻿using CCAuthServer.Context;
+using CCAuthServer.Models;
 using CCAuthServer.OauthRequest;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Concurrent;
@@ -10,6 +11,12 @@ namespace CCAuthServer.Services.CodeService
     {
         private readonly ConcurrentDictionary<string, AuthorizationCode> _codeIssued = new ConcurrentDictionary<string, AuthorizationCode>();
         private readonly ClientStore _clientStore = new ClientStore();
+        IServiceProvider _serviceProvider;
+
+        public CodeStoreService(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
 
         // Here I genrate the code for authorization, and I will store it 
         // in the Concurrent Dictionary
@@ -57,16 +64,16 @@ namespace CCAuthServer.Services.CodeService
         // Before updated the Concurrent Dictionary I have to Process User Sign In,
         // and check the user credienail first
         // But here I merge this process here inside update Concurrent Dictionary method
-        public AuthorizationCode UpdatedClientDataByCode(OpenIdConnectLoginRequest loginRequest)
+        public async Task<AuthorizationCode> UpdatedClientDataByCode(OpenIdConnectLoginRequest loginRequest, UserData userData)
         {
             //loginRequest.Code, loginRequest.RequestedScopes,
             //        loginRequest.UserName, nonce: loginRequest.Nonce, systemSettingsId: loginRequest.SystemSettingId
-            var oldValue = GetClientDataByCode(loginRequest.Code);
+            AuthorizationCode oldValue = GetClientDataByCode(loginRequest.Code);
 
             if (oldValue != null)
             {
                 // check the requested scopes with the one that are stored in the Client Store 
-                var client = _clientStore.Clients.Where(x => x.ClientId == oldValue.ClientId).FirstOrDefault();
+                Client client = _clientStore.Clients.Where(x => x.ClientId == oldValue.ClientId).FirstOrDefault();
 
                 if (client != null)
                 {
@@ -95,8 +102,22 @@ namespace CCAuthServer.Services.CodeService
 
                     // ------------------ I suppose the user name and password is correct  -----------------
                     var claims = new List<Claim>();
-
-                    claims.Add(new Claim("Tenant", loginRequest.SystemSettingId.ToString()));
+                    //claims_at.Add(new Claim("SystemId", "f2a46b64-ab2e-47b1-84fe-8cc91b241165"));
+                    //claims_at.Add(new Claim("UserGroupId", "05e652ff-c4b6-4966-8da4-08cb9d102081"));
+                    List<Guid> ids = null;
+                    using (IServiceScope service = _serviceProvider.CreateScope())
+                    {
+                        ids = await service.ServiceProvider.GetService<IUserRepository>().GetUserClaims(userData, loginRequest.TenantDatabase).ConfigureAwait(false);
+                    }
+                    if (ids != null)
+                    {
+                        claims.Add(new Claim("UserGroupId", ids[0].ToString()));
+                        claims.Add(new Claim("ProductPoolId", ids[1].ToString()));
+                        claims.Add(new Claim("CategoryPoolId", ids[2].ToString()));
+                    }
+                    claims.Add(new Claim("UserId", userData.Id.ToString()));
+                    claims.Add(new Claim("TenantId", loginRequest.SystemSettingId.ToString()));
+                    claims.Add(new Claim("SystemId", loginRequest.SystemSettingId.ToString()));
                     claims.Add(new Claim("TenantDatabase", loginRequest.TenantDatabase));
 
                     if (newValue.IsOpenId)
