@@ -651,14 +651,17 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId, productPoolId, categoryPoolId;
+                    Guid productId,categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Warengruppen", 1));
-
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+                        
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
                     HttpClient client = application.CreateClient();
@@ -678,11 +681,16 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
                     }
                 }
             }
 
         }
+        [Fact]
         public async void GetProduct_PoolTypeTags_200_and_Item_if_successfull()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -690,13 +698,17 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId, productPoolId, categoryPoolId ;
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
+
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Essenskomponenten", 2));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -717,10 +729,15 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
                     }
                 }
             }
         }
+        [Fact]
         public async void GetProduct_PoolTypeTaxes_200_and_Item_if_successfull()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
@@ -728,13 +745,17 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId, productPoolId, categoryPoolId;
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
+
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Sondersteuer", 3));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -755,10 +776,15 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
                     }
                 }
             }
         }
+        [Fact]
         public async void GetProduct_PoolTypeMenuPlan_200_and_Item_if_successfull()
         {
             WebApplicationFactory<Program> application = GetWebApplication();
