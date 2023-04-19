@@ -351,7 +351,7 @@ namespace CCProductService.Controller
         }
 
         [HttpGet]
-        [Route("{id}/history")]
+        [Route("{id}/pricings/history")]
         [SwaggerOperation("Get a history of prices for the product")]
         public async Task<IActionResult> GetPricingHistory(Guid id, string startDate, string endDate)
         {
@@ -536,6 +536,7 @@ namespace CCProductService.Controller
         }
 
         [HttpPut]
+        [Route("{id}/categories")]
         [SwaggerOperation("Updates Category By ProductID")]
         public async Task<IActionResult> UpdateCategoryByProductId(Guid id, [ModelBinder] ProductCategory productCategory)
         {
@@ -903,13 +904,6 @@ namespace CCProductService.Controller
                 }
 
             }
-
         }
-
-
-
-
-
     }
-
 }

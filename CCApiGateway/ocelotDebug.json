@@ -96,6 +96,188 @@
       "SwaggerKey": "product"
     },
     {
+      "UpstreamPathTemplate": "/product/{id}/categories",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/categories",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/taxes",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/taxes",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/taxes",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/taxes",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/taxes",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/tags",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/tags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/tags",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/tags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/tags",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/tags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/allergens",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/allergens",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/allergens",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/allergens",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/allergens",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/allergens",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/additives",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/additives",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/additives",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/categories",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
       "UpstreamPathTemplate": "/product/{id}/barcodes",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}/barcodes",
@@ -151,6 +333,19 @@
       "UpstreamPathTemplate": "/product/{id}/pricings",
       "UpstreamHttpMethod": [ "Delete" ],
       "DownstreamPathTemplate": "/api/v2/product/{id}/pricings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7298
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+    {
+      "UpstreamPathTemplate": "/product/{id}/pricings/history",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/v2/product/{id}/pricings/history",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
