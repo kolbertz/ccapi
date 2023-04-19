@@ -1,4 +1,5 @@
-﻿using CCProductPoolService.Data;
+﻿using CCApiLibrary.Models;
+using CCProductPoolService.Data;
 using System.ComponentModel.DataAnnotations;
 
 namespace CCProductPoolService.Dtos
@@ -10,9 +11,9 @@ namespace CCProductPoolService.Dtos
         public int? Key { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public List<MultilanguageText> Names { get; set; }
 
-        public string Description { get; set; }
+        public List<MultilanguageText> Descriptions { get; set; }
 
         public Guid? ParentProductPool { get; set; }
 
@@ -26,8 +27,14 @@ namespace CCProductPoolService.Dtos
             if (internalProductPool != null)
             {                
                 Key = internalProductPool.ProductPoolKey;
-                Name = internalProductPool.Name;
-                Description = internalProductPool.Description;
+                Names = new List<MultilanguageText>
+            {
+                new MultilanguageText("de-DE", internalProductPool.Name)
+            };
+                Descriptions = new List<MultilanguageText>
+            {
+                new MultilanguageText ("de-DE", internalProductPool.Description)
+            };
                 ParentProductPool = internalProductPool.ParentProductPoolId;
                 SystemSettingsId = internalProductPool.SystemSettingsId;
             }

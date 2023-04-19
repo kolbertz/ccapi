@@ -159,7 +159,7 @@ namespace CCProductServiceTest
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
-                    var respone = await client.GetAsync("/api/v2/product/" + productId);
+                    var respone = await client.GetAsync($"/api/v2/product/{productId}");
                     string messsage = await respone.Content.ReadAsStringAsync();
                     dynamic product = JObject.Parse(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
@@ -536,7 +536,7 @@ namespace CCProductServiceTest
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         for (int i = 0; i < 3; i++)
                         {
-                            await dbConnection.ExecuteAsync(ProductQueries.SetPriductBarcode(productId, "Barcode" + i));
+                            await dbConnection.ExecuteAsync(ProductQueries.SetProductBarcode(productId, "Barcode" + i));
                         }
                     }
                     HttpClient client = application.CreateClient();
@@ -637,6 +637,186 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPrices());
                         await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPriceLists());
                         await dbConnection.ExecuteAsync(ProductPriceQueries.DeleteProductPricePools());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                    }
+                }
+            }
+        }
+        [Fact]
+        public async void GetProduct_PoolTypeCategory_200_and_Item_if_successfull() 
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId,categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Warengruppen", 1));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+                        
+                        await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    var respone = await client.GetAsync($"/api/v2/product/{productId}/categories");
+                    string messsage = await respone.Content.ReadAsStringAsync();
+                    dynamic product = JObject.Parse(messsage);
+                    Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
+                    Assert.Equal(1, (int)product.key);
+                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
+                    }
+                }
+            }
+
+        }
+        [Fact]
+        public async void GetProduct_PoolTypeTags_200_and_Item_if_successfull()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
+
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Essenskomponenten", 2));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+
+                        await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    var respone = await client.GetAsync($"/api/v2/product/{productId}/tags");
+                    string messsage = await respone.Content.ReadAsStringAsync();
+                    dynamic product = JObject.Parse(messsage);
+                    Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
+                    Assert.Equal(1, (int)product.key);
+                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
+                    }
+                }
+            }
+        }
+        [Fact]
+        public async void GetProduct_PoolTypeTaxes_200_and_Item_if_successfull()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
+
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Sondersteuer", 3));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+
+                        await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    var respone = await client.GetAsync($"/api/v2/product/{productId}/tags");
+                    string messsage = await respone.Content.ReadAsStringAsync();
+                    dynamic product = JObject.Parse(messsage);
+                    Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
+                    Assert.Equal(1, (int)product.key);
+                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
+                        await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
+                    }
+                }
+            }
+        }
+        [Fact]
+        public async void GetProduct_PoolTypeMenuPlan_200_and_Item_if_successfull()
+        {
+            WebApplicationFactory<Program> application = GetWebApplication();
+            using (IServiceScope services = application.Services.CreateScope())
+            {
+                try
+                {
+                    Guid productId, productPoolId, categoryPoolId;
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Allergene", 4));
+
+                        await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
+                    }
+                    HttpClient client = application.CreateClient();
+                    CreateBasicClientWithAuth(client);
+                    var respone = await client.GetAsync($"/api/v2/product/{productId}/tags");
+                    string messsage = await respone.Content.ReadAsStringAsync();
+                    dynamic product = JObject.Parse(messsage);
+                    Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
+                    Assert.Equal(1, (int)product.key);
+                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                }
+                finally
+                {
+                    using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
+                    {
+                        dbConnection.Init(databaseKey);
+                        await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
                     }

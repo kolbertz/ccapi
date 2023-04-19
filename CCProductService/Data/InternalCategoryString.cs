@@ -7,6 +7,8 @@ public partial class InternalCategoryString
 {
     public Guid Id { get; set; }
 
+    public Guid CategoryPoolId { get; set; }
+
     public string Culture { get; set; }
 
     public string CategoryName { get; set; }

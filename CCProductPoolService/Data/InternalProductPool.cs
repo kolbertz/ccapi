@@ -35,8 +35,14 @@ public partial class InternalProductPool
     public InternalProductPool(ProductPoolBase productPool) 
     {        
         ProductPoolKey = productPool.Key.Value;
-        Name = productPool.Name;
-        Description = productPool.Description;
+        if (productPool.Names != null && productPool.Names.Count > 0)
+        {
+            Name = productPool.Names.First().Text;
+        }        
+        if (productPool.Descriptions != null && productPool.Descriptions.Count > 0)
+        {
+            Name = productPool.Descriptions.First().Text;
+        } 
         ParentProductPoolId = productPool.ParentProductPool;
         SystemSettingsId = productPool.SystemSettingsId.Value;
     }
@@ -45,8 +51,15 @@ public partial class InternalProductPool
     {
         Id = productPoolDto.Id;
         ProductPoolKey = productPoolDto.Key.Value;
-        Name = productPoolDto.Name;
-        Description = productPoolDto.Description;
+
+        if (productPoolDto.Names != null && productPoolDto.Names.Count > 0)
+        {
+            Name = productPoolDto.Names.First().Text;
+        }
+        if (productPoolDto.Descriptions != null && productPoolDto.Descriptions.Count > 0)
+        {
+            Name = productPoolDto.Descriptions.First().Text;
+        }
         ParentProductPoolId = productPoolDto.ParentProductPool;
         SystemSettingsId = productPoolDto.SystemSettingsId.Value;
     }

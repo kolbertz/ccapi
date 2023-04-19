@@ -33,7 +33,7 @@ namespace CCApiTestLibrary.PopulateQueries
             return "DELETE FROM ProductString";
         }
 
-        public static string SetPriductBarcode(Guid productId, string barcode)
+        public static string SetProductBarcode(Guid productId, string barcode)
         {
             return $"INSERT INTO ProductBarcode(Barcode, ProductId, Refund) VALUES('{barcode}', '{productId}', 0)";
         }
