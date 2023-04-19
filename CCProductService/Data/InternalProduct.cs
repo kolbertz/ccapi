@@ -10,7 +10,7 @@ public partial class InternalProduct
 
     public int ProductKey { get; set; }
 
-    public decimal Standardprice { get; set; }
+    public decimal? Standardprice { get; set; }
 
     public bool IsBlocked { get; set; }
 
