@@ -74,11 +74,11 @@ namespace CCProductPoolServiceTest
                     CreateBasicClientWithAuth(client);
                     HttpResponseMessage respone = await client.GetAsync("/api/v2/productpool");
                     string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic pools = JArray.Parse(messsage);
+                    List<ProductPool> pools = JsonConvert.DeserializeObject<List<ProductPool>>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
                     Assert.Equal(2, pools.Count);
-                    Assert.Equal(1, (int)pools[0].key);
-                    Assert.Equal("Pool 2", (string)pools[1].name);
+                    Assert.Equal(1, (int)pools[0].Key);
+                    Assert.Equal("Pool 2", pools[1].Names[0].Text);
                 }
                 finally
                 {
@@ -161,10 +161,10 @@ namespace CCProductPoolServiceTest
                     CreateBasicClientWithAuth(client);
                     HttpResponseMessage respone = await client.GetAsync("/api/v2/productpool/" + productPoolId);
                     string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic pool = JObject.Parse(messsage);
+                    ProductPool pool = JsonConvert.DeserializeObject<ProductPool>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
-                    Assert.Equal(1, (int)pool.key);
-                    Assert.Equal("Pool 1", (string)pool.name);
+                    Assert.Equal(1, (int)pool.Key);
+                    Assert.Equal("Pool 1", (string)pool.Names[0].Text);
                 }
                 finally
                 {
@@ -218,10 +218,10 @@ namespace CCProductPoolServiceTest
                     if (response.StatusCode == HttpStatusCode.NoContent)
                     {
                         HttpResponseMessage getResponse = await client.GetAsync("/api/v2/productpool/" + productPoolId);
-                        dynamic patchedPool = JObject.Parse(await getResponse.Content.ReadAsStringAsync());
-                        Assert.Equal(2, (int)patchedPool.key);
-                        Assert.Equal("ApiController Put Test Pool", (string)patchedPool.description);
-                        Assert.Equal("ApiController Put Test Pool", (string)patchedPool.name);
+                        ProductPool patchedPool = JsonConvert.DeserializeObject<ProductPool>(await getResponse.Content.ReadAsStringAsync());
+                        Assert.Equal(2, (int)patchedPool.Key);
+                        Assert.Equal("ApiController Put Test Pool", (string)patchedPool.Descriptions[0].Text);
+                        Assert.Equal("ApiController Put Test Pool", (string)patchedPool.Names[0].Text);
                     }
                 }
                 finally
