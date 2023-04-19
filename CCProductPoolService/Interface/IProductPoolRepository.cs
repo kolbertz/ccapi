@@ -2,6 +2,7 @@
 using CCProductPoolService.Data;
 using CCProductPoolService.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Collections;
 
 namespace CCProductPoolService.Interface
 {

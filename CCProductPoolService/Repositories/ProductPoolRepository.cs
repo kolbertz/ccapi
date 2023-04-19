@@ -28,11 +28,17 @@ namespace CCProductPoolService.Repositories
             _dbContext.Init(database);
         }
 
-        public Task<IEnumerable<ProductPool>> GetProductPoolsAsync(UserClaim userClaim)
+        public async Task<IEnumerable<ProductPool>> GetProductPoolsAsync(UserClaim userClaim)
         {
 
-            var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool";
-            return _dbContext.QueryAsync<ProductPool>(query);
+            var query = "SELECT Id, ProductPoolKey, [Name], Description, ParentProductPoolId, SystemSettingsId FROM ProductPool";
+            IEnumerable<InternalProductPool> internalProductPool = await _dbContext.QueryAsync<InternalProductPool>(query);
+            List<ProductPool> pools = new List<ProductPool>();
+            foreach (var item in internalProductPool)
+            {
+                pools.Add(new ProductPool(item));
+            }
+            return pools;
         }
 
         //public Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim)
@@ -50,6 +56,14 @@ namespace CCProductPoolService.Repositories
             paramObj.TryAdd("Id", id);
 
             return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, paramObj);
+            
+            //IEnumerable<InternalProductPool> internalProductPool = await _dbContext.QueryAsync<InternalProductPool>(query, paramObj);
+            //List<ProductPool> pools = new List<ProductPool>();
+            //foreach (var item in internalProductPool)
+            //{
+            //    pools.Add(new ProductPool(item));
+            //}
+            //return pools;
         }
 
         public Task<Guid> AddProductPoolAsync(ProductPoolBase productPoolDto, UserClaim userClaim)

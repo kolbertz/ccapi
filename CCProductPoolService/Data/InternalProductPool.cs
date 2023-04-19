@@ -27,6 +27,10 @@ public partial class InternalProductPool
 
     public Guid SystemSettingsId { get; set; }
 
+    public InternalProductPool()
+    {
+        
+    }
     public InternalProductPool(ProductPool productPoolDto)
     {
         MergeProductPool(productPoolDto);

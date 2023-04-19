@@ -802,13 +802,16 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId, productPoolId, categoryPoolId;
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Allergene", 4));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -829,6 +832,10 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
                     }
                 }
             }
