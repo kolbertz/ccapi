@@ -4,6 +4,7 @@ using CCApiTestLibrary.BaseClasses;
 using CCApiTestLibrary.Interfaces;
 using CCApiTestLibrary.PopulateQueries;
 using CCProductService.DTOs;
+using CCProductService.DTOs.Enums;
 using CCProductService.Interface;
 using CCProductService.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -64,12 +65,13 @@ namespace CCProductServiceTest
             {
                 try
                 {
+                    Guid productPoolId;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         // Populate DB
-                        Guid productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
-                        Guid productOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
+                        Guid productOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId), 1);
                         Guid productTwo = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(2, productPoolId));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productOne, "Produkt 1"));
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productTwo, "Produkt 2"));
@@ -78,11 +80,16 @@ namespace CCProductServiceTest
                     CreateBasicClientWithAuth(client);
                     var respone = await client.GetAsync("/api/v2/product");
                     string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic products = JArray.Parse(messsage);
+                    List<ProductStandardPrice> products = JsonConvert.DeserializeObject<List<ProductStandardPrice>>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
                     Assert.Equal(2, products.Count);
-                    Assert.Equal(1, (int)products[0].key);
-                    Assert.Equal("Produkt 2", (string)products[1].shortNames[0].text);
+                    Assert.Equal(1, products[0].Key);
+                    Assert.Equal(productPoolId, products[1].ProductPoolId);
+                    Assert.Equal(ProductType.MenuProduct, products[0].ProductType);
+                    Assert.Equal(ProductType.DefaultProduct, products[1].ProductType);
+                    Assert.Equal("Produkt 2", products[1].ShortNames[0].Text);
+                    Assert.Equal("Produkt 1 Lang", products[1].LongNames[0].Text);
+                    Assert.Null(products[0].Standardprice);
                 }
                 finally
                 {
@@ -154,17 +161,20 @@ namespace CCProductServiceTest
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
-                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
+                        productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId), 3);
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
                     var respone = await client.GetAsync($"/api/v2/product/{productId}");
                     string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic product = JObject.Parse(messsage);
+                    ProductBase product = JsonConvert.DeserializeObject<ProductBase>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
-                    Assert.Equal(1, (int)product.key);
-                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                    Assert.Equal(1, product.Key);
+                    Assert.Equal(productPoolId, product.ProductPoolId);
+                    Assert.Equal("Get By Id Test", product.ShortNames[0].Text);
+                    Assert.Equal("Get By Id Test Lang", product.LongNames[0].Text);
+                    Assert.Equal(ProductType.Discount, product.ProductType);
                 }
                 finally
                 {
@@ -660,7 +670,7 @@ namespace CCProductServiceTest
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Warengruppen", 1));
                         categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
                         categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
-                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryId));
                         
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -708,7 +718,7 @@ namespace CCProductServiceTest
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Essenskomponenten", 2));
                         categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
                         categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
-                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -755,7 +765,7 @@ namespace CCProductServiceTest
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Sondersteuer", 3));
                         categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
                         categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
-                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryPoolId));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
