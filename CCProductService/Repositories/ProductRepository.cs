@@ -99,6 +99,7 @@ namespace CCProductService.Repositories
                 {
                     dto = new ProductStandardPrice(p);
                     stringMap.Add(p.Id, dto);
+
                 }
                 dto.SetMultilanguageText(ps);
                 return dto;
