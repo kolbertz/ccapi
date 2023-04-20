@@ -88,7 +88,7 @@ namespace CCProductServiceTest
                     Assert.Equal(ProductType.MenuProduct, products[0].ProductType);
                     Assert.Equal(ProductType.DefaultProduct, products[1].ProductType);
                     Assert.Equal("Produkt 2", products[1].ShortNames[0].Text);
-                    Assert.Equal("Produkt 1 Lang", products[1].LongNames[0].Text);
+                    Assert.Equal("Produkt 1 Lang", products[0].LongNames[0].Text);
                     Assert.Null(products[0].Standardprice);
                 }
                 finally
@@ -677,11 +677,11 @@ namespace CCProductServiceTest
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
                     var respone = await client.GetAsync($"/api/v2/product/{productId}/categories");
-                    string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic product = JObject.Parse(messsage);
+                    string messsage = await respone.Content.ReadAsStringAsync();                   
+                    Product pool = JsonConvert.DeserializeObject<Product>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
-                    Assert.Equal(1, (int)product.key);
-                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                    Assert.Equal(1, (int)pool.Key);
+                    Assert.Equal("Get By Id Test", (string)pool.ShortNames[0].Text);
                 }
                 finally
                 {

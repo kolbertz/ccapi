@@ -39,14 +39,7 @@ namespace CCProductPoolService.Repositories
                 pools.Add(new ProductPool(item));
             }
             return pools;
-        }
-
-        //public Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim)
-        //{
-        //    var query = "SELECT Id, ProductPoolKey as [Key], [Name], Description, ParentProductPoolId as ParentProductPool, SystemSettingsId FROM ProductPool " +
-        //        "WHERE Id = @ProductPoolId";
-        //    return _dbContext.QueryFirstOrDefaultAsync<ProductPool>(query, param: new { ProductPoolId = id });
-        //}
+        }        
 
         public async Task<ProductPool> GetProductPoolByIdAsync(Guid id, UserClaim userClaim)
         {
