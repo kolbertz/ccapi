@@ -27,22 +27,26 @@ public partial class InternalProductPool
 
     public Guid SystemSettingsId { get; set; }
 
+    public InternalProductPool()
+    {
+
+    }
     public InternalProductPool(ProductPool productPoolDto)
     {
         MergeProductPool(productPoolDto);
     }
 
-    public InternalProductPool(ProductPoolBase productPool) 
-    {        
+    public InternalProductPool(ProductPoolBase productPool)
+    {
         ProductPoolKey = productPool.Key.Value;
         if (productPool.Names != null && productPool.Names.Count > 0)
         {
             Name = productPool.Names.First().Text;
-        }        
+        }
         if (productPool.Descriptions != null && productPool.Descriptions.Count > 0)
         {
-            Name = productPool.Descriptions.First().Text;
-        } 
+            Description = productPool.Descriptions.First().Text;
+        }
         ParentProductPoolId = productPool.ParentProductPool;
         SystemSettingsId = productPool.SystemSettingsId.Value;
     }
@@ -58,7 +62,7 @@ public partial class InternalProductPool
         }
         if (productPoolDto.Descriptions != null && productPoolDto.Descriptions.Count > 0)
         {
-            Name = productPoolDto.Descriptions.First().Text;
+            Description = productPoolDto.Descriptions.First().Text;
         }
         ParentProductPoolId = productPoolDto.ParentProductPool;
         SystemSettingsId = productPoolDto.SystemSettingsId.Value;

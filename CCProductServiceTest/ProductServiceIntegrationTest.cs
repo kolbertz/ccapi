@@ -88,7 +88,7 @@ namespace CCProductServiceTest
                     Assert.Equal(ProductType.MenuProduct, products[0].ProductType);
                     Assert.Equal(ProductType.DefaultProduct, products[1].ProductType);
                     Assert.Equal("Produkt 2", products[1].ShortNames[0].Text);
-                    Assert.Equal("Produkt 1 Lang", products[1].LongNames[0].Text);
+                    Assert.Equal("Produkt 1 Lang", products[0].LongNames[0].Text);
                     Assert.Null(products[0].Standardprice);
                 }
                 finally
@@ -677,11 +677,11 @@ namespace CCProductServiceTest
                     HttpClient client = application.CreateClient();
                     CreateBasicClientWithAuth(client);
                     var respone = await client.GetAsync($"/api/v2/product/{productId}/categories");
-                    string messsage = await respone.Content.ReadAsStringAsync();
-                    dynamic product = JObject.Parse(messsage);
+                    string messsage = await respone.Content.ReadAsStringAsync();                   
+                    Product pool = JsonConvert.DeserializeObject<Product>(messsage);
                     Assert.Equal(HttpStatusCode.OK, respone.StatusCode);
-                    Assert.Equal(1, (int)product.key);
-                    Assert.Equal("Get By Id Test", (string)product.shortNames[0].text);
+                    Assert.Equal(1, (int)pool.Key);
+                    Assert.Equal("Get By Id Test", (string)pool.ShortNames[0].Text);
                 }
                 finally
                 {
@@ -802,13 +802,16 @@ namespace CCProductServiceTest
             {
                 try
                 {
-                    Guid productId, productPoolId, categoryPoolId;
+                    Guid productId, categoryId, productPoolId, categoryPoolId, categoryStringOne, productCategoryOne;
                     using (IApplicationDbConnection dbConnection = services.ServiceProvider.GetService<IApplicationDbConnection>())
                     {
                         dbConnection.Init(databaseKey);
                         productPoolId = await dbConnection.ExecuteScalarAsync<Guid>(ProductPoolQueries.PopulateSingleProductPool());
                         productId = await dbConnection.ExecuteScalarAsync<Guid>(ProductQueries.PopulateSingleProduct(1, productPoolId));
                         categoryPoolId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryPoolQueries.PopulateSingleCategoryPool("Allergene", 4));
+                        categoryId = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateSingleCategory(1, categoryPoolId));
+                        categoryStringOne = await dbConnection.ExecuteScalarAsync<Guid>(CategoryQueries.PopulateCategoryStringsForSingleCategory(categoryId, "TestString"));
+                        productCategoryOne = await dbConnection.ExecuteScalarAsync<Guid>(ProductCategoryQueries.PopulateSingleCategory(productId, categoryId));
 
                         await dbConnection.ExecuteAsync(ProductQueries.PopulateProductStringsForSingleProduct(productId, "Get By Id Test"));
                     }
@@ -829,6 +832,10 @@ namespace CCProductServiceTest
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProductStrings());
                         await dbConnection.ExecuteAsync(ProductQueries.DeleteProducts());
                         await dbConnection.ExecuteAsync(ProductPoolQueries.DeleteProductPools());
+                        await dbConnection.ExecuteAsync(CategoryPoolQueries.DeleteCategoryPools());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategories());
+                        await dbConnection.ExecuteAsync(CategoryQueries.DeleteCategoryStrings());
+                        await dbConnection.ExecuteAsync(ProductCategoryQueries.DeleteProductCategories());
                     }
                 }
             }
